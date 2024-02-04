@@ -11,19 +11,8 @@ import { motion } from 'framer-motion'
 import { Fade } from 'react-awesome-reveal'
 
 // UI COMPONENTS
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import Link from 'next/link'
 import {
   calculateTimeDifference,
   getCurrentDate,
@@ -38,7 +27,6 @@ export default function Reservation() {
   // RESERVATION STATE DATA
   const [continueTapped, setContinueTapped] = React.useState(false)
   const [idReservasi, setIdReservasi] = React.useState(generateRandomString)
-  const ref = useRef()
   const [namaReservasi, setNamaReservasi] = React.useState('')
   const [nomorWhatsappReservasi, setNoWhatsappReservasi] = React.useState('')
   const [floorSelected, setFloorSelected] = React.useState('')

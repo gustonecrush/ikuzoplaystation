@@ -69,7 +69,7 @@ module.exports = {
         },
       },
       boxShadow: {
-        md: 'rgba(149, 157, 165, 0.2) 0px 8px 24px;',
+        md: 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',

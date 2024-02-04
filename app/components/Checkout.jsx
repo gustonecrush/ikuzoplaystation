@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import { product } from '../libs/product'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 const Checkout = ({ id, productName, price, detailCustomer }) => {
