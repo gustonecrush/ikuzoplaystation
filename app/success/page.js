@@ -5,7 +5,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen gap-4 px-14">
+    <div className="flex flex-col justify-center items-center min-h-screen gap-4 px-10">
       <Image
         src={'success.png'}
         alt="Successfully Pay"
