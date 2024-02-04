@@ -239,6 +239,7 @@ export default function Reservation() {
                       onChange={(e) => setStartTimeReservasi(e.target.value)}
                       name="tanggal_reservasi"
                       id="tanggal_reservasi"
+                      step="600"
                       placeholder="Masukkan nomor Whatsapp"
                       className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
                       required
@@ -252,6 +253,7 @@ export default function Reservation() {
                       onChange={(e) => setEndTimeReservasi(e.target.value)}
                       name="tanggal_reservasi"
                       id="tanggal_reservasi"
+                      step="600"
                       placeholder="Masukkan nomor Whatsapp"
                       className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
                       required
