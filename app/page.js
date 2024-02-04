@@ -54,12 +54,32 @@ export default function Reservation() {
   const [isLoading, setIsLoading] = React.useState(false)
 
   const handleContinue = () => {
-    window.scrollTo(0, 0)
-    setIsLoading(!isLoading)
-    setContinueTapped(!continueTapped)
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 4000)
+    // Assuming you have some state variables for your input values
+    if (
+      namaReservasi &&
+      nomorWhatsappReservasi &&
+      floorSelected &&
+      tanggalReservasi &&
+      startTimeReservasi &&
+      endTimeReservasi
+    ) {
+      // Scroll to the top of the page
+      window.scrollTo(0, 0)
+
+      // Set isLoading to true
+      setIsLoading(true)
+
+      // Set continueTapped to true
+      setContinueTapped(!continueTapped)
+
+      // Delay setting isLoading back to false by 4 seconds (4000 milliseconds)
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 4000)
+    } else {
+      // Handle case where not all required inputs are filled
+      alert('Please fill in all required inputs.')
+    }
   }
 
   useEffect(() => {
