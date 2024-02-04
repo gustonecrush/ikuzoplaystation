@@ -112,7 +112,7 @@ export default function Reservation() {
                 name="nama"
                 id="nama"
                 placeholder="Masukkan namamu"
-                className="border border-black rounded-full px-3 py-2 active:border-orange"
+                className="border border-black rounded-full px-3 py-2 active:border-orange focus:border-orange"
                 required
               />
             </div>
@@ -127,7 +127,7 @@ export default function Reservation() {
                 name="nomor_whatsapp"
                 id="nomor_whatsapp"
                 placeholder="Masukkan nomor Whatsapp"
-                className="border border-black rounded-full px-3 py-2 active:border-orange"
+                className="border border-black rounded-full px-3 py-2 active:border-orange focus:border-orange"
                 value={nomorWhatsappReservasi}
                 onChange={(e) => setNoWhatsappReservasi(e.target.value)}
                 required
@@ -146,7 +146,7 @@ export default function Reservation() {
                 name="tanggal_reservasi"
                 id="tanggal_reservasi"
                 placeholder="Masukkan nomor Whatsapp"
-                className="border border-black rounded-full px-3 py-2 active:border-orange w-full bg-white"
+                className="border border-black rounded-full px-3 py-2 active:border-orange focus:border-orange w-full bg-white"
                 min={currentDate}
                 max={maxDate}
                 required
@@ -163,7 +163,7 @@ export default function Reservation() {
                 id="lantai_reservasi"
                 placeholder="Masukkan nomor Whatsapp"
                 className="border border-black rounded-full px-3 py-2 
-         active:border-orange w-full bg-white"
+         active:border-orange focus:border-orange w-full bg-white"
                 onChange={(e) => setFloorSelected(e.target.value)}
                 required
               >
@@ -205,7 +205,7 @@ export default function Reservation() {
                   name="tanggal_reservasi"
                   id="tanggal_reservasi"
                   placeholder="Masukkan nomor Whatsapp"
-                  className="border border-black rounded-full px-3 py-2 active:border-orange w-full bg-white"
+                  className="border border-black rounded-full px-3 py-2 active:border-orange focus:border-orange w-full bg-white"
                   required
                 />
               </div>
@@ -218,7 +218,7 @@ export default function Reservation() {
                   name="tanggal_reservasi"
                   id="tanggal_reservasi"
                   placeholder="Masukkan nomor Whatsapp"
-                  className="border border-black rounded-full px-3 py-2 active:border-orange w-full bg-white"
+                  className="border border-black rounded-full px-3 py-2 active:border-orange focus:border-orange w-full bg-white"
                   required
                 />
               </div>

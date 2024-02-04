@@ -17,7 +17,6 @@ export async function POST(request) {
 
   let parameter = {
     item_details: {
-      id: id,
       name: productName,
       price: price,
       quantity: quantity,
