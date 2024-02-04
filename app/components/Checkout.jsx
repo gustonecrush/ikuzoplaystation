@@ -1,65 +1,41 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
+import { product } from '../libs/product'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
-const Checkout = () => {
-  const [quantity, setQuantity] = useState(1);
-
-  const decreaseQuantity = () => {
-    setQuantity((prevState) => (quantity > 1 ? prevState - 1 : null));
-  };
-
-  const increaseQuantity = () => {
-    setQuantity((prevState) => prevState + 1);
-  };
+const Checkout = ({ id, productName, price, detailCustomer }) => {
+  const [quantity, setQuantity] = useState(1)
 
   const checkout = async () => {
-    alert("Checkout SNAP! 🌟")
-  };
+    const data = {
+      id: id,
+      productName: productName,
+      price: price,
+      quantity: quantity,
+      name: detailCustomer.name,
+      phone: detailCustomer.no,
+    }
 
-  const generatePaymentLink = async () => {
-    alert("Checkout Payment Link! 🔥")
-  };
+    const response = await fetch('/api/tokenizer', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+
+    // fetching bawaannya javascript, kita harus begini
+    const requestData = await response.json()
+    window.snap.pay(requestData.token)
+  }
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <div className="flex sm:gap-4">
-          <button
-            className="transition-all hover:opacity-75"
-            onClick={decreaseQuantity}
-          >
-            ➖
-          </button>
-
-          <input
-            type="number"
-            id="quantity"
-            value={quantity}
-            className="h-10 w-16 text-black border-transparent text-center"
-            onChange={quantity}
-          />
-
-          <button
-            className="transition-all hover:opacity-75"
-            onClick={increaseQuantity}
-          >
-            ➕
-          </button>
-        </div>
-        <button
-          className="rounded bg-indigo-500 p-4 text-sm font-medium transition hover:scale-105"
-          onClick={checkout}
-        >
-          Checkout
-        </button>
-      </div>
-      <button
-        className="text-indigo-500 py-4 text-sm font-medium transition hover:scale-105"
-        onClick={generatePaymentLink}
+      <Button
+        onClick={checkout}
+        className="bg-orange rounded-full px-5 py-6 text-base font-jakarta hover:bg-orange"
       >
-        Create Payment Link
-      </button>
+        Pay
+      </Button>
     </>
-  );
-};
+  )
+}
 
-export default Checkout;
+export default Checkout
