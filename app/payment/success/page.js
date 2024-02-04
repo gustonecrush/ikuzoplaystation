@@ -21,9 +21,11 @@ const page = () => {
           Playstation!
         </p>
       </div>
-      <Button className="bg-orange rounded-full px-5 mt-2 py-6 text-sm font-jakarta hover:bg-orange w-full">
-        Lihat Struk Pembayaran
-      </Button>
+      <Link href='/payment/success/invoice'>
+        <Button className="bg-orange rounded-full px-5 mt-2 py-6 text-sm font-jakarta hover:bg-orange w-full">
+          Lihat Struk Pembayaran
+        </Button>
+      </Link>s
       <Link href={'/'} className="!rounded-full text-sm !w-full -mt-2">
         <Button
           variant="outline"

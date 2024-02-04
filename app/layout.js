@@ -1,7 +1,8 @@
 import './globals.css'
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import { Inter, Montserrat, Plus_Jakarta_Sans } from 'next/font/google'
 
 const inter = Plus_Jakarta_Sans({ subsets: ['latin'] })
+const montserrat = Montserrat({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Ikuzo Playstation!',
@@ -11,7 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.className} ${montserrat.variable}`}>{children}</body>
     </html>
   )
 }
