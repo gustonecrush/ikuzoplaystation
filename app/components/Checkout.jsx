@@ -30,7 +30,7 @@ const Checkout = ({ id, productName, price, detailCustomer }) => {
     <>
       <Button
         onClick={checkout}
-        className="bg-orange rounded-full px-5 py-6 text-base font-jakarta hover:bg-orange"
+        className="bg-orange rounded-lg px-5 py-6 text-base font-jakarta hover:bg-orange"
       >
         Pay
       </Button>
