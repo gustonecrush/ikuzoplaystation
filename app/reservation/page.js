@@ -1,8 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { product } from './libs/product'
-import Checkout from './components/Checkout'
+import Checkout from '../components/Checkout'
 import React, { useEffect, useRef } from 'react'
 
 // FRAMER MOTION
@@ -134,7 +133,7 @@ export default function Reservation() {
 
           <Fade>
             <div className="flex flex-col">
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-2xl font-semibold">
                 {!continueTapped ? 'Reservation' : 'Payment'}
               </h1>
               <p className="text-sm font-normal text-gray-400">
@@ -160,7 +159,7 @@ export default function Reservation() {
                     name="nama"
                     id="nama"
                     placeholder="Masukkan namamu"
-                    className="border border-border duration-500 rounded-full px-3 py-2 active:border-orange focus:border-orange focus:outline-orange"
+                    className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange"
                     required
                   />
                 </div>
@@ -175,7 +174,7 @@ export default function Reservation() {
                     name="nomor_whatsapp"
                     id="nomor_whatsapp"
                     placeholder="Masukkan nomor Whatsapp"
-                    className="border border-border duration-500 rounded-full px-3 py-2 active:border-orange focus:border-orange focus:outline-orange"
+                    className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange"
                     value={nomorWhatsappReservasi}
                     onChange={(e) => setNoWhatsappReservasi(e.target.value)}
                     required
@@ -194,7 +193,7 @@ export default function Reservation() {
                     name="tanggal_reservasi"
                     id="tanggal_reservasi"
                     placeholder="Masukkan nomor Whatsapp"
-                    className="border border-border duration-500 rounded-full px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
+                    className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
                     min={currentDate}
                     max={maxDate}
                     required
@@ -210,7 +209,7 @@ export default function Reservation() {
                     name="lantai_reservasi"
                     id="lantai_reservasi"
                     placeholder="Masukkan nomor Whatsapp"
-                    className="border border-border duration-500 rounded-full px-3 py-2 
+                    className="border border-border duration-500 rounded-lg px-3 py-2 
          active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
                     onChange={(e) => setFloorSelected(e.target.value)}
                     required
@@ -253,7 +252,7 @@ export default function Reservation() {
                       name="tanggal_reservasi"
                       id="tanggal_reservasi"
                       placeholder="Masukkan nomor Whatsapp"
-                      className="border border-border duration-500 rounded-full px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
+                      className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
                       required
                     />
                   </div>
@@ -266,7 +265,7 @@ export default function Reservation() {
                       name="tanggal_reservasi"
                       id="tanggal_reservasi"
                       placeholder="Masukkan nomor Whatsapp"
-                      className="border border-border duration-500 rounded-full px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
+                      className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
                       required
                     />
                   </div>
