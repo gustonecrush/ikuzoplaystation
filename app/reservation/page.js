@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
   calculateTimeDifference,
+  formatDate,
+  generateTimeArray,
   getCurrentDate,
   getCurrentTime,
   getMaxDate,
@@ -22,6 +24,22 @@ import {
 } from '@/utils/date'
 import { generateRandomString } from '@/utils/id'
 import { HashLoader } from 'react-spinners'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Calendar } from '@/components/ui/calendar'
+import { addDays, subDays } from 'date-fns'
 
 export default function Reservation() {
   // RESERVATION STATE DATA
@@ -61,7 +79,7 @@ export default function Reservation() {
       namaReservasi &&
       nomorWhatsappReservasi &&
       floorSelected &&
-      tanggalReservasi &&
+      selectedDate &&
       startTimeReservasi &&
       endTimeReservasi
     ) {
@@ -158,6 +176,11 @@ export default function Reservation() {
     }
   }, [startTimeReservasi, endTimeReservasi, imageRef, scale])
 
+  const [date, setDate] = useState(null)
+  const [selectedDate, setSelectedDate] = useState('')
+
+  console.log(floorSelected)
+
   return (
     <>
       <section className="bg-white w-full h-full font-jakarta px-5 py-5">
@@ -173,7 +196,6 @@ export default function Reservation() {
               className="w-[150px] h-fit"
             />
           </Fade>
-          {/* <Link href={'/'} title={'Home Ikuzo Playstation'}><HomeIcon /></Link> */}
         </div>
 
         {/* Testing */}
@@ -243,18 +265,38 @@ export default function Reservation() {
               <Fade delay={6} duration={1200}>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="nama">Tanggal Reservasi</label>
-                  <input
-                    type="date"
-                    value={tanggalReservasi}
-                    onChange={(e) => setTanggalReservasi(e.target.value)}
-                    name="tanggal_reservasi"
-                    id="tanggal_reservasi"
-                    placeholder="Masukkan nomor Whatsapp"
-                    className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
-                    min={currentDate}
-                    max={maxDate}
-                    required
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        name="tanggal_reservasi"
+                        id="tanggal_reservasi"
+                        placeholder="Masukkan nomor Whatsapp"
+                        className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
+                        min={currentDate}
+                        max={maxDate}
+                        required
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(date) => {
+                          setDate(date)
+                          const nextDay = addDays(date, 1)
+                          setSelectedDate(nextDay.toISOString().split('T')[0])
+                        }}
+                        disabled={(date) =>
+                          date > new addDays(new Date(), 15) ||
+                          date < subDays(new Date(), 1)
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </Fade>
 
@@ -262,21 +304,32 @@ export default function Reservation() {
               <Fade delay={7} duration={1300}>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="nama">Lantai Reservasi</label>
-                  <select
-                    name="lantai_reservasi"
-                    id="lantai_reservasi"
-                    placeholder="Masukkan nomor Whatsapp"
-                    className="border border-border duration-500 rounded-lg px-3 py-2 
-         active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
-                    onChange={(e) => setFloorSelected(e.target.value)}
+                  <Select
+                    value={floorSelected}
+                    onValueChange={(value) => setFloorSelected(value)}
                     required
+                    className="border border-border duration-500 rounded-lg !px-3 !py-4 "
                   >
-                    <option value="First Floor" className="text-gray-400">
-                      Pilih Lantai
-                    </option>
-                    <option value="first-floor">1st Floor</option>
-                    <option value="second-floor">2nd Floor</option>
-                  </select>
+                    <SelectTrigger className="py-5 px-3 text-base">
+                      <SelectValue
+                        className="text-base"
+                        placeholder="Pilih Lantai"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel className="text-base">
+                          Pilih Lantai Reservasi
+                        </SelectLabel>
+                        <SelectItem className="text-base" value="first-floor">
+                          1st Floor
+                        </SelectItem>
+                        <SelectItem className="text-base" value="second-floor">
+                          2nd Floor
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
               </Fade>
 
@@ -321,23 +374,6 @@ export default function Reservation() {
                         </span>
                       </button>
                     </div>
-
-                    {/* <img
-                      ref={imageRef}
-                      src={`/${
-                        floorSelected == 'first-floor'
-                          ? 'first-floor'
-                          : 'second-floor'
-                      }.jpg`}
-                      alt=""
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                        cursor: 'move',
-                      }}
-                      draggable={false}
-                    /> */}
                     <img
                       ref={imageRef}
                       src={'/first-floor.jpg'}
@@ -435,31 +471,59 @@ export default function Reservation() {
                 <div className="flex gap-1 w-full">
                   <div className="flex flex-col gap-2 w-full flex-1">
                     <label htmlFor="nama">Start Time</label>
-                    <input
-                      type="time"
+                    <Select
                       value={startTimeReservasi}
-                      onChange={(e) => setStartTimeReservasi(e.target.value)}
-                      name="tanggal_reservasi"
-                      id="tanggal_reservasi"
-                      step="600"
-                      placeholder="Masukkan nomor Whatsapp"
-                      className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
+                      onValueChange={(value) => setStartTimeReservasi(value)}
                       required
-                    />
+                      className="border border-border duration-500 rounded-lg !px-3 !py-4 "
+                    >
+                      <SelectTrigger className="py-5 px-3 text-base">
+                        <SelectValue
+                          className="text-base"
+                          placeholder="00.00"
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel className="text-base">
+                            Pilih Waktu Mulai
+                          </SelectLabel>
+                          {generateTimeArray().map((time, index) => (
+                            <SelectItem key={index} value={time}>
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex flex-col gap-2 w-full flex-1">
                     <label htmlFor="nama">End Time</label>
-                    <input
-                      type="time"
+                    <Select
                       value={endTimeReservasi}
-                      onChange={(e) => setEndTimeReservasi(e.target.value)}
-                      name="tanggal_reservasi"
-                      id="tanggal_reservasi"
-                      step="600"
-                      placeholder="Masukkan nomor Whatsapp"
-                      className="border border-border duration-500 rounded-lg px-3 py-2 active:border-orange focus:border-orange focus:outline-orange w-full bg-white"
+                      onValueChange={(value) => setEndTimeReservasi(value)}
                       required
-                    />
+                      className="border border-border duration-500 rounded-lg !px-3 !py-4 "
+                    >
+                      <SelectTrigger className="py-5 px-3 text-base">
+                        <SelectValue
+                          className="text-base"
+                          placeholder="00.00"
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel className="text-base">
+                            Pilih Waktu Berakhir
+                          </SelectLabel>
+                          {generateTimeArray().map((time, index) => (
+                            <SelectItem key={index} value={time}>
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </Fade>
@@ -515,7 +579,7 @@ export default function Reservation() {
                           Tanggal Reservasi
                         </h4>
                         <p className="text-base font-jakarta text-muted-foreground">
-                          {tanggalReservasi}
+                          {formatDate(selectedDate)}
                         </p>
                       </div>
                     </Fade>

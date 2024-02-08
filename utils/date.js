@@ -65,3 +65,28 @@ export const calculateTimeDifference = (startTime, endTime) => {
 
   return hours
 }
+
+export const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  const options = {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }
+  return date.toLocaleDateString('en-US', options)
+}
+
+export const generateTimeArray = () => {
+  const times = []
+  for (let hour = 9; hour <= 23; hour++) {
+    for (let minute = 0; minute < 60; minute += 10) {
+      const time = `${hour
+        .toString()
+        .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+      if (hour === 23 && minute === 30) break // Stop at 23:30
+      times.push(time)
+    }
+  }
+  return times
+}
