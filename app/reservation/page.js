@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Checkout from '../components/Checkout'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 // FRAMER MOTION
 import { motion } from 'framer-motion'
@@ -40,6 +40,21 @@ export default function Reservation() {
   const [maxTime, setMaxTime] = React.useState(getMaxTime)
   const [isLoading, setIsLoading] = React.useState(false)
 
+  /***********************************************************
+   * functions & states for scaling image
+   ***********************************************************/
+  const [scale, setScale] = useState(1)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const imageRef = useRef(null)
+
+  const handleZoomIn = () => {
+    setScale((scale) => scale + 0.1)
+  }
+
+  const handleZoomOut = () => {
+    setScale((scale) => scale - 0.1)
+  }
+
   const handleContinue = () => {
     // Assuming you have some state variables for your input values
     if (
@@ -69,6 +84,10 @@ export default function Reservation() {
     }
   }
 
+  const handleClick = (alt) => {
+    alert(alt)
+  }
+
   useEffect(() => {
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js'
     const clientKey = process.env.NEXT_PUBLIC_CLIENT
@@ -83,11 +102,43 @@ export default function Reservation() {
     setTotalTime(getTimeDIfferent)
 
     document.body.appendChild(script)
+
+    const image = imageRef.current
+    let isDragging = false
+    let prevPosition = { x: 0, y: 0 }
+    const handleMouseDown = (e) => {
+      isDragging = true
+      prevPosition = { x: e.clientX, y: e.clientY }
+    }
+
+    const handleMouseMove = (e) => {
+      if (!isDragging) return
+      const deltaX = e.clientX - prevPosition.x
+      const deltaY = e.clientY - prevPosition.y
+      prevPosition = { x: e.clientX, y: e.clientY }
+      setPosition((position) => ({
+        x: position.x + deltaX,
+        y: position.y + deltaY,
+      }))
+    }
+
+    const handleMouseUp = (e) => {
+      isDragging = false
+    }
+
+    image?.addEventListener('mousedown', handleMouseDown)
+    image?.addEventListener('mousemove', handleMouseMove)
+    image?.addEventListener('mouseup', handleMouseUp)
+
     return () => {
       document.body.removeChild(script)
+      image?.removeEventListener('mousedown', handleMouseDown)
+      image?.removeEventListener('mousemove', handleMouseMove)
+      image?.removeEventListener('mouseup', handleMouseUp)
     }
+
     // render midtrans snap token
-  }, [startTimeReservasi, endTimeReservasi])
+  }, [startTimeReservasi, endTimeReservasi, imageRef, scale])
 
   return (
     <>
@@ -213,7 +264,64 @@ export default function Reservation() {
 
               <Fade delay={8} duration={1400}>
                 <div className="flex-relative w-full h-fit">
-                  <Image
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      borderRadius: '10px',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                        backgroundColor: 'white',
+                        borderRadius: '8px 0 8px',
+                        overflow: 'hidden',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        zIndex: 100,
+                      }}
+                    >
+                      <button
+                        className="border-none text-[#737373] bg-white p-3 text-lg cursor-pointer"
+                        onClick={handleZoomIn}
+                      >
+                        <span className="material-symbols-outlined text-lg">
+                          +
+                        </span>
+                      </button>
+                      <button
+                        className="border-none text-[#737373] bg-white p-3 text-lg cursor-pointer"
+                        onClick={handleZoomOut}
+                      >
+                        <span className="material-symbols-outlined text-lg px-2">
+                          -
+                        </span>
+                      </button>
+                    </div>
+
+                    <img
+                      ref={imageRef}
+                      src={`/${
+                        floorSelected == 'first-floor'
+                          ? 'first-floor'
+                          : 'second-floor'
+                      }.jpg`}
+                      alt=""
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                        cursor: 'move',
+                      }}
+                      draggable={false}
+                    />
+                  </div>
+                  {/* <Image
                     src={`/${
                       floorSelected == 'first-floor'
                         ? 'first-floor'
@@ -222,9 +330,27 @@ export default function Reservation() {
                     alt={floorSelected}
                     title={floorSelected}
                     width={0}
+                    ref={imageRef}
                     height={0}
-                    className={'w-full h-full rounded-md'}
-                  />
+                    draggable={false}
+                    className={'w-full h-full rounded-md cursor-move'}
+                    style={{
+                      transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                    }}
+                  /> */}
+                  {/* <div>
+                    <img src="/first-floor.jpg" useMap="#image_map" alt="Floor Plan" />
+                    <map name="image_map">
+                      <area alt="position1" title="position1" href="#" coords="598,-1098,1031,-348" shape="rect" onClick={() => handleClick("position1")} />
+                      <area alt="position2" title="position2" href="#" coords="1135,-1116,1605,-378" shape="rect" onClick={() => handleClick("position2")} />
+                      <area alt="position3" title="position3" href="#" coords="1666,-1110,2135,-336" shape="rect" onClick={() => handleClick("position3")} />
+                      <area alt="position4" title="position4" href="#" coords="2276,-1141,2685,-342" shape="rect" onClick={() => handleClick("position4")} />
+                      <area alt="position5" title="position5" href="#" coords="2758,-1116,3288,-275" shape="rect" onClick={() => handleClick("position5")} />
+                      <area alt="position6" title="position6" href="#" coords="787,-134,1245,567" shape="rect" onClick={() => handleClick("position6")} />
+                      <area alt="position7" title="position7" href="#" coords="1281,-140,1763,592" shape="rect" onClick={() => handleClick("position7")} />
+                      <area alt="position8" title="position8" href="#" coords="1891,31,2386,598" shape="rect" onClick={() => handleClick("position8")} />
+                    </map>
+                  </div> */}
                 </div>
               </Fade>
 
