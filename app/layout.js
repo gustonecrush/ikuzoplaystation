@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import './globals.css'
 import { Inter, Montserrat, Plus_Jakarta_Sans } from 'next/font/google'
 
@@ -12,7 +13,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${montserrat.variable}`}>{children}</body>
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+        />
+      </head>
+      <body className={`${inter.className} ${montserrat.variable}`}>
+        {children}
+      </body>
     </html>
   )
 }

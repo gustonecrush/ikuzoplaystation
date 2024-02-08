@@ -322,7 +322,7 @@ export default function Reservation() {
                       </button>
                     </div>
 
-                    <img
+                    {/* <img
                       ref={imageRef}
                       src={`/${
                         floorSelected == 'first-floor'
@@ -337,38 +337,96 @@ export default function Reservation() {
                         cursor: 'move',
                       }}
                       draggable={false}
+                    /> */}
+                    <img
+                      ref={imageRef}
+                      src={'/first-floor.jpg'}
+                      useMap="#image-map"
+                      alt=""
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                        cursor: 'move',
+                      }}
+                      draggable={false}
                     />
-                  </div>
-                  {/* <Image
-                    src={`/${
-                      floorSelected == 'first-floor'
-                        ? 'first-floor'
-                        : 'second-floor'
-                    }.jpg`}
-                    alt={floorSelected}
-                    title={floorSelected}
-                    width={0}
-                    ref={imageRef}
-                    height={0}
-                    draggable={false}
-                    className={'w-full h-full rounded-md cursor-move'}
-                    style={{
-                      transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                    }}
-                  /> */}
-                  {/* <div>
-                    <img src="/first-floor.jpg" useMap="#image_map" alt="Floor Plan" />
-                    <map name="image_map">
-                      <area alt="position1" title="position1" href="#" coords="598,-1098,1031,-348" shape="rect" onClick={() => handleClick("position1")} />
-                      <area alt="position2" title="position2" href="#" coords="1135,-1116,1605,-378" shape="rect" onClick={() => handleClick("position2")} />
-                      <area alt="position3" title="position3" href="#" coords="1666,-1110,2135,-336" shape="rect" onClick={() => handleClick("position3")} />
-                      <area alt="position4" title="position4" href="#" coords="2276,-1141,2685,-342" shape="rect" onClick={() => handleClick("position4")} />
-                      <area alt="position5" title="position5" href="#" coords="2758,-1116,3288,-275" shape="rect" onClick={() => handleClick("position5")} />
-                      <area alt="position6" title="position6" href="#" coords="787,-134,1245,567" shape="rect" onClick={() => handleClick("position6")} />
-                      <area alt="position7" title="position7" href="#" coords="1281,-140,1763,592" shape="rect" onClick={() => handleClick("position7")} />
-                      <area alt="position8" title="position8" href="#" coords="1891,31,2386,598" shape="rect" onClick={() => handleClick("position8")} />
+
+                    <map name="image-map">
+                      <area
+                        target="_blank"
+                        alt="Position 1"
+                        title="Position 1"
+                        href="https://google.com"
+                        coords="1527,590,1201,892"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
+                      <area
+                        target="_blank"
+                        alt="Position 2"
+                        title="Position 2"
+                        href="https://google.com"
+                        coords="3192,862,2866,560"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
+                      <area
+                        target="_blank"
+                        alt="Position 3"
+                        title="Position 3"
+                        href="https://google.com"
+                        coords="1969,1486,2288,1785,3580,1863,3071,1479,3394,1771"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
+                      <area
+                        target="_blank"
+                        alt="Position 4"
+                        title="Position 4"
+                        href="https://google.com"
+                        coords="1742,583,2081,892"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
+                      <area
+                        target="_blank"
+                        alt="Position 5"
+                        title="Position 5"
+                        href="https://google.com"
+                        coords="2308,576,2627,875"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
+                      <area
+                        target="_blank"
+                        alt="Position 6"
+                        title="Position 6"
+                        href="https://google.com"
+                        coords="650,597,962,888"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
+                      <area
+                        target="_blank"
+                        alt="Position 7"
+                        title="Position 7"
+                        href="https://google.com"
+                        coords="820,1343,1145,1913"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
+                      <area
+                        target="_blank"
+                        alt="Position 8"
+                        title="Position 8"
+                        href="https://google.com"
+                        coords="1331,1343,1654,1899"
+                        shape="rect"
+                        className="w-8 h-8 bg-orange"
+                      />
                     </map>
-                  </div> */}
+                  </div>
                 </div>
               </Fade>
 
