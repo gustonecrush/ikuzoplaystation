@@ -108,36 +108,54 @@ export default function Reservation() {
     let prevPosition = { x: 0, y: 0 }
     const handleMouseDown = (e) => {
       isDragging = true
-      prevPosition = { x: e.clientX, y: e.clientY }
+      prevPosition = getEventPosition(e)
     }
 
     const handleMouseMove = (e) => {
       if (!isDragging) return
-      const deltaX = e.clientX - prevPosition.x
-      const deltaY = e.clientY - prevPosition.y
-      prevPosition = { x: e.clientX, y: e.clientY }
+      const currentPosition = getEventPosition(e)
+      const deltaX = currentPosition.x - prevPosition.x
+      const deltaY = currentPosition.y - prevPosition.y
+      prevPosition = currentPosition
       setPosition((position) => ({
         x: position.x + deltaX,
         y: position.y + deltaY,
       }))
     }
 
-    const handleMouseUp = (e) => {
+    const handleMouseUp = () => {
       isDragging = false
     }
 
-    image?.addEventListener('mousedown', handleMouseDown)
-    image?.addEventListener('mousemove', handleMouseMove)
-    image?.addEventListener('mouseup', handleMouseUp)
-
-    return () => {
-      document.body.removeChild(script)
-      image?.removeEventListener('mousedown', handleMouseDown)
-      image?.removeEventListener('mousemove', handleMouseMove)
-      image?.removeEventListener('mouseup', handleMouseUp)
+    const getEventPosition = (e) => {
+      if (e.touches && e.touches.length) {
+        return {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+        }
+      }
+      return {
+        x: e.clientX,
+        y: e.clientY,
+      }
     }
 
-    // render midtrans snap token
+    image?.addEventListener('mousedown', handleMouseDown)
+    image?.addEventListener('touchstart', handleMouseDown)
+    image?.addEventListener('mousemove', handleMouseMove)
+    image?.addEventListener('touchmove', handleMouseMove)
+    image?.addEventListener('mouseup', handleMouseUp)
+    image?.addEventListener('touchend', handleMouseUp)
+
+    return () => {
+      image?.removeEventListener('mousedown', handleMouseDown)
+      image?.removeEventListener('touchstart', handleMouseDown)
+      image?.removeEventListener('mousemove', handleMouseMove)
+      image?.removeEventListener('touchmove', handleMouseMove)
+      image?.removeEventListener('mouseup', handleMouseUp)
+      image?.removeEventListener('touchend', handleMouseUp)
+      document.body.removeChild(script)
+    }
   }, [startTimeReservasi, endTimeReservasi, imageRef, scale])
 
   return (
