@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/select'
 import { Calendar } from '@/components/ui/calendar'
 import { addDays, subDays } from 'date-fns'
+import axios from 'axios'
 
 export default function Reservation() {
   // RESERVATION STATE DATA
@@ -58,12 +59,41 @@ export default function Reservation() {
   const [maxTime, setMaxTime] = React.useState(getMaxTime)
   const [isLoading, setIsLoading] = React.useState(false)
 
+  const [reserves, setReserves] = useState([])
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  const getAllReservation = async (date) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/reservations?reserve_date=${date}`,
+      )
+      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        setReserves(jsonData)
+        console.log(response.data)
+
+        setIsLoading(false)
+      } else {
+        setIsLoading(false)
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+
+      setIsLoading(false)
+    }
+  }
+
   /***********************************************************
    * functions & states for scaling image
    ***********************************************************/
   const [scale, setScale] = useState(1)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const imageRef = useRef(null)
+
+  const [posisiReservasi, setPosisiReservasi] = useState(0)
 
   const handleZoomIn = () => {
     setScale((scale) => scale + 0.1)
@@ -81,7 +111,8 @@ export default function Reservation() {
       floorSelected &&
       selectedDate &&
       startTimeReservasi &&
-      endTimeReservasi
+      endTimeReservasi &&
+      posisiReservasi
     ) {
       // Scroll to the top of the page
       window.scrollTo(0, 0)
@@ -102,8 +133,30 @@ export default function Reservation() {
     }
   }
 
-  const handleClick = (alt) => {
-    alert(alt)
+  const handleCancle = async (alt) => {
+    try {
+      const response = await axios
+        .delete(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/reservations/${idReservasi}`,
+        )
+        .then((response) => {
+          setNamaReservasi('')
+          setNoWhatsappReservasi('')
+          setFloorSelected('')
+          setSelectedDate('')
+          setStartTimeReservasi('')
+          setEndTimeReservasi('')
+          setIdReservasi('')
+          setPosisiReservasi(0)
+          setContinueTapped(!continueTapped)
+          console.log(response)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    } catch (error) {
+      throw new Error(error)
+    }
   }
 
   useEffect(() => {
@@ -179,12 +232,28 @@ export default function Reservation() {
   const [date, setDate] = useState(null)
   const [selectedDate, setSelectedDate] = useState('')
 
+  const disableTimes =
+    reserves.length > 0
+      ? reserves
+          .map((reserve) => {
+            if (reserve.reserve_end_time) {
+              const [hour, minute, second] = reserve.reserve_end_time.split(':')
+              const formattedTime = `${hour}:${minute}`
+              return formattedTime
+            }
+            return null
+          })
+          .filter((time) => time !== null)
+      : []
+
+  console.log({ disableTimes })
   console.log(floorSelected)
+  console.log({ reserves })
+  console.log('reservasi', reserves)
 
   return (
     <>
       <section className="bg-white w-full h-full font-jakarta px-5 py-5">
-        {/* Header Navigation & Logo */}
         <div className="flex items-center justify-between border-b border-b-white">
           <Fade>
             <Image
@@ -198,7 +267,6 @@ export default function Reservation() {
           </Fade>
         </div>
 
-        {/* Testing */}
         <div className="px-5 py-5 text-black bg-white shadow-md rounded-lg flex flex-row gap-3 items-center">
           <Fade>
             <Image
@@ -227,7 +295,6 @@ export default function Reservation() {
         {!continueTapped ? (
           <>
             <div className="flex flex-col gap-3 px-5 bg-white shadow-md rounded-lg mt-5 py-7">
-              {/* /Input Nama */}
               <Fade>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="nama">Nama</label>
@@ -245,7 +312,6 @@ export default function Reservation() {
               </Fade>
 
               <Fade delay={5} duration={1100}>
-                {/* Input No Whatsapp */}
                 <div className="flex flex-col gap-2">
                   <label htmlFor="nama">No Whatsapp</label>
                   <input
@@ -288,6 +354,7 @@ export default function Reservation() {
                           setDate(date)
                           const nextDay = addDays(date, 1)
                           setSelectedDate(nextDay.toISOString().split('T')[0])
+                          getAllReservation(nextDay.toISOString().split('T')[0])
                         }}
                         disabled={(date) =>
                           date > new addDays(new Date(), 15) ||
@@ -376,7 +443,11 @@ export default function Reservation() {
                     </div>
                     <img
                       ref={imageRef}
-                      src={'/first-floor.jpg'}
+                      src={`/${
+                        floorSelected == 'first-floor'
+                          ? 'first-floor.jpg'
+                          : 'second-floor.jpg'
+                      }`}
                       useMap="#image-map"
                       alt=""
                       style={{
@@ -466,6 +537,156 @@ export default function Reservation() {
                 </div>
               </Fade>
 
+              <Fade delay={7} duration={1300}>
+                {/* Lantai 1 */}
+                {floorSelected == 'first-floor' ? (
+                  <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex flex-row justify-evenly gap-2">
+                      {[1, 2, 3, 4, 5].map((number) => {
+                        const reserveExists =
+                          reserves[0].length > 0 &&
+                          reserves[0].some(
+                            (reserve) =>
+                              parseInt(reserve.position) === number &&
+                              reserve.status_reserve === 'booked',
+                          )
+
+                        const inHold =
+                          reserves[0].length > 0 &&
+                          reserves[0].some(
+                            (reserve) =>
+                              parseInt(reserve.position) === number &&
+                              reserve.status_reserve === 'in hold',
+                          )
+
+                        return (
+                          <div
+                            key={number}
+                            className={`cursor-pointer w-full h-fit border ${
+                              posisiReservasi === number
+                                ? 'border-green-500 text-green-500 bg-green-500 bg-opacity-10'
+                                : inHold
+                                ? 'border-yellow-500 text-yellow-500 bg-yellow-500 bg-opacity-10'
+                                : reserveExists
+                                ? 'border-red-500 bg-red-500 bg-opacity-10 disabled:cursor-not-allowed'
+                                : 'border-gray-400 bg-gray-400 bg-opacity-10'
+                            } rounded-lg py-3 items-center justify-center flex`}
+                            onClick={() =>
+                              !reserveExists &&
+                              !inHold &&
+                              setPosisiReservasi(number)
+                            }
+                          >
+                            <p className="opacity-100">{number}</p>
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    <div className="flex flex-row gap-2 ml-10">
+                      {[6, 7].map((number) => {
+                        const reserveExists =
+                          reserves[0].length > 0 &&
+                          reserves[0].some(
+                            (reserve) =>
+                              parseInt(reserve.position) === number &&
+                              reserve.status_reserve === 'booked',
+                          )
+
+                        const inHold =
+                          reserves[0].length > 0 &&
+                          reserves[0].some(
+                            (reserve) =>
+                              parseInt(reserve.position) === number &&
+                              reserve.status_reserve === 'in hold',
+                          )
+                        return (
+                          <div
+                            key={number}
+                            className={`${
+                              posisiReservasi === number
+                                ? 'border-green-500 text-green-500 bg-green-500 bg-opacity-10'
+                                : inHold
+                                ? 'border-yellow-500 text-yellow-500 bg-yellow-500 bg-opacity-10'
+                                : reserveExists
+                                ? 'border-red-500 bg-red-500 bg-opacity-10 disabled:cursor-not-allowed'
+                                : 'border-gray-400 bg-gray-400 bg-opacity-10'
+                            } cursor-pointer w-fit px-6 h-fit border rounded-lg py-10 items-center justify-center flex`}
+                            onClick={() =>
+                              !reserveExists &&
+                              !inHold &&
+                              setPosisiReservasi(number)
+                            }
+                          >
+                            {number}
+                          </div>
+                        )
+                      })}
+
+                      {[8].map((number) => {
+                        const reserveExists =
+                          reserves[0].length > 0 &&
+                          reserves[0].some(
+                            (reserve) =>
+                              parseInt(reserve.position) === number &&
+                              reserve.status_reserve === 'booked',
+                          )
+
+                        const inHold =
+                          reserves[0].length > 0 &&
+                          reserves[0].some(
+                            (reserve) =>
+                              parseInt(reserve.position) === number &&
+                              reserve.status_reserve === 'in hold',
+                          )
+                        return (
+                          <div
+                            key={number}
+                            className={`${
+                              posisiReservasi === number
+                                ? 'border-green-500 text-green-500 bg-green-500 bg-opacity-10'
+                                : inHold
+                                ? 'border-yellow-500 text-yellow-500 bg-yellow-500 bg-opacity-10'
+                                : reserveExists
+                                ? 'border-red-500 bg-red-500 bg-opacity-10 disabled:cursor-not-allowed'
+                                : 'border-gray-400 bg-gray-400 bg-opacity-10'
+                            } cursor-pointer w-fit px-6 h-fit border rounded-lg py-3 items-center justify-center flex`}
+                            onClick={() =>
+                              !reserveExists &&
+                              !inHold &&
+                              setPosisiReservasi(number)
+                            }
+                          >
+                            {number}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <h1>second floor</h1>
+                )}
+
+                <div className="flex flex-row gap-2 items-center justify-center mb-8">
+                  <div className="flex gap-1 items-center">
+                    <div className="w-4 h-4 border border-green-500 bg-green-500 bg-opacity-10 rounded-sm"></div>
+                    <p className="text-xs">selected</p>
+                  </div>
+                  <div className="flex gap-1 items-center">
+                    <div className="w-4 h-4 border border-yellow-500 bg-yellow-500 bg-opacity-10 rounded-sm"></div>
+                    <p className="text-xs">in hold</p>
+                  </div>
+                  <div className="flex gap-1 items-center">
+                    <div className="w-4 h-4 border border-red-500 bg-red-500 bg-opacity-10 rounded-sm"></div>
+                    <p className="text-xs">reserved</p>
+                  </div>
+                  <div className="flex gap-1 items-center">
+                    <div className="w-4 h-4 border border-gray-500 bg-gray-500 bg-opacity-10 rounded-sm"></div>
+                    <p className="text-xs">available</p>
+                  </div>
+                </div>
+              </Fade>
+
               {/* Waktu Reservasi */}
               <Fade delay={9} duration={1500}>
                 <div className="flex gap-1 w-full">
@@ -516,11 +737,19 @@ export default function Reservation() {
                           <SelectLabel className="text-base">
                             Pilih Waktu Berakhir
                           </SelectLabel>
-                          {generateTimeArray().map((time, index) => (
-                            <SelectItem key={index} value={time}>
-                              {time}
-                            </SelectItem>
-                          ))}
+                          {generateTimeArray().map((time, index) => {
+                            const isDisabled = disableTimes.includes(time)
+                            console.log(isDisabled)
+                            return (
+                              <SelectItem
+                                key={index}
+                                value={time}
+                                disabled={isDisabled}
+                              >
+                                {time}
+                              </SelectItem>
+                            )
+                          })}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -606,7 +835,7 @@ export default function Reservation() {
                           {floorSelected == 'second-floor'
                             ? ' 2nd Floor'
                             : ' 1st Floor'}
-                          , Position 5
+                          , Position {posisiReservasi}
                         </p>
                       </div>
                     </Fade>
@@ -649,11 +878,19 @@ export default function Reservation() {
               detailCustomer={{
                 name: namaReservasi,
                 no: nomorWhatsappReservasi,
+                reserve_date: selectedDate,
+                reserve_start_time: startTimeReservasi,
+                reserve_end_time: endTimeReservasi,
+                position: posisiReservasi,
+                location:
+                  floorSelected == 'second-floor'
+                    ? `2nd Floor Position ${posisiReservasi}`
+                    : `1st Floor Position ${posisiReservasi}`,
               }}
             />
             <Button
               variant="outline"
-              onClick={(e) => handleContinue()}
+              onClick={(e) => handleCancle()}
               className="rounded-lg px-5 py-6 text-base font-jakarta"
             >
               Cancel

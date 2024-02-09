@@ -81,11 +81,9 @@ export const generateTimeArray = () => {
   const times = []
   for (let hour = 9; hour <= 23; hour++) {
     for (let minute = 0; minute < 60; minute += 10) {
-      const time = `${hour
-        .toString()
-        .padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-      if (hour === 23 && minute === 30) break // Stop at 23:30
-      times.push(time)
+      const formattedHour = hour.toString().padStart(2, '0')
+      const formattedMinute = minute.toString().padStart(2, '0')
+      times.push(`${formattedHour}:${formattedMinute}`)
     }
   }
   return times
