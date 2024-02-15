@@ -77,14 +77,85 @@ export const formatDate = (dateString) => {
   return date.toLocaleDateString('en-US', options)
 }
 
-export const generateTimeArray = () => {
+export const generateTimeArray = (
+  date = new Date().toISOString().split('T')[0],
+) => {
   const times = []
-  for (let hour = 9; hour <= 23; hour++) {
-    for (let minute = 0; minute < 60; minute += 10) {
+  const today = new Date()
+
+  const currentHour = today.getHours()
+  const currentMinute = today.getMinutes()
+
+  console.log(date)
+  console.log(today)
+
+  // Set start hour and minute
+  let startHour, startMinute
+  if (date === today.toISOString().split('T')[0]) {
+    // If today, start from current hour and nearest multiple of 10 for minute
+    startHour = currentHour
+    startMinute = Math.ceil(currentMinute / 10) * 10
+  } else {
+    // If not today, start from 09:00
+    startHour = 9
+    startMinute = 0
+  }
+
+  const endHour = 23
+
+  for (let hour = startHour; hour <= endHour; hour++) {
+    const maxMinute =
+      hour === endHour ? Math.floor(currentMinute / 10) * 10 : 60
+    const startLoopMinute = hour === startHour ? startMinute : 0
+    for (let minute = startLoopMinute; minute < maxMinute; minute += 10) {
       const formattedHour = hour.toString().padStart(2, '0')
       const formattedMinute = minute.toString().padStart(2, '0')
       times.push(`${formattedHour}:${formattedMinute}`)
     }
   }
+  return times
+}
+
+export const generateTimeArrayWithStep = (selectedTime) => {
+  const times = []
+  const maxHour = 23
+  const maxMinute = 30
+
+  const [hourStr, minuteStr] = selectedTime.split(':')
+  let selectedHour = parseInt(hourStr)
+  let selectedMinute = parseInt(minuteStr)
+
+  // Add the selected time
+  times.push(selectedTime)
+
+  // Generate times with step one hour, two hours, three hours, etc. until max 15 hours
+  for (let i = 1; i <= 15; i++) {
+    // Calculate next hour and minute
+    let nextHour = selectedHour + i
+    let nextMinute = selectedMinute
+
+    // Adjust if minute exceeds 59
+    if (nextMinute >= 60) {
+      nextHour++
+      nextMinute -= 60
+    }
+
+    // Check if next hour exceeds maximum hour or if hour is 23 and minute exceeds maximum minute
+    if (
+      nextHour > maxHour ||
+      (nextHour === maxHour && nextMinute > maxMinute)
+    ) {
+      // If exceeded, break the loop
+      break
+    }
+
+    // Format next hour and minute
+    const formattedHour = nextHour.toString().padStart(2, '0')
+    const formattedMinute = nextMinute.toString().padStart(2, '0')
+
+    // Add the formatted time to the times array
+    times.push(`${formattedHour}:${formattedMinute}`)
+  }
+
   return times
 }

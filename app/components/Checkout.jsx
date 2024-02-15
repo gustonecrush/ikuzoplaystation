@@ -34,7 +34,7 @@ const Checkout = ({ id, productName, price, detailCustomer }) => {
         reserve_date: detailCustomer.reserve_date,
         reserve_start_time: detailCustomer.reserve_start_time,
         reserve_end_time: detailCustomer.reserve_end_time,
-        status_reserve: 'in hold',
+        status_reserve: 'booked',
         price: price,
         position: detailCustomer.position,
       }
