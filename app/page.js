@@ -1,17 +1,17 @@
 import React, { Suspense } from 'react'
 import Navbar from './components/Navbar'
 import Image from 'next/image'
+import SlideContainer from './components/SlideContainer'
 import FadeContainer from './components/FadeContainer'
 import BounceContainer from './components/BounceContainer'
-import SlideContainer from './components/SlideContainer'
-import SwiperContainer from './components/SwiperContainer'
 import SwiperContainer2 from './components/SwiperContainer2'
-import { Footer } from './components/Footer'
+import SwiperContainer from './components/SwiperContainer'
 import Loading from './loading'
+import { Footer } from './components/Footer'
 
 export default function Home() {
   return (
-    <Suspense fallback={<Loading />}>
+    <>
        <section className='flex flex-col h-full w-full'>
       {/* Navbar */}
       <Navbar />
@@ -99,7 +99,7 @@ export default function Home() {
       
       <Footer />
     </section>
-    </Suspense>
+    </>
   )
 }
 

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Checkout from '../components/Checkout'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 
 // FRAMER MOTION
 import { motion } from 'framer-motion'
@@ -56,6 +56,7 @@ import {
 
 import regularFacilityImg from '../../public/fasilitas/regular.png'
 import simulatorFacilityImg from '../../public/fasilitas/simulator.png'
+import Loading from '../loading'
 
 export default function Reservation() {
   // RESERVATION STATE DATA

@@ -20,17 +20,17 @@ export const Footer = () => {
           />  
             </a>
             <div className="mt-6 lg:max-w-sm">
-              <p className="text-sm text-gray-800">
+              <p className="text-base text-gray-800">
                 Sed ut perspiciatis unde omnis iste natus error sit voluptatem
                 accusantium doloremque laudantium, totam rem aperiam.
               </p>
-              <p className="mt-4 text-sm text-gray-800">
+              <p className="mt-4 text-base text-gray-800">
                 Eaque ipsa quae ab illo inventore veritatis et quasi architecto
                 beatae vitae dicta sunt explicabo.
               </p>
             </div>
           </div>
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-base">
             <p className="text-base font-bold tracking-wide text-gray-900">
               Contacts
             </p>
@@ -101,21 +101,21 @@ export const Footer = () => {
                 </svg>
               </a>
             </div>
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-4 text-base text-gray-500">
               Bacon ipsum dolor amet short ribs pig sausage prosciutto chicken
               spare ribs salami.
             </p>
           </div>
         </div>
         <div className="flex flex-col-reverse justify-between pt-5 pb-10 border-t lg:flex-row">
-          <p className="text-sm text-gray-600">
+          <p className="text-base text-gray-600">
             © Copyright 2020 Lorem Inc. All rights reserved.
           </p>
           <ul className="flex flex-col mb-3 space-y-2 lg:mb-0 sm:space-y-0 sm:space-x-5 sm:flex-row">
             <li>
               <a
                 href="/"
-                className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
+                className="text-base text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
               >
                 F.A.Q
               </a>
@@ -123,7 +123,7 @@ export const Footer = () => {
             <li>
               <a
                 href="/"
-                className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
+                className="text-base text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
               >
                 Privacy Policy
               </a>
@@ -131,7 +131,7 @@ export const Footer = () => {
             <li>
               <a
                 href="/"
-                className="text-sm text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
+                className="text-base text-gray-600 transition-colors duration-300 hover:text-deep-purple-accent-400"
               >
                 Terms &amp; Conditions
               </a>
