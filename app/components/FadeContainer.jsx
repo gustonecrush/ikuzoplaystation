@@ -5,7 +5,7 @@ import { Fade } from 'react-awesome-reveal'
 
 const FadeContainer = ({children}) => {
   return (
-    <Fade>
+    <Fade triggerOnce={true}>
         {children}
     </Fade>
   )
