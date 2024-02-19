@@ -8,11 +8,13 @@ import SwiperContainer2 from './components/SwiperContainer2'
 import SwiperContainer from './components/SwiperContainer'
 import Loading from './loading'
 import { Footer } from './components/Footer'
+import ScrollDown from './components/ScrollDown'
+import { Button } from '@/components/ui/button'
 
 export default function Home() {
   return (
     <>
-       <section className='flex flex-col h-full w-full'>
+       <section className='flex flex-col h-full w-full scroll-smooth'>
       {/* Navbar */}
       <Navbar />
 
@@ -21,29 +23,36 @@ export default function Home() {
       <div className='flex relative items-center justify-center'>
         <Video />
         <FadeContainer>
-        <div className='absolute flex flex-col gap-2 left-1/2 transform -translate-x-1/2 w-full px-2 top-1/2 z-40 -translate-y-1/2'>
+        <div className='absolute flex flex-col gap-2 left-1/2 transform -translate-x-1/2 w-full px-2 top-1/2 z-40 -translate-y-1/2 items-center justify-center'>
           <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
             Better Gaming at Ikuzo Playsation!
           </h1>
           <p className='text-white font-normal text-center text-base'>Discover the unforgettable gaming experience with your family, friends, or as a couple. Feel it and tell the world how excited it was!</p>
+
+        <ScrollDown />
+
         </div>
         </FadeContainer>
-       
+
       </div>
       </SlideContainer>
      
 
       {/* Facility Section */}
       <SlideContainer>
-      <div className='flex flex-col relative items-center justify-center'>
+      <div className='flex flex-col relative items-center justify-center' id='reserve'>
         <Image className='-z-50 w-full h-screen object-cover bg-opacity-10' alt='Facilites Image' width={0} height={0} title='Facilities Image' src={'/facilities.png'} />
         <FadeContainer>
-        <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2'>
+        <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2 items-center' >
             <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
               Private Room, Reguler Spot, and Facilities
             </h1>
             <p className='text-white font-normal text-center text-base'>Rasakan suasana "Homey" saat bermain pada Gaming Space Keluarga No. 1 di Kota Bandung. Maksimalkan pengalamanmu dengan beragam fasilitas seru pelayan terbaik yang bisa kamu dapatkan
             !</p>
+
+            <Button variant="outline" className={`bg-orange text-white border-orange py-6 text-base mt-4 w-fit px-10 relative`} >
+                 Reservasi
+            </Button>
         </div>
         </FadeContainer>
       
