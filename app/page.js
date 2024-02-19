@@ -10,6 +10,7 @@ import Loading from './loading'
 import { Footer } from './components/Footer'
 import ScrollDown from './components/ScrollDown'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -23,9 +24,9 @@ export default function Home() {
       <div className='flex relative items-center justify-center'>
         <Video />
         <FadeContainer>
-        <div className='absolute flex flex-col gap-2 left-1/2 transform -translate-x-1/2 w-full px-2 top-1/2 z-40 -translate-y-1/2 items-center justify-center'>
+        <div className='absolute flex flex-col gap-2 left-1/2 transform -translate-x-1/2 w-full top-1/2 z-40 -translate-y-1/2 items-center justify-center'>
           <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
-            Better Gaming at Ikuzo Playsation!
+            BETTER GAMING AT <span className='text-orange'>IKUZO!</span>
           </h1>
           <p className='text-white font-normal text-center text-base'>Discover the unforgettable gaming experience with your family, friends, or as a couple. Feel it and tell the world how excited it was!</p>
 
@@ -45,14 +46,16 @@ export default function Home() {
         <FadeContainer>
         <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2 items-center' >
             <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
-              Private Room, Reguler Spot, and Facilities
+              PRIVATE ROOM, <span className='text-orange'>REGULAR SPOT</span> , AND FACILITIES
             </h1>
             <p className='text-white font-normal text-center text-base'>Rasakan suasana "Homey" saat bermain pada Gaming Space Keluarga No. 1 di Kota Bandung. Maksimalkan pengalamanmu dengan beragam fasilitas seru pelayan terbaik yang bisa kamu dapatkan
             !</p>
 
-            <Button variant="outline" className={`bg-orange text-white border-orange py-6 text-base mt-4 w-fit px-10 relative`} >
-                 Reservasi
+            <Link href={'/reservation'} className=''>
+        <Button variant="outline" className={`bg-orange text-white border-orange py-6 text-base mt-4 w-fit px-10 relative font-semibold duration-1000`} >
+                 RESERVE NOW
             </Button>
+        </Link>
         </div>
         </FadeContainer>
       
@@ -68,7 +71,7 @@ export default function Home() {
         <FadeContainer>
         <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2'>
             <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
-              Coming Soon Membership Ikuzo!
+              COMING SOON <span className='text-orange'>MEMBERSHIP</span> IKUZO!
             </h1>
             <p className='text-white font-normal text-center text-base'>Nantikan membership di Ikuzo Playstation! dan nikmati layanan serta benefit dari bergabung membership segera</p>
         </div>
@@ -93,7 +96,7 @@ export default function Home() {
       </div>
 
       {/* Fasilitas Section */}
-      <div className='flex flex-col gap-2 items-center justify-center py-10'>
+      <div className='flex flex-col gap-2 items-center justify-center py-10 bg-white w-full h-fit z-20'>
         <BounceContainer>
           <div className='flex flex-col gap-2 px-3'>
           <h1 className='text-orange font-extrabold font-montserrat text-4xl text-center'>
@@ -104,6 +107,12 @@ export default function Home() {
 
         </BounceContainer>
         <SwiperContainer2 />
+        <Link href={'/reservation'} className=''>
+        <Button variant="outline" className={`bg-orange text-white border-orange py-6 text-base -mt-4 w-fit px-10 relative font-semibold animate-bounce duration-1000`} >
+                 RESERVE NOW
+            </Button>
+        </Link>
+        
       </div>
       
       <Footer />
