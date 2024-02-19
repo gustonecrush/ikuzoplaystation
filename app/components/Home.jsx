@@ -23,7 +23,7 @@ export default function Home() {
       <SlideContainer>
       <div className='flex relative items-center justify-center'>
         <Video />
-        <FadeContainer>
+        <BounceContainer>
         <div className='absolute flex flex-col gap-2 left-1/2 transform -translate-x-1/2 w-full top-1/2 z-40 -translate-y-1/2 items-center justify-center'>
           <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
             BETTER GAMING AT <span className='text-orange'>IKUZO!</span>
@@ -33,7 +33,7 @@ export default function Home() {
         <ScrollDown />
 
         </div>
-        </FadeContainer>
+        </BounceContainer>
 
       </div>
       </SlideContainer>
@@ -43,7 +43,7 @@ export default function Home() {
       <SlideContainer>
       <div className='flex flex-col relative items-center justify-center' id='reserve'>
         <Image className='-z-50 w-full h-screen object-cover bg-opacity-10' alt='Facilites Image' width={0} height={0} title='Facilities Image' src={'/facilities.png'} />
-        <FadeContainer>
+        <BounceContainer>
         <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2 items-center' >
             <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
               PRIVATE ROOM, <span className='text-orange'>REGULAR SPOT</span> , AND FACILITIES
@@ -57,7 +57,7 @@ export default function Home() {
             </Button>
         </Link>
         </div>
-        </FadeContainer>
+        </BounceContainer>
       
        
       </div>
@@ -68,14 +68,14 @@ export default function Home() {
       <SlideContainer>
       <div className='flex flex-col relative items-center justify-center'>
         <Image className='-z-50 w-full h-screen object-cover bg-opacity-10' alt='Facilites Image' width={0} height={0} title='Facilities Image' src={'/fasilitas/regular-plus.png'} />
-        <FadeContainer>
+        <BounceContainer>
         <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2'>
             <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
               COMING SOON <span className='text-orange'>MEMBERSHIP</span> IKUZO!
             </h1>
             <p className='text-white font-normal text-center text-base'>Nantikan membership di Ikuzo Playstation! dan nikmati layanan serta benefit dari bergabung membership segera</p>
         </div>
-        </FadeContainer>
+        </BounceContainer>
       
        
       </div>

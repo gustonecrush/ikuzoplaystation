@@ -12,7 +12,7 @@ export default function Page() {
 
     setTimeout(() => {
         setLoading(false)
-    }, 2000)
+    }, 5000)
   }, [])
 
   return (
