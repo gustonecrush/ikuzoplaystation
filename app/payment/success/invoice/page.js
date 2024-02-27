@@ -1,7 +1,13 @@
+'use client'
+
 import { Button } from '@/components/ui/button';
 import React from 'react';
 
 const Invoice = () => {
+  const [orderId, setOrderId] = React.useState('')
+  React.useEffect(() => {
+    setOrderId(localStorage.getItem('order_id'))
+  },[]) 
   return (
     <section class="bg-black">
  <div class="max-w-5xl mx-auto pt-16 bg-white">
@@ -12,7 +18,7 @@ const Invoice = () => {
       <img class="object-cover h-20" src="/logo-orange.png" />
 
       <p class="text-xl font-extrabold text-black tracking-tight uppercase font-body">
-       #PLAYIKUZO987239499872
+       {orderId}
       </p>
      </div>
     </div>

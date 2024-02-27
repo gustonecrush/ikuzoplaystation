@@ -1,9 +1,19 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
 const page = () => {
+  const searchParam = useSearchParams()
+  const order_id = searchParam.get('order_id');
+
+  console.log({order_id})
+  React.useEffect(() => {
+    localStorage.setItem('order_id', order_id);
+  }, [])
   return (
     <div className="flex flex-col justify-center items-center min-h-screen gap-4 px-10">
       <Image
@@ -29,6 +39,7 @@ const page = () => {
       <Link href={'/'} className="!rounded-full text-sm !w-full -mt-2">
         <Button
           variant="outline"
+          onClick={() => localStorage.removeItem('order_id')}
           className="!rounded-full px-5 py-6 text-sm !w-full"
         >
           Kembali
