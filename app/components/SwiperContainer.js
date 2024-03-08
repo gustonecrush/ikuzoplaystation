@@ -20,7 +20,7 @@ const SwiperContainer = ({children}) => {
       grabCursor={true}
       centeredSlides={true}
       slidesPerView={'auto'}
-      initialSlide={1}
+      initialSlide={4}
       coverflowEffect={{
         rotate: 50,
         stretch: 0,

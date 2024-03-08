@@ -15,20 +15,20 @@ import Link from 'next/link'
 export default function Home() {
   return (
     <>
-       <section className='flex flex-col h-full w-full scroll-smooth'>
+       <section className='flex flex-col h-full w-full scroll-smooth overflow-x-hidden'>
       {/* Navbar */}
       <Navbar />
 
       {/* Hero Section */}
       <SlideContainer>
-      <div className='flex relative items-center justify-center'>
+      <div className='flex flex-col relative items-center justify-center bg-black bg-opacity-35'>
         <Video />
         <FadeContainer>
-        <div className='absolute flex flex-col gap-2 left-1/2 transform -translate-x-1/2 w-full top-1/2 z-40 -translate-y-1/2 items-center justify-center'>
-          <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
+        <div className='absolute flex flex-col gap-2 left-1/2 transform -translate-x-1/2 w-full md:w-1/2 top-1/2 z-40 -translate-y-1/2 items-center justify-center'>
+          <h1 className='text-white font-extrabold font-montserrat text-6xl text-center md:text-[6rem] md:mt-16'>
             BETTER GAMING AT <span className='text-orange'>IKUZO!</span>
           </h1>
-          <p className='text-white font-normal text-center text-base'>Discover the unforgettable gaming experience with your family, friends, or as a couple. Feel it and tell the world how excited it was!</p>
+          <p className='text-white font-normal text-center text-base md:text-lg'>Discover the unforgettable gaming experience with your family, friends, or as a couple. Feel it and tell the world how excited it was!</p>
 
         <ScrollDown />
 
@@ -41,18 +41,18 @@ export default function Home() {
 
       {/* Facility Section */}
       <SlideContainer>
-      <div className='flex flex-col relative items-center justify-center' id='reserve'>
-        <Image className='-z-50 w-full h-screen object-cover bg-opacity-10' alt='Facilites Image' width={0} height={0} title='Facilities Image' src={'/facilities.png'} />
+      <div className='flex flex-col bg-black bg-opacity-35 h-fit relative items-center justify-center ' id='reserve'>
+        <Image className='-z-50 w-full h-full object-cover bg-opacity-10' alt='Facilites Image' width={0} height={0} title='Facilities Image' src={'/facilities.png'} />
         <FadeContainer>
-        <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2 items-center' >
-            <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
-              PRIVATE ROOM, <span className='text-orange'>REGULAR SPOT</span> , AND FACILITIES
-            </h1>
-            <p className='text-white font-normal text-center text-base'>Rasakan suasana "Homey" saat bermain pada Gaming Space Keluarga No. 1 di Kota Bandung. Maksimalkan pengalamanmu dengan beragam fasilitas seru pelayan terbaik yang bisa kamu dapatkan
+        <div className='absolute w-full md:w-1/2 px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2 items-center py-12' >
+        <h1 className='text-white font-extrabold font-montserrat text-6xl text-center md:text-[6rem] md:mt-16'>
+        PRIVATE ROOM, <span className='text-orange'>REGULAR SPOT</span> , AND FACILITIES
+          </h1>
+          <p className='text-white font-normal text-center text-base md:text-lg'>suasana "Homey" saat bermain pada Gaming Space Keluarga No. 1 di Kota Bandung. Maksimalkan pengalamanmu dengan beragam fasilitas seru pelayan terbaik yang bisa kamu dapatkan
             !</p>
 
             <Link href={'/reservation'} className=''>
-        <Button variant="outline" className={`bg-orange text-white border-orange py-6 text-base mt-4 w-fit px-10 relative font-semibold duration-1000`} >
+        <Button variant="outline" className={`bg-orange text-white border-orange py-6 text-base mt-4 mb-20 w-fit px-10 relative font-semibold duration-1000`} >
                  RESERVE NOW
             </Button>
         </Link>
@@ -66,14 +66,15 @@ export default function Home() {
 
       {/* Membership Section */}
       <SlideContainer>
-      <div className='flex flex-col relative items-center justify-center'>
+      <div className='flex bg-black bg-opacity-35 flex-col relative items-center justify-center'>
         <Image className='-z-50 w-full h-screen object-cover bg-opacity-10' alt='Facilites Image' width={0} height={0} title='Facilities Image' src={'/fasilitas/regular-plus.png'} />
         <FadeContainer>
-        <div className='absolute w-full px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2'>
-            <h1 className='text-white font-extrabold font-montserrat text-6xl text-center'>
-              COMING SOON <span className='text-orange'>MEMBERSHIP</span> IKUZO!
-            </h1>
-            <p className='text-white font-normal text-center text-base'>Nantikan membership di Ikuzo Playstation! dan nikmati layanan serta benefit dari bergabung membership segera</p>
+        <div className='absolute w-full md:w-1/2 px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2'>
+        <h1 className='text-white font-extrabold font-montserrat text-6xl text-center md:text-[6rem] md:mt-16'>
+        COMING SOON <span className='text-orange'>MEMBERSHIP</span> IKUZO!
+          </h1>
+          <p className='text-white font-normal text-center text-base md:text-lg'>Nantikan membership di Ikuzo Playstation! dan nikmati layanan serta benefit dari bergabung membership segera</p>
+          
         </div>
         </FadeContainer>
       
@@ -82,7 +83,7 @@ export default function Home() {
       </SlideContainer>
 
       {/* Game Section */}
-      <div className='flex flex-col gap-2 items-center justify-center py-10 bg-white w-full h-fit z-20'>
+      <div className='flex flex-col gap-2 mt-9 items-center justify-center py-10 bg-white w-full  h-fit z-20'>
         <BounceContainer>
           <div className='flex flex-col gap-2 px-3'>
           <h1 className='text-orange font-extrabold font-montserrat text-4xl text-center'>
@@ -99,7 +100,7 @@ export default function Home() {
       <div className='flex flex-col gap-2 items-center justify-center py-10 bg-white w-full h-fit z-20'>
         <BounceContainer>
           <div className='flex flex-col gap-2 px-3'>
-          <h1 className='text-orange font-extrabold font-montserrat text-4xl text-center'>
+          <h1 className='text-orange font-extrabold font-montserrat text-4xl  md:text-[5rem] text-center'>
               Fasilitas di Ikuzo!
             </h1>
             <p className='text-gray-400 font-normal text-center text-base'>Reservasi segera dengan pilihan layanan yang ada dan nikmati keseruan bermain bersama Ikuzo!</p>
@@ -123,7 +124,8 @@ export default function Home() {
 
 async function Video() {
   return (
-    <video width="320" height="240" preload="none" autoPlay muted loop className='h-screen w-full object-cover -z-30'>
+    <>
+      <video width="320" height="240" preload="none" autoPlay muted loop className='h-screen w-full object-cover -z-30 block md:hidden'>
     <source src="/ikuzoplaystation.mp4" type="video/mp4" />
     <track
       src="/ikuzoplaystation.mp4"
@@ -132,5 +134,16 @@ async function Video() {
     />
     Your browser does not support the video tag.
   </video>
+  <video width="320" height="240" preload="none" autoPlay muted loop className='h-screen w-full object-cover -z-30 hidden md:block'>
+    <source src="/ikuzo-dekstop.mp4" type="video/mp4" />
+    <track
+      src="/ikuzoplaystation.mp4"
+      srcLang="en"
+      label="English"
+    />
+    Your browser does not support the video tag.
+  </video>
+    </>
+  
   )
 }

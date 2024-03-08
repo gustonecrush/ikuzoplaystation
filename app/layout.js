@@ -2,7 +2,7 @@ import './globals.css'
 import {Montserrat, Plus_Jakarta_Sans } from 'next/font/google'
 
 const inter = Plus_Jakarta_Sans({ subsets: ['latin'] })
-const montserrat = Montserrat({ subsets: ['latin'] })
+const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-montserrat' })
 
 export const metadata = {
   title: 'Ikuzo Playstation!',

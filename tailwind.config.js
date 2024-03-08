@@ -18,7 +18,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        'montserrat': ['var(--montserrat)', 'sans-serif']
+        'montserrat': ['var(--font-montserrat)', 'sans-serif']
       },
       colors: {
         orange: '#FF6200',
