@@ -1,5 +1,5 @@
-import React from 'react';
-import { HashLoader } from 'react-spinners';
+import React from 'react'
+import { HashLoader } from 'react-spinners'
 
 import {
   Table,
@@ -8,8 +8,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { flexRender } from '@tanstack/react-table';
+} from '@/components/ui/table'
+import { flexRender } from '@tanstack/react-table'
 
 const TableReservations = ({ isLoading, columns, table, type }) => {
   return (
@@ -22,8 +22,13 @@ const TableReservations = ({ isLoading, columns, table, type }) => {
               key={headerGroup.id}
             >
               {headerGroup.headers.map((header) => (
-                <TableHead className="h-fit py-3" key={header.id}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                <TableHead className="h-fit py-3 text-black" key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                 </TableHead>
               ))}
             </TableRow>
@@ -42,7 +47,7 @@ const TableReservations = ({ isLoading, columns, table, type }) => {
                 data-state={row.getIsSelected() && 'selected'}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-3 text-xs">
+                  <TableCell key={cell.id} className="py-3 text-sm">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -58,7 +63,7 @@ const TableReservations = ({ isLoading, columns, table, type }) => {
         </TableBody>
       </Table>
     </div>
-  );
-};
+  )
+}
 
-export default TableReservations;
+export default TableReservations
