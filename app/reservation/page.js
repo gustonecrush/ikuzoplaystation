@@ -2,10 +2,7 @@
 
 import Image from 'next/image'
 import Checkout from '../components/Checkout'
-import React, { Suspense, useEffect, useRef, useState } from 'react'
-
-// FRAMER MOTION
-import { motion } from 'framer-motion'
+import React, { useEffect, useRef, useState } from 'react'
 
 // REVEAL
 import { Fade } from 'react-awesome-reveal'
@@ -17,7 +14,6 @@ import {
   calculateTimeDifference,
   formatDate,
   generateTimeArray,
-  generateTimeArrayFromSelected,
   generateTimeArrayWithStep,
   getCurrentDate,
   getCurrentTime,
@@ -53,9 +49,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
-
-import regularFacilityImg from '../../public/fasilitas/regular.png'
-import simulatorFacilityImg from '../../public/fasilitas/simulator.png'
 import Loading from '../loading'
 
 export default function Reservation() {
@@ -65,7 +58,6 @@ export default function Reservation() {
   const [namaReservasi, setNamaReservasi] = React.useState('')
   const [nomorWhatsappReservasi, setNoWhatsappReservasi] = React.useState('')
   const [floorSelected, setFloorSelected] = React.useState('')
-  const [tanggalReservasi, setTanggalReservasi] = React.useState('')
   const [startTimeReservasi, setStartTimeReservasi] = React.useState('')
   const [endTimeReservasi, setEndTimeReservasi] = React.useState('')
   const [totalTime, setTotalTime] = React.useState(null)
@@ -148,6 +140,17 @@ export default function Reservation() {
   }
 
   const handleContinue = () => {
+    const data = {
+      nama : namaReservasi,
+      noWhatsapp: nomorWhatsappReservasi,
+      tanggal: selectedDate,
+      location: location,
+      startTimeReservasi: startTimeReservasi,
+      endTimeReservasi: endTimeReservasi,
+      position: posisiReservasi
+    }
+
+    console.log({data})
     // Assuming you have some state variables for your input values
     if (
       namaReservasi &&
@@ -209,8 +212,6 @@ export default function Reservation() {
     console.log('fetching', reserves)
   }
 
-  const [availableTimes, setAvailableTimes] = React.useState([])
-
   useEffect(() => {
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js'
     const clientKey = process.env.NEXT_PUBLIC_CLIENT
@@ -223,8 +224,6 @@ export default function Reservation() {
       endTimeReservasi,
     )
     setTotalTime(getTimeDIfferent)
-
-    
 
     document.body.appendChild(script)
 
@@ -415,7 +414,7 @@ export default function Reservation() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <input
-                        type="date"
+                        type="text"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
                         name="tanggal_reservasi"
@@ -568,7 +567,7 @@ export default function Reservation() {
                                   )
                                 }}
                               >
-                                <p className="opacity-100">{number}</p>{' '}
+                                <p className="opacity-100 text-xs py-2">Reg</p>{' '}
                               </div>
                             </DrawerTrigger>
                             <DrawerContent className="active:border-none border-none outline-none">
@@ -704,7 +703,7 @@ export default function Reservation() {
                                                 const isDisabled = disableTimes.includes(
                                                   time,
                                                 )
-                                                console.log(isDisabled)
+                                                
                                                 return (
                                                   <SelectItem
                                                     key={index}
@@ -750,7 +749,7 @@ export default function Reservation() {
                             <DrawerTrigger asChild>
                               <div
                                 key={number}
-                                className={`cursor-pointer w-fit px-6 h-fit border ${'border-gray-400 bg-gray-400 bg-opacity-10'
+                                className={`cursor-pointer w-fit h-fit border ${'border-gray-400 bg-gray-400 bg-opacity-10'
                                 } rounded-lg py-10 flex-col items-center justify-center flex`}
                                 onClick={() => {
                                   setPosisiReservasi(number)
@@ -761,7 +760,7 @@ export default function Reservation() {
                                   )
                                 }}
                               >
-                                <p className="opacity-100">{number}</p>{' '}
+                                <p className="opacity-100 text-xs rotate-[290deg]">Simulator</p>{' '}
                               </div>
                             </DrawerTrigger>
                             <DrawerContent className="active:border-none border-none outline-none">
@@ -896,7 +895,7 @@ export default function Reservation() {
                                                 const isDisabled = disableTimes.includes(
                                                   time,
                                                 )
-                                                console.log(isDisabled)
+                                                
                                                 return (
                                                   <SelectItem
                                                     key={index}
@@ -941,7 +940,7 @@ export default function Reservation() {
                             <DrawerTrigger asChild>
                               <div
                                 key={number}
-                                className={`cursor-pointer w-fit px-6 h-fit border ${'border-gray-400 bg-gray-400 bg-opacity-10'
+                                className={`cursor-pointer w-fit px-5 h-fit border ${'border-gray-400 bg-gray-400 bg-opacity-10'
                                 } rounded-lg py-2 flex-col items-center justify-center flex`}
                                 onClick={() => {
                                   setPosisiReservasi(number)
@@ -952,7 +951,7 @@ export default function Reservation() {
                                   )
                                 }}
                               >
-                                <p className="opacity-100">{number}</p>{' '}
+                                <p className="opacity-100 text-xs py-2">Reg</p>{' '}
                               </div>
                             </DrawerTrigger>
                             <DrawerContent className="active:border-none border-none outline-none">
@@ -1087,7 +1086,7 @@ export default function Reservation() {
                                                 const isDisabled = disableTimes.includes(
                                                   time,
                                                 )
-                                                console.log(isDisabled)
+                                                
                                                 return (
                                                   <SelectItem
                                                     key={index}
@@ -1148,7 +1147,7 @@ export default function Reservation() {
                                   )
                                 }}
                               >
-                                <p className="opacity-100">{number}</p>{' '}
+                                <p className="opacity-100 text-xs py-2">{number == '9' ? 'VIP' : number == 12 ? 'PS 2' : 'Reg+'}</p>{' '}
                               </div>
                             </DrawerTrigger>
                             <DrawerContent className="active:border-none border-none outline-none">
@@ -1283,7 +1282,7 @@ export default function Reservation() {
                                                 const isDisabled = disableTimes.includes(
                                                   time,
                                                 )
-                                                console.log(isDisabled)
+                                                
                                                 return (
                                                   <SelectItem
                                                     key={index}
@@ -1332,8 +1331,6 @@ export default function Reservation() {
                               reserve.status_reserve === 'settlement',
                           )
 
-                        console.log({ reservesPosition })
-
                         const inHold =
                           reservesPosition.length > 0 &&
                           reservesPosition.some(
@@ -1357,7 +1354,7 @@ export default function Reservation() {
                                   )
                                 }}
                               >
-                                <p className="opacity-100">{number}</p>{' '}
+                                <p className="opacity-100 text-xs py-2">PS 2</p>{' '}
                               </div>
                             </DrawerTrigger>
                             <DrawerContent className="active:border-none border-none outline-none">
@@ -1492,7 +1489,7 @@ export default function Reservation() {
                                                 const isDisabled = disableTimes.includes(
                                                   time,
                                                 )
-                                                console.log(isDisabled)
+                                                
                                                 return (
                                                   <SelectItem
                                                     key={index}
@@ -1561,7 +1558,7 @@ export default function Reservation() {
                 {isLoading ? (
                   <div className="flex items-center justify-center w-full">
                     {' '}
-                    <HashLoader color="#FF6200" />
+                    <Loading />
                   </div>
                 ) : (
                   <div>
@@ -1665,7 +1662,7 @@ export default function Reservation() {
           <div className="flex flex-col gap-1 w-full mt-5">
             <Checkout
               id={idReservasi}
-              price={totalTime * 10000}
+              price={totalTime * pricePerReserve}
               productName={`Reservation ${
                 floorSelected == 'second-floor'
                   ? '2nd Floor Position 1'

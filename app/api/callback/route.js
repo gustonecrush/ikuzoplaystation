@@ -8,7 +8,7 @@ async function updateDataStatus(order_id, transaction_status) {
     };
 
     try {
-        const response = await axios.post(`https://t5pwxbsg-8000.asse.devtunnels.ms/api/reservations/${order_id}`, payload);
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/reservations/${order_id}`, payload);
         console.log('Response:', response.data);
     } catch (error) {
         console.error('Error:', error.response.data);
