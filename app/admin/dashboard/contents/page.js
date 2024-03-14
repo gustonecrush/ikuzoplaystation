@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import React from 'react'
-import Reservation from '../components/Reservations'
 import Card from '@/app/components/Card'
 import TableReservations from '@/app/components/TableReservations'
 
@@ -76,6 +75,9 @@ import { AiFillEdit } from 'react-icons/ai'
 import Toast from '@/app/components/Toast'
 import Loading from '../components/loading'
 import { Fade } from 'react-awesome-reveal'
+import Layout from '../components/Layout'
+import SwiperContentGames from '@/app/components/SwiperContentGames'
+import SwiperContentFacilities from '@/app/admin/dashboard/components/SwiperContentFacilities'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -527,6 +529,29 @@ function page() {
     }
   }
 
+  const features = [
+    {
+      id: 'games',
+      name: 'Games',
+      desc: 'Setup Content Games',
+      img: '/game.png',
+    },
+    {
+      id: 'facilities',
+      name: 'Facilities',
+      desc: 'Setup Content Facilities',
+      img: '/sofa.png',
+    },
+    {
+      id: 'sections',
+      name: 'Sections',
+      desc: 'Setup Content Sections',
+      img: '/laptop.png',
+    },
+  ]
+
+  const [selectedFeature, setSelectedFeature] = React.useState('games')
+
   const [
     openCreateReservationForm,
     setOpenCreateReservationForm,
@@ -537,207 +562,67 @@ function page() {
   }, [])
 
   return (
-    <main className="flex w-full h-screen rounded-3xl">
-      <section className="flex h-full flex-col w-2/12 pt-8 bg-white shadow-md rounded-l-3xl">
-        <div className="mx-auto p-4  rounded-2xl text-white">
-          <Image
-            src={'/logo-orange.png'}
-            alt="Ikuzo Playstation Logo"
-            width={0}
-            height={0}
-            className="w-[150px]"
-          />
+    <Layout>
+      <div className="flex flex-col gap-4 w-full mb-6 p-8">
+        <div className=" w-fit py-5 text-black bg-white rounded-lg mt-8  flex flex-row gap-3 items-center">
+          <Fade>
+            <Image
+              src={'/checkout.png'}
+              width={0}
+              height={0}
+              alt={'Reservation'}
+              className="w-20"
+            />
+          </Fade>
+
+          <Fade>
+            <div className="flex flex-col">
+              <h1 className="text-4xl font-semibold">CMS</h1>
+              <p className="text-base font-normal text-gray-400">
+                Content Management System Website Ikuzo
+              </p>
+            </div>
+          </Fade>
         </div>
-        <nav className="relative flex flex-col py-4 items-center">
-          <a
-            href="#"
-            className="relative w-16 p-4 bg-yellow-100 text-orange rounded-2xl mb-4"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        <div className="flex flex-row gap-4 w-full">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              onClick={(e) => setSelectedFeature(feature.id)}
+              className={`flex w-full hover:scale-110 duration-1000 cursor-pointer items-center px-2 py-6 justify-center ${
+                selectedFeature == feature.id
+                  ? 'bg-orange bg-opacity-5'
+                  : 'bg-white'
+              } rounded-lg shadow-md`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1"
-                d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"
-              />
-            </svg>
-            <span className="absolute -top-2 -right-2 bg-red-600 h-6 w-6 p-2 flex justify-center items-center text-white rounded-full">
-              3
-            </span>
-          </a>
-          <a
-            href="#"
-            className="w-16 p-4 border text-gray-700 rounded-2xl mb-4"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1"
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-              />
-            </svg>
-          </a>
-          <a
-            href="#"
-            className="w-16 p-4 border text-gray-700 rounded-2xl mb-4"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </a>
-          <a
-            href="#"
-            className="w-16 p-4 mt-10 border text-gray-700 rounded-2xl"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-          </a>
-        </nav>
-      </section>
-      <section className="flex flex-col pt-3 w-10/12 bg-white h-full overflow-y-scroll">
-        {openCreateReservationForm ? (
-          <Reservation />
-        ) : (
-          <>
-            <div className=" w-fit py-5 px-7 text-black bg-white rounded-lg  flex flex-row gap-3 items-center">
-              <Fade>
+              <div className="flex flex-col gap-1 items-center justify-center">
                 <Image
-                  src={'/checkout.png'}
+                  src={feature.img}
+                  alt={'Content Games'}
                   width={0}
                   height={0}
-                  alt={'Reservation'}
-                  className="w-20"
+                  className="w-[120px]"
                 />
-              </Fade>
 
-              <Fade>
-                <div className="flex flex-col">
-                  <h1 className="text-4xl font-semibold">Reservations</h1>
-                  <p className="text-base font-normal text-gray-400">
-                    Lihat list reservasi yang ada
+                <div className="flex flex-col justify-center items-center">
+                  <h1 className="text-lg font-semibold">{feature.name}</h1>
+                  <p className={`text-base font-normal text-gray-400`}>
+                    {feature.desc}
                   </p>
                 </div>
-              </Fade>
+              </div>
             </div>
-            <section className="gap-3 px-5 ml-8 bg-white shadow-md rounded-lg mt-5 ">
-              <Card extra="mt-6 p-5 text-base">
-                <div className="w-full">
-                  <div className="flex items-center justify-between py-4">
-                    <Input
-                      placeholder="Cari ID Reservasi..."
-                      value={
-                        table.getColumn('reserve_id')?.getFilterValue() ?? ''
-                      }
-                      onChange={(event) =>
-                        table
-                          .getColumn('reserve_id')
-                          ?.setFilterValue(event.target.value)
-                      }
-                      className="max-w-sm"
-                    />
-                    <div className="flex gap-1">
-                      <Button
-                        onClick={(e) =>
-                          setOpenCreateReservationForm(
-                            !openCreateReservationForm,
-                          )
-                        }
-                        variant="outline"
-                        className="ml-auto"
-                      >
-                        Tambah Reservasi <IoMdAdd className="ml-2 h-4 w-4" />
-                      </Button>
-
-                      {/* <ExcelExport
-                  apiData={dataExcel}
-                  fileName={'IKU PNBP Satker Puslatluh'}
-                /> */}
-                    </div>
-                  </div>
-
-                  {isLoading ? (
-                    <div className="flex h-[300px] w-full flex-col items-center justify-center py-20">
-                      <Loading />
-                    </div>
-                  ) : (
-                    <TableReservations
-                      isLoading={isLoading}
-                      columns={columns}
-                      table={table}
-                      type={'short'}
-                    />
-                  )}
-
-                  <div className="flex items-center justify-end space-x-2 py-4">
-                    <div className="text-muted-foreground flex-1 text-sm">
-                      {table.getFilteredSelectedRowModel().rows.length} of{' '}
-                      {table.getFilteredRowModel().rows.length} row(s) selected.
-                    </div>
-                    <div className="space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </section>
-          </>
+          ))}
+        </div>
+      </div>
+      <div>
+        {selectedFeature == 'games' ? (
+          <SwiperContentGames />
+        ) : (
+          <SwiperContentFacilities />
         )}
-        {/* <Reservation /> */}
-      </section>
-    </main>
+      </div>
+    </Layout>
   )
 }
 

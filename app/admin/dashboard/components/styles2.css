@@ -4,11 +4,11 @@
   padding-bottom: 50px;
 }
 
-.swiper-slide-2 {
+.swiper-slide {
   background-position: center;
   background-size: cover;
-  width: 300px !important;
-  height: 300px !important;
+  width: 700px !important;
+  height: fit-content !important;
 }
 
 .swiper-slide img {

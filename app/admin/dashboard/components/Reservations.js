@@ -396,7 +396,7 @@ export default function Reservation() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <input
-                        type="date"
+                        type="text"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
                         name="tanggal_reservasi"
