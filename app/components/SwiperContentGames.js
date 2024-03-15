@@ -24,8 +24,51 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { AiOutlineDelete } from 'react-icons/ai'
+import axios from 'axios'
+import Toast from './Toast'
+import { headers } from '@/next.config'
 
-const SwiperContentGames = ({ children }) => {
+const SwiperContentGames = ({ games, fetchContentGames }) => {
+  const deleteContentGame = async (id) => {
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/content-games/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzEwNDM4MTAzLCJleHAiOjE3MTA0NDE3MDMsIm5iZiI6MTcxMDQzODEwMywianRpIjoiVzNEbFBId3RTR0RoMmtNSyIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.sxT6ch4vRJP-aFABgfTBDrRqhZ0y7BVP0FPaUwj11yE'}`,
+          },
+        },
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        console.log({ jsonData })
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data content games berhasil dihapus!`,
+      })
+
+      fetchContentGames()
+    } catch (error) {
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data content gagal games berhasil dihapus!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
   return (
     <>
       <Swiper
@@ -33,7 +76,7 @@ const SwiperContentGames = ({ children }) => {
         grabCursor={true}
         centeredSlides={true}
         slidesPerView={'auto'}
-        initialSlide={4}
+        initialSlide={2}
         coverflowEffect={{
           rotate: 50,
           stretch: 0,
@@ -45,83 +88,48 @@ const SwiperContentGames = ({ children }) => {
         modules={[EffectCoverflow, Pagination]}
         className="mySwiper"
       >
-        <SwiperSlide className="w-[300px] swiper-slide2">
-          <div className="relative">
-            <form action="" method="post" className="absolute top-4 right-4">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="ml-auto border border-red-500 bg-red-500 hover:bg-red-300 bg-opacity-10 hover:text-red-500 text-base text-red-500"
-                  >
-                    <AiOutlineDelete className="h-7 w-5" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      your account and remove your data from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </form>
-            <img
-              className="rounded-md !w-[300px] !h-[300px]"
-              src="https://i.ibb.co/Kh67bXm/A-way-out.webp"
-            />
-          </div>
-        </SwiperSlide>
-        <SwiperSlide className="!w-[300px]">
-          <img
-            className="rounded-md !w-[300px] !h-[300px]"
-            src="https://i.ibb.co/khTTCzJ/Naruto-Strom-4.webp"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="!w-[300px]">
-          <img
-            className="rounded-md !w-[300px] !h-[300px]"
-            src="https://i.ibb.co/jr9HPtx/spiderman.png"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="!w-[300px]">
-          <img
-            className="rounded-md !w-[300px] !h-[300px]"
-            src="https://i.ibb.co/3RV6GGr/Aotennis-2.jpg"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="!w-[300px]">
-          <img
-            className="rounded-md !w-[300px] !h-[300px]"
-            src="https://i.ibb.co/WKkZrgF/Astro-Playroom.webp"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="!w-[300px]">
-          <img
-            className="rounded-md !w-[300px] !h-[300px]"
-            src="https://i.ibb.co/4WYM4GC/2k-drive.png"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="w-[300px] swiper-slide2">
-          <img
-            className="rounded-md !w-[300px] !h-[300px]"
-            src="https://i.ibb.co/4tWMKL6/ultimate-ninja-5-1-final-1655137135122.jpg"
-          />
-        </SwiperSlide>
-        <SwiperSlide className="w-[300px] swiper-slide2">
-          <img
-            className="rounded-md !w-[300px] !h-[300px]"
-            src="https://i.ibb.co/Y04DbxG/Alienation.webp"
-          />
-        </SwiperSlide>
+        {games.map((game, index) => (
+          <SwiperSlide key={index} className="w-fit small">
+            <div className="relative">
+              <form action="" method="post" className="absolute top-4 right-4">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="ml-auto border border-red-500 bg-red-500 hover:bg-red-300 bg-opacity-10 hover:text-red-500 text-base text-red-500"
+                    >
+                      <AiOutlineDelete className="h-7 w-5" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your account and remove your data from our
+                        servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={(e) => deleteContentGame(game.id)}
+                      >
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </form>
+              <img
+                className="rounded-md !w-[300px] !h-[300px]"
+                src={process.env.NEXT_PUBLIC_IMAGE_URL + game.file_name}
+              />
+            </div>
+          </SwiperSlide>
+        ))}
       </Swiper>
     </>
   )

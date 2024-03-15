@@ -33,7 +33,7 @@ const SwiperContentFacilities = ({ children }) => {
         grabCursor={true}
         centeredSlides={true}
         slidesPerView={'auto'}
-        initialSlide={4}
+        initialSlide={2}
         coverflowEffect={{
           rotate: 50,
           stretch: 0,
@@ -45,7 +45,7 @@ const SwiperContentFacilities = ({ children }) => {
         modules={[EffectCoverflow, Pagination]}
         className="mySwiper mx-10"
       >
-        <SwiperSlide className="w-[700px]">
+        <SwiperSlide className="wide">
           <div className="relative">
             <form action="" method="post" className="absolute top-4 right-4">
               <AlertDialog>
@@ -80,25 +80,25 @@ const SwiperContentFacilities = ({ children }) => {
             />
           </div>
         </SwiperSlide>
-        <SwiperSlide className="w-[700px]">
+        <SwiperSlide className="wide">
           <img
             className="rounded-lg w-[700px]"
             src="https://i.ibb.co/rQznhYC/ps2.png"
           />
         </SwiperSlide>
-        <SwiperSlide className="w-[700px]">
+        <SwiperSlide className="wide">
           <img
             className="rounded-lg w-[700px]"
             src="https://i.ibb.co/khhvvWY/vip-plus.png"
           />
         </SwiperSlide>
-        <SwiperSlide className="w-[700px]">
+        <SwiperSlide className="wide">
           <img
             className="rounded-lg w-[700px]"
             src="https://i.ibb.co/mC9q8X2/regular.png"
           />
         </SwiperSlide>
-        <SwiperSlide className="w-[700px]">
+        <SwiperSlide className="wide">
           <img
             className="rounded-lg w-[700px]"
             src="https://i.ibb.co/Wyf3KvL/simulator.png"

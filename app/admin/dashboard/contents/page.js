@@ -83,6 +83,41 @@ function page() {
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
 
+  // Content Games Management
+  const [games, setGames] = React.useState([])
+  const fetchContentGames = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/content-games`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setGames(jsonData.data)
+        console.log({ jsonData })
+        setIsLoading(false)
+      } else {
+        setIsLoading(false)
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      setIsLoading(false)
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
@@ -496,39 +531,6 @@ function page() {
     },
   })
 
-  const getAllDataReservations = async () => {
-    setIsLoading(true)
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/reservations`,
-      )
-      if (response.status == 200) {
-        const jsonData = await response.data
-        setData(jsonData)
-        console.log({ jsonData })
-        setIsLoading(false)
-      } else {
-        setIsLoading(false)
-        console.error({ error })
-        throw new Error('Failed to fetch data')
-      }
-    } catch (error) {
-      setIsLoading(false)
-      console.error({ error })
-      if (error.code == 'ERR_NETWORK') {
-        Toast.fire({
-          icon: 'error',
-          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
-        })
-      } else {
-        Toast.fire({
-          icon: 'error',
-          title: `Internal server sedang error, coba lagi nanti!`,
-        })
-      }
-    }
-  }
-
   const features = [
     {
       id: 'games',
@@ -552,43 +554,39 @@ function page() {
 
   const [selectedFeature, setSelectedFeature] = React.useState('games')
 
-  const [
-    openCreateReservationForm,
-    setOpenCreateReservationForm,
-  ] = React.useState(false)
-
   React.useEffect(() => {
-    getAllDataReservations()
+    fetchContentGames()
   }, [])
+
+  console.log({ games })
 
   return (
     <Layout>
       <div className="flex flex-col gap-4 w-full mb-6 p-8">
         <div className=" w-fit py-5 text-black bg-white rounded-lg mt-8  flex flex-row gap-3 items-center">
-          <Fade>
-            <Image
-              src={'/checkout.png'}
-              width={0}
-              height={0}
-              alt={'Reservation'}
-              className="w-20"
-            />
-          </Fade>
+          <Image
+            src={'/checkout.png'}
+            width={0}
+            height={0}
+            alt={'Reservation'}
+            className="w-20"
+          />
 
-          <Fade>
-            <div className="flex flex-col">
-              <h1 className="text-4xl font-semibold">CMS</h1>
-              <p className="text-base font-normal text-gray-400">
-                Content Management System Website Ikuzo
-              </p>
-            </div>
-          </Fade>
+          <div className="flex flex-col">
+            <h1 className="text-4xl font-semibold">CMS</h1>
+            <p className="text-base font-normal text-gray-400">
+              Content Management System Website Ikuzo
+            </p>
+          </div>
         </div>
         <div className="flex flex-row gap-4 w-full">
           {features.map((feature, index) => (
             <div
               key={index}
-              onClick={(e) => setSelectedFeature(feature.id)}
+              onClick={(e) => {
+                setSelectedFeature(feature.id)
+                setIsLoading(!isLoading)
+              }}
               className={`flex w-full hover:scale-110 duration-1000 cursor-pointer items-center px-2 py-6 justify-center ${
                 selectedFeature == feature.id
                   ? 'bg-orange bg-opacity-5'
@@ -616,11 +614,14 @@ function page() {
         </div>
       </div>
       <div>
-        {selectedFeature == 'games' ? (
-          <SwiperContentGames />
-        ) : (
-          <SwiperContentFacilities />
+        {selectedFeature == 'games' && (
+          <SwiperContentGames
+            games={games}
+            fetchContentGames={fetchContentGames}
+          />
         )}
+
+        {selectedFeature == 'facilities' && <SwiperContentFacilities />}
       </div>
     </Layout>
   )
