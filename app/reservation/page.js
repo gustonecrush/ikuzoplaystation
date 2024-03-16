@@ -1,5 +1,3 @@
-'use client'
-
 import { initializeGoogleTagManager } from '@/utils/googleTagManager'
 import { Video } from '../components/Home'
 import Reservation from './Reservations'
