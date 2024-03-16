@@ -1,3 +1,6 @@
+'use client'
+
+import { initializeGoogleTagManager } from '@/utils/googleTagManager'
 import { Video } from '../components/Home'
 import Reservation from './Reservations'
 
@@ -18,6 +21,9 @@ export const metadata = {
 }
 
 export default function Page() {
+  React.useEffect(() => {
+    initializeGoogleTagManager('G-RH5E4VBLZM')
+  }, [])
   return (
     <section
       className={`${plusJakartaSans.className} flex flex-col h-full w-full scroll-smooth overflow-x-hidden`}

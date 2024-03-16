@@ -56,7 +56,8 @@ const Navbar = () => {
         <Link href="/">
           <Image
             src="/logo-orange.png"
-            alt="logo"
+            alt="Ikuzo Playstation's Logo"
+            title="Ikuzo Playstation's Logo"
             width={0}
             height={0}
             className="w-[110px] md:w-[140px] md:h-[80px]"
@@ -91,14 +92,6 @@ const Navbar = () => {
             />
           </div>
         </div>
-
-        {/* <Image
-          src="/menu.svg"
-          alt="menu"
-          width={32}
-          height={32}
-          className="inline-block cursor-pointer lg:hidden w-[20px] h-[20px] md:w-[32px] z-60 md:h-[32px] mr-[200px]"
-        /> */}
       </div>
     </nav>
   )

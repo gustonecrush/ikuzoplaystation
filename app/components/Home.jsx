@@ -1,14 +1,11 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import Navbar from './Navbar'
 import Image from 'next/image'
-import SlideContainer from './SlideContainer'
 import BounceContainer from './BounceContainer'
 import SwiperContainer2 from './SwiperContainer2'
 import SwiperContainer from './SwiperContainer'
-import Loading from '../loading'
 import { Footer } from './Footer'
 import ScrollDown from './ScrollDown'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import FadeContainer from './FadeContainer'
 import { IoLogoGameControllerB } from 'react-icons/io'
@@ -29,6 +26,7 @@ export default function Home() {
               className="-z-50 w-full h-screen object-cover bg-opacity-10"
               alt="Facilites Image"
               width={0}
+              priority
               height={0}
               title="Facilities Image"
               src={'/facilities.png'}
@@ -57,6 +55,7 @@ export default function Home() {
               alt="Facilites Image"
               width={0}
               height={0}
+              priority
               title="Facilities Image"
               src={'/fasilitas/regular-plus.png'}
             />
@@ -121,12 +120,12 @@ export default function Home() {
 
 function CTAButton() {
   return (
-      <Link
-        href={'/reservation'}
-        className="fixed bottom-5 right-5 z-[100] h-16 w-16 bg-orange rounded-full p-4 flex items-center justify-center"
-      >
-        <IoLogoGameControllerB className="text-white text-4xl w-10 " />
-      </Link>
+    <Link
+      href={'/reservation'}
+      className="fixed bottom-5 right-5 z-[100] h-16 w-16 bg-orange rounded-full p-4 flex items-center justify-center"
+    >
+      <IoLogoGameControllerB className="text-white text-4xl w-10 " />
+    </Link>
   )
 }
 
@@ -171,6 +170,7 @@ export async function Video({ extra = '' }) {
         autoPlay
         muted
         loop
+        title="Ikuzo Playstation"
         className={`h-screen w-full object-cover -z-30 block md:hidden ${extra}`}
       >
         <source src="/ikuzoplaystation.mp4" type="video/mp4" />
@@ -184,6 +184,7 @@ export async function Video({ extra = '' }) {
         autoPlay
         muted
         loop
+        title="Ikuzo Playstation"
         className="h-screen w-full object-cover -z-30 hidden md:block"
       >
         <source src="/ikuzo-dekstop.mp4" type="video/mp4" />
