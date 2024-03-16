@@ -11,6 +11,7 @@ import ScrollDown from './ScrollDown'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import FadeContainer from './FadeContainer'
+import { IoLogoGameControllerB } from 'react-icons/io'
 
 export default function Home() {
   return (
@@ -111,8 +112,21 @@ export default function Home() {
         </section>
 
         <Footer />
+
+        <CTAButton />
       </section>
     </>
+  )
+}
+
+function CTAButton() {
+  return (
+      <Link
+        href={'/reservation'}
+        className="fixed bottom-5 right-5 z-[100] h-16 w-16 bg-orange rounded-full p-4 flex items-center justify-center"
+      >
+        <IoLogoGameControllerB className="text-white text-4xl w-10 " />
+      </Link>
   )
 }
 
