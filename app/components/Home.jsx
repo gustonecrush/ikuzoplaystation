@@ -148,17 +148,16 @@ function ReserveButton() {
   )
 }
 
-async function Video() {
+export async function Video({ extra = '' }) {
   return (
     <>
       <video
         width="320"
-        height="240"
         preload="none"
         autoPlay
         muted
         loop
-        className="h-screen w-full object-cover -z-30 block md:hidden"
+        className={`h-screen w-full object-cover -z-30 block md:hidden ${extra}`}
       >
         <source src="/ikuzoplaystation.mp4" type="video/mp4" />
         <track src="/ikuzoplaystation.mp4" srcLang="en" label="English" />
