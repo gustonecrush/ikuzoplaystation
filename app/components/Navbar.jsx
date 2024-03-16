@@ -34,7 +34,7 @@ const Navbar = () => {
     <nav
       className={`flexBetween max-container z-[80] pt-1 font-montserrat flex flex-col ${
         scrolled ? 'bg-white text-black' : 'bg-transparent text-white'
-      } fixed top-0 transition-all ease-in-out duration-300`}
+      } fixed top-0 transition-all ease-in-out duration-1000`}
     >
       {/* MARQUEE TEXT */}
       <Marquee
@@ -59,7 +59,7 @@ const Navbar = () => {
             alt="logo"
             width={0}
             height={0}
-            className="w-[140px] md:w-[140px] md:h-[80px]"
+            className="w-[110px] md:w-[140px] md:h-[80px]"
           />
         </Link>
 

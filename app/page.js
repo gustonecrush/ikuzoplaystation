@@ -5,20 +5,15 @@ import Loading from './loading'
 import Home from './components/Home'
 
 export default function Page() {
-  const [loading, setLoading] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
     setLoading(true)
 
     setTimeout(() => {
-        setLoading(false)
+      setLoading(false)
     }, 5000)
   }, [])
 
-  return (
-    <>
-     {
-        !loading ?  <Home /> : <Loading />
-       }</>
-  )
+  return <>{!loading ? <Home /> : <Loading />}</>
 }
