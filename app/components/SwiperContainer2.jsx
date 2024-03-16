@@ -11,7 +11,48 @@ import { EffectCoverflow, Pagination } from 'swiper/modules'
 
 import './styles.css'
 
+import Image from 'next/image'
+import Toast from './Toast'
+import axios from 'axios'
+
 export default function SwiperContainer2() {
+  const [facilities, setFacilities] = React.useState([])
+
+  const fetchContents = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/content-facilities`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setFacilities(jsonData.data)
+        console.log({ jsonData })
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
+  console.log({ facilities })
+
+  React.useEffect(() => {
+    fetchContents()
+  }, [])
+
   return (
     <section className="-mt-4 px-8 md:px-0">
       <Swiper
@@ -31,33 +72,17 @@ export default function SwiperContainer2() {
         modules={[EffectCoverflow, Pagination]}
         className="mySwiper mx-10"
       >
-        <SwiperSlide>
-          <img
-            className="rounded-lg"
-            src="https://i.ibb.co/2FCP3dS/regular-plus.png"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img className="rounded-lg" src="https://i.ibb.co/rQznhYC/ps2.png" />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            className="rounded-lg"
-            src="https://i.ibb.co/khhvvWY/vip-plus.png"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            className="rounded-lg"
-            src="https://i.ibb.co/mC9q8X2/regular.png"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            className="rounded-lg"
-            src="https://i.ibb.co/Wyf3KvL/simulator.png"
-          />
-        </SwiperSlide>
+        {facilities.map((facility, index) => (
+          <SwiperSlide key={index}>
+            <Image
+              alt={facility.name}
+              width={0}
+              height={0}
+              className="rounded-lg"
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
+            />
+          </SwiperSlide>
+        ))}
       </Swiper>
     </section>
   )
