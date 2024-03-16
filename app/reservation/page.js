@@ -3,6 +3,7 @@ import { Video } from '../components/Home'
 import Reservation from './Reservations'
 
 import { Plus_Jakarta_Sans } from 'next/font/google'
+import React from 'react'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -19,9 +20,6 @@ export const metadata = {
 }
 
 export default function Page() {
-  React.useEffect(() => {
-    initializeGoogleTagManager('G-RH5E4VBLZM')
-  }, [])
   return (
     <section
       className={`${plusJakartaSans.className} flex flex-col h-full w-full scroll-smooth overflow-x-hidden`}
