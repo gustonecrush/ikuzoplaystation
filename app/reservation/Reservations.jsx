@@ -1684,7 +1684,7 @@ export default function Reservation() {
                         <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           ID Reservasi
                         </h4>
-                        <p className="text-base font-jakarta text-muted-foreground text-gray-200">
+                        <p className="text-base font-jakarta text-gray-300">
                           {idReservasi}
                         </p>
                       </div>
@@ -1695,7 +1695,7 @@ export default function Reservation() {
                         <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           Nama
                         </h4>
-                        <p className="text-base font-jakarta text-muted-foreground text-gray-200">
+                        <p className="text-base font-jakarta text-gray-300">
                           {namaReservasi}
                         </p>
                       </div>
@@ -1706,7 +1706,7 @@ export default function Reservation() {
                         <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           No Whatsapp
                         </h4>
-                        <p className="text-base font-jakarta text-muted-foreground text-gray-200">
+                        <p className="text-base font-jakarta text-gray-300">
                           {nomorWhatsappReservasi}
                         </p>
                       </div>
@@ -1717,7 +1717,7 @@ export default function Reservation() {
                         <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           Tanggal Reservasi
                         </h4>
-                        <p className="text-base font-jakarta text-muted-foreground text-gray-200">
+                        <p className="text-base font-jakarta text-gray-300">
                           {formatDate(selectedDate)}
                         </p>
                       </div>
@@ -1728,7 +1728,7 @@ export default function Reservation() {
                         <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           Waktu Reservasi
                         </h4>
-                        <p className="text-base font-jakarta text-muted-foreground text-gray-200">
+                        <p className="text-base font-jakarta text-gray-300">
                           {startTimeReservasi} - {endTimeReservasi} -{' '}
                           {totalTime} Hours
                         </p>
@@ -1740,7 +1740,7 @@ export default function Reservation() {
                         <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           Detail Tempat
                         </h4>
-                        <p className="text-base font-jakarta text-muted-foreground text-gray-200">
+                        <p className="text-base font-jakarta text-gray-300">
                           in
                           {floorSelected == 'second-floor'
                             ? ' 2nd Floor'
@@ -1755,7 +1755,7 @@ export default function Reservation() {
                         <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           Total Harga
                         </h4>
-                        <p className="text-base font-jakarta text-muted-foreground text-gray-200">
+                        <p className="text-base font-jakarta text-gray-300">
                           Rp {totalTime * pricePerReserve}
                         </p>
                       </div>
