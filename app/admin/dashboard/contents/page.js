@@ -88,7 +88,7 @@ function page() {
   return (
     <Layout>
       <div className="flex flex-col gap-4 w-full mb-6 p-8">
-        <div className=" w-fit py-5 text-black bg-white rounded-lg mt-8  flex flex-row gap-3 items-center">
+        <div className=" w-fit py-5 text-black bg-white rounded-lg flex flex-row gap-3 items-center">
           <Image
             src={'/checkout.png'}
             width={0}

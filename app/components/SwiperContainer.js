@@ -1,63 +1,88 @@
 'use client'
 
-import React, { useRef, useState } from 'react';
+import React from 'react'
 
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide } from 'swiper/react'
 
-import 'swiper/css';
-import 'swiper/css/effect-coverflow';
-import 'swiper/css/pagination';
+import 'swiper/css'
+import 'swiper/css/effect-coverflow'
+import 'swiper/css/pagination'
 
-import { EffectCoverflow, Pagination } from 'swiper/modules';
+import { EffectCoverflow, Pagination } from 'swiper/modules'
 
-import './styles.css';
+import './styles.css'
+import Image from 'next/image'
+import Toast from './Toast'
+import axios from 'axios'
 
-const SwiperContainer = ({children}) => {
+const SwiperContainer = () => {
+  const [games, setGames] = React.useState([])
+
+  const fetchContents = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/content-games`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setGames(jsonData.data)
+        console.log({ jsonData })
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
+  React.useEffect(() => {
+    fetchContents()
+  }, [])
+
   return (
-    <>
-    <Swiper
-      effect={'coverflow'}
-      grabCursor={true}
-      centeredSlides={true}
-      slidesPerView={'auto'}
-      initialSlide={4}
-      coverflowEffect={{
-        rotate: 50,
-        stretch: 0,
-        depth: 100,
-        modifier: 1,
-        slideShadows: true,
-      }}
-      pagination={true}
-      modules={[EffectCoverflow, Pagination]}
-      className="mySwiper"
-    >
-      <SwiperSlide>
-        <img src="https://i.ibb.co/Kh67bXm/A-way-out.webp" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://i.ibb.co/khTTCzJ/Naruto-Strom-4.webp" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://i.ibb.co/jr9HPtx/spiderman.png" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://i.ibb.co/3RV6GGr/Aotennis-2.jpg" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://i.ibb.co/WKkZrgF/Astro-Playroom.webp" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://i.ibb.co/4WYM4GC/2k-drive.png" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://i.ibb.co/4tWMKL6/ultimate-ninja-5-1-final-1655137135122.jpg" />
-      </SwiperSlide>
-      <SwiperSlide>
-        <img src="https://i.ibb.co/Y04DbxG/Alienation.webp" />
-      </SwiperSlide>
-    </Swiper>
-  </>
+    <section className="-mt-4 px-8 md:px-0">
+      <Swiper
+        effect={'coverflow'}
+        grabCursor={true}
+        centeredSlides={true}
+        slidesPerView={'auto'}
+        initialSlide={2}
+        coverflowEffect={{
+          rotate: 50,
+          stretch: 0,
+          depth: 100,
+          modifier: 1,
+          slideShadows: true,
+        }}
+        pagination={true}
+        modules={[EffectCoverflow, Pagination]}
+        className="mySwiper"
+      >
+        {games.map((game, index) => (
+          <SwiperSlide key={index}>
+            <Image
+              alt={game.file_name}
+              width={0}
+              height={0}
+              className="rounded-lg"
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${game.file_name}`}
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
   )
 }
 

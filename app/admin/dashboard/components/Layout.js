@@ -1,7 +1,50 @@
+'use client'
+
 import Image from 'next/image'
 import React from 'react'
+import { handleLogout } from '../../utils/logout'
+import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import Toast from '@/app/components/Toast'
 
 function Layout({ children }) {
+  const router = useRouter()
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  const token = Cookies.get('token')
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(`${baseUrl}/logout`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status == 200) {
+        Cookies.remove('token')
+        Toast.fire({
+          icon: 'success',
+          title: `Berhasil logout dari dashboard!`,
+        })
+        console.log({ response })
+
+        router.replace('/admin/login')
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Gagal logout dari dashboard!`,
+        })
+        console.log({ response })
+      }
+    } catch (error) {
+      Toast.fire({
+        icon: 'error',
+        title: `Gagal logout dari dashboard!`,
+      })
+      console.error({ error })
+    }
+  }
   return (
     <main className="flex w-full h-screen rounded-3xl">
       <section className="flex h-full flex-col w-2/12 pt-8 bg-white shadow-md rounded-l-3xl">
@@ -16,8 +59,8 @@ function Layout({ children }) {
         </div>
         <nav className="relative flex flex-col py-4 items-center">
           <a
-            href="#"
-            className="relative w-16 p-4 bg-yellow-100 text-orange rounded-2xl mb-4"
+            href="/admin/dashboard/reservations"
+            className="w-16 p-4 border text-gray-700 rounded-2xl mb-4"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -32,13 +75,10 @@ function Layout({ children }) {
                 d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"
               />
             </svg>
-            <span className="absolute -top-2 -right-2 bg-red-600 h-6 w-6 p-2 flex justify-center items-center text-white rounded-full">
-              3
-            </span>
           </a>
           <a
-            href="#"
-            className="w-16 p-4 border text-gray-700 rounded-2xl mb-4"
+            href="/admin/dashboard/contents"
+            className="relative w-16 p-4 bg-yellow-100 text-orange rounded-2xl mb-4 "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -56,24 +96,7 @@ function Layout({ children }) {
           </a>
           <a
             href="#"
-            className="w-16 p-4 border text-gray-700 rounded-2xl mb-4"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </a>
-          <a
-            href="#"
+            onClick={() => handleLogout()}
             className="w-16 p-4 mt-10 border text-gray-700 rounded-2xl"
           >
             <svg

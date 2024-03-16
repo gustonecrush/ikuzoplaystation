@@ -273,7 +273,9 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
                     </AlertDialogContent>
                   </AlertDialog>
                 </form>
-                <img
+                <Image
+                  width={0}
+                  height={0}
                   className="rounded-md !w-[300px] !h-[300px]"
                   src={process.env.NEXT_PUBLIC_IMAGE_URL + game.file_name}
                 />
