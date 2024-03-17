@@ -153,6 +153,7 @@ export default function Reservation() {
   const imageRef = useRef(null)
 
   const [posisiReservasi, setPosisiReservasi] = useState(0)
+  const [namaPosisiReservasi, setNamaPosisiReservasi] = useState('')
 
   const handleZoomIn = () => {
     setScale((scale) => scale + 0.1)
@@ -218,6 +219,7 @@ export default function Reservation() {
           setEndTimeReservasi('')
           setIdReservasi('')
           setPosisiReservasi(0)
+          setNamaPosisiReservasi('')
           setContinueTapped(!continueTapped)
           console.log(response)
         })
@@ -581,6 +583,10 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
+                                        setNamaPosisiReservasi(
+                                          positions[0].name,
+                                        )
+
                                         setPricePerReserve(positions[0].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
@@ -602,7 +608,7 @@ export default function Reservation() {
                                         {positions[0].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        IDR{positions[0].price}/hour and can
+                                        IDR {positions[0].price}/hour and can
                                         only accomodate {positions[0].capacity}{' '}
                                         person.
                                       </DrawerDescription>
@@ -803,6 +809,9 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
+                                        setNamaPosisiReservasi(
+                                          positions[1].name,
+                                        )
                                         setPricePerReserve(positions[1].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
@@ -824,7 +833,7 @@ export default function Reservation() {
                                         {positions[1].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        IDR{positions[1].price}/hour and can
+                                        IDR {positions[1].price}/hour and can
                                         only accomodate {positions[1].capacity}{' '}
                                         person.
                                       </DrawerDescription>
@@ -1024,6 +1033,9 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
+                                        setNamaPosisiReservasi(
+                                          positions[0].name,
+                                        )
                                         setPricePerReserve(positions[0].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
@@ -1045,7 +1057,7 @@ export default function Reservation() {
                                         {positions[0].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        IDR{positions[0].price}/hour and can
+                                        IDR {positions[0].price}/hour and can
                                         only accomodate {positions[0].capacity}{' '}
                                         person.
                                       </DrawerDescription>
@@ -1249,6 +1261,9 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
+                                        setNamaPosisiReservasi(
+                                          positions[4].name,
+                                        )
                                         setPricePerReserve(positions[4].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
@@ -1274,7 +1289,7 @@ export default function Reservation() {
                                         {positions[4].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        IDR{positions[4].price}/hour and can
+                                        IDR {positions[4].price}/hour and can
                                         only accomodate {positions[4].capacity}{' '}
                                         person.
                                       </DrawerDescription>
@@ -1475,6 +1490,9 @@ export default function Reservation() {
                                       }`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
+                                        setNamaPosisiReservasi(
+                                          positions[2].name,
+                                        )
                                         setPricePerReserve(positions[2].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
@@ -1500,7 +1518,7 @@ export default function Reservation() {
                                         {positions[2].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        IDR{positions[2].price}/hour and can
+                                        IDR {positions[2].price}/hour and can
                                         only accomodate {positions[2].capacity}{' '}
                                         person.
                                       </DrawerDescription>
@@ -1714,6 +1732,9 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 ml-1 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
+                                        setNamaPosisiReservasi(
+                                          positions[3].name,
+                                        )
                                         setPricePerReserve(positions[3].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
@@ -2015,11 +2036,7 @@ export default function Reservation() {
                           Detail Tempat
                         </h4>
                         <p className="text-base font-jakarta text-gray-300">
-                          in
-                          {floorSelected == 'second-floor'
-                            ? ' 2nd Floor'
-                            : ' 1st Floor'}
-                          , Position {posisiReservasi}
+                          in {namaPosisiReservasi}, Position {posisiReservasi}
                         </p>
                       </div>
                     </Fade>

@@ -4,6 +4,9 @@ import Reservation from './Reservations'
 
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -21,11 +24,41 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <section
-      className={`${plusJakartaSans.className} flex flex-col h-full w-full scroll-smooth overflow-x-hidden`}
-    >
-      <Video extra="!h-[1000px]" />
-      <Reservation />
-    </section>
+    <>
+      <section
+        className={`${plusJakartaSans.className} flex md:hidden flex-col h-full w-full scroll-smooth overflow-x-hidden`}
+      >
+        <Video extra="!h-[1000px]" />
+        <Reservation />
+      </section>
+      <section
+        className={`${plusJakartaSans.className} hidden md:flex flex-col h-full w-full scroll-smooth overflow-x-hidden`}
+      >
+        <div className="flex flex-col justify-center items-center min-h-screen gap-4 px-10">
+          <Image
+            src={'/error.png'}
+            alt="Failed Pay"
+            title={'Failed Pay'}
+            width={0}
+            height={0}
+            className="w-[300px] h-fit object-contain"
+          />
+          <div className="flex flex-col gap-1 items-center mt-7 text-center">
+            <h1 className="text-3xl font-montserrat font-semibold">
+              Still In Development!
+            </h1>
+            <p className="text-sm text-gray-400 w-5xl">
+              You can not access this page on desktop for right now because
+              still in development, please open from your mobile phone!
+            </p>
+          </div>
+          <Link href={'/'} className="!rounded-full text-sm !w-fit -mt-2">
+            <Button className="bg-orange rounded-full px-24 mt-2 py-6 text-sm font-jakarta hover:bg-orange w-full">
+              Back to Home
+            </Button>
+          </Link>
+        </div>
+      </section>
+    </>
   )
 }

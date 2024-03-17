@@ -71,12 +71,12 @@ const SwiperContainer = () => {
         className="mySwiper"
       >
         {games.map((game, index) => (
-          <SwiperSlide key={index}>
+          <SwiperSlide key={index} className="md:small">
             <Image
               alt={game.file_name}
               width={0}
               height={0}
-              className="rounded-lg"
+              className="rounded-lg md:w-[300px]"
               src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${game.file_name}`}
             />
           </SwiperSlide>

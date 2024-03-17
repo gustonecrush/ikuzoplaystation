@@ -60,29 +60,11 @@ const Navbar = () => {
             title="Ikuzo Playstation's Logo"
             width={0}
             height={0}
-            className="w-[110px] md:w-[140px] md:h-[80px]"
+            className="w-[110px] md:w-[140px] md:hidden block"
           />
         </Link>
 
         <div className="flex gap-12 items-center justify-center">
-          <ul
-            className={`hidden h-full gap-12 lg:flex ${
-              scrolled ? 'text-black' : 'text-white'
-            }`}
-          >
-            {NAV_LINKS.map((link) => (
-              <Link
-                href={link.href}
-                key={link.key}
-                className={`regular-16 flexCenter cursor-pointer transition-all hover:font-bold font-montserrat ${
-                  scrolled ? 'text-black' : 'text-white'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </ul>
-
           <div className="lg:flexCenter hidden">
             <Button
               type="button"

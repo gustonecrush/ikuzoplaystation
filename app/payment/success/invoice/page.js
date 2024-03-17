@@ -45,6 +45,9 @@ const Invoice = () => {
     const invoice = document.getElementById('invoice-container')
 
     html2canvas(invoice).then(function (canvas) {
+      console.log({ canvas })
+      console.log(canvas.toBlob())
+
       const link = document.createElement('a')
       link.download = `${order_id}.png`
       link.href = canvas.toDataURL('image/png')
