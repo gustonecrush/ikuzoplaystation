@@ -2073,8 +2073,8 @@ export default function Reservation() {
               price={totalTime * pricePerReserve}
               productName={`Reservation ${
                 floorSelected == 'second-floor'
-                  ? '2nd Floor Position 1'
-                  : '1st Floor Position 2'
+                  ? `${namaPosisiReservasi} Position ${posisiReservasi}`
+                  : `${namaPosisiReservasi} Position ${posisiReservasi}`
               } in ${totalTime} hours`}
               detailCustomer={{
                 name: namaReservasi,
@@ -2085,8 +2085,8 @@ export default function Reservation() {
                 position: posisiReservasi,
                 location:
                   floorSelected == 'second-floor'
-                    ? `2nd Floor Position ${posisiReservasi}`
-                    : `1st Floor Position ${posisiReservasi}`,
+                    ? `${namaPosisiReservasi}`
+                    : `${namaPosisiReservasi}`,
               }}
             />
             <Button
