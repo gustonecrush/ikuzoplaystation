@@ -254,7 +254,7 @@ export default function Reservation() {
     let isDragging = false
     let prevPosition = { x: 0, y: 0 }
     const handleMouseDown = (e) => {
-      isDragging = true
+      isDragging = false
       prevPosition = getEventPosition(e)
     }
 
@@ -286,13 +286,6 @@ export default function Reservation() {
         y: e.clientY,
       }
     }
-
-    image?.addEventListener('mousedown', handleMouseDown)
-    image?.addEventListener('touchstart', handleMouseDown)
-    image?.addEventListener('mousemove', handleMouseMove)
-    image?.addEventListener('touchmove', handleMouseMove)
-    image?.addEventListener('mouseup', handleMouseUp)
-    image?.addEventListener('touchend', handleMouseUp)
 
     const getAllReservationWithoutState = async () => {
       try {
@@ -326,12 +319,6 @@ export default function Reservation() {
     }, intervalTime)
 
     return () => {
-      image?.removeEventListener('mousedown', handleMouseDown)
-      image?.removeEventListener('touchstart', handleMouseDown)
-      image?.removeEventListener('mousemove', handleMouseMove)
-      image?.removeEventListener('touchmove', handleMouseMove)
-      image?.removeEventListener('mouseup', handleMouseUp)
-      image?.removeEventListener('touchend', handleMouseUp)
       document.body.removeChild(script)
       clearInterval(interval)
     }
