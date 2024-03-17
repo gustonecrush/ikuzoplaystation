@@ -178,7 +178,7 @@ const generateTimeSlots = (date, bookedSlots) => {
   return timeSlots
 }
 
-export const generateTimeArrayWithStep = (selectedTime) => {
+export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
   const times = []
   const maxHour = 23
   const maxMinute = 30
@@ -190,33 +190,62 @@ export const generateTimeArrayWithStep = (selectedTime) => {
   // Add the selected time
   times.push(selectedTime)
 
-  // Generate times with step one hour, two hours, three hours, etc. until max 15 hours
-  for (let i = 1; i <= 15; i++) {
-    // Calculate next hour and minute
-    let nextHour = selectedHour + i
-    let nextMinute = selectedMinute
-
-    // Adjust if minute exceeds 59
-    if (nextMinute >= 60) {
-      nextHour++
-      nextMinute -= 60
+  // Check if bookedSlots is not empty
+  if (bookedSlots.length !== 0) {
+    // Find the nearest startTime after the selected time
+    let nearestStartTime = ''
+    for (const slot of bookedSlots) {
+      const [startHour, startMinute] = slot.startTime.split(':')
+      const slotStartTime = parseInt(startHour) * 60 + parseInt(startMinute)
+      const selectedTimeMinutes = selectedHour * 60 + selectedMinute
+      if (slotStartTime > selectedTimeMinutes) {
+        nearestStartTime = slot.startTime
+        break
+      }
     }
 
-    // Check if next hour exceeds maximum hour or if hour is 23 and minute exceeds maximum minute
-    if (
-      nextHour > maxHour ||
-      (nextHour === maxHour && nextMinute > maxMinute)
-    ) {
-      // If exceeded, break the loop
-      break
+    // Generate times from the selected time to the nearest startTime with step one hour
+    if (nearestStartTime) {
+      for (let hour = selectedHour + 1; hour <= maxHour; hour++) {
+        const formattedHour = hour.toString().padStart(2, '0')
+        const formattedMinute = selectedMinute.toString().padStart(2, '0')
+        const time = `${formattedHour}:${formattedMinute}`
+
+        // Check if the time is within the range of selected time to nearestStartTime
+        if (isTimeBetween(time, selectedTime, nearestStartTime)) {
+          times.push(time)
+        }
+
+        // If the nearestStartTime is reached, break the loop
+        if (`${hour}:00` === nearestStartTime) {
+          break
+        }
+      }
+    } else {
+      // If no nearest startTime, generate times with step one hour until 23:30
+      for (let hour = selectedHour + 1; hour <= maxHour; hour++) {
+        const formattedHour = hour.toString().padStart(2, '0')
+        const formattedMinute = selectedMinute.toString().padStart(2, '0')
+        const time = `${formattedHour}:${formattedMinute}`
+        times.push(time)
+
+        if (hour === maxHour && selectedMinute === maxMinute) {
+          break
+        }
+      }
     }
+  } else {
+    // If bookedSlots is empty, generate times with step one hour until 23:30
+    for (let hour = selectedHour + 1; hour <= maxHour; hour++) {
+      const formattedHour = hour.toString().padStart(2, '0')
+      const formattedMinute = selectedMinute.toString().padStart(2, '0')
+      const time = `${formattedHour}:${formattedMinute}`
+      times.push(time)
 
-    // Format next hour and minute
-    const formattedHour = nextHour.toString().padStart(2, '0')
-    const formattedMinute = nextMinute.toString().padStart(2, '0')
-
-    // Add the formatted time to the times array
-    times.push(`${formattedHour}:${formattedMinute}`)
+      if (hour === maxHour && selectedMinute === maxMinute) {
+        break
+      }
+    }
   }
 
   return times
