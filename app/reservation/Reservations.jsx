@@ -69,6 +69,7 @@ export default function Reservation() {
   const [pricePerReserve, setPricePerReserve] = React.useState(0)
 
   const [reserves, setReserves] = useState([])
+  const [bookedSlots, setBookedSlots] = useState([])
   const [reservesPosition, setReservesPosition] = useState([])
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -107,6 +108,11 @@ export default function Reservation() {
         const jsonData = await response.data
 
         setReserves(jsonData)
+        const slots = jsonData.map((reserve) => ({
+          startTime: reserve.reserve_start_time,
+          endTime: reserve.reserve_end_time,
+        }))
+        setBookedSlots(slots)
         console.log(response.data)
 
         setIsLoading(false)
@@ -144,6 +150,8 @@ export default function Reservation() {
       setIsLoading(false)
     }
   }
+
+  console.log({ bookedSlots })
 
   /***********************************************************
    * functions & states for scaling image
@@ -705,6 +713,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {generateTimeArray(
                                                   selectedDate,
+                                                  bookedSlots,
                                                 ).map((time, index) => (
                                                   <SelectItem
                                                     key={index}
@@ -929,6 +938,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {generateTimeArray(
                                                   selectedDate,
+                                                  bookedSlots,
                                                 ).map((time, index) => (
                                                   <SelectItem
                                                     key={index}
@@ -1153,6 +1163,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {generateTimeArray(
                                                   selectedDate,
+                                                  bookedSlots,
                                                 ).map((time, index) => (
                                                   <SelectItem
                                                     key={index}
@@ -1195,16 +1206,11 @@ export default function Reservation() {
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                   ).map((time, index) => {
-                                                    const isDisabled = disableTimes.includes(
-                                                      time,
-                                                    )
-
                                                     return (
                                                       <SelectItem
                                                         key={index}
                                                         value={time}
                                                         className={'text-sm'}
-                                                        disabled={isDisabled}
                                                       >
                                                         {time}
                                                       </SelectItem>
@@ -1384,6 +1390,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {generateTimeArray(
                                                   selectedDate,
+                                                  bookedSlots,
                                                 ).map((time, index) => (
                                                   <SelectItem
                                                     key={index}
@@ -1613,6 +1620,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {generateTimeArray(
                                                   selectedDate,
+                                                  bookedSlots,
                                                 ).map((time, index) => (
                                                   <SelectItem
                                                     key={index}
@@ -1851,6 +1859,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {generateTimeArray(
                                                   selectedDate,
+                                                  bookedSlots,
                                                 ).map((time, index) => (
                                                   <SelectItem
                                                     key={index}

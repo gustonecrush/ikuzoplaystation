@@ -79,86 +79,104 @@ export const formatDate = (dateString) => {
 
 export const generateTimeArray = (
   date = new Date().toISOString().split('T')[0],
-  bookedSlots = []
+  bookedSlots,
 ) => {
-  const times = [];
-  const today = new Date();
-
-  const currentHour = today.getHours();
-  const currentMinute = today.getMinutes();
+  const times = []
+  const today = new Date()
+  const currentHour = today.getHours()
+  const currentMinute = today.getMinutes()
 
   // Set start hour and minute
-  let startHour, startMinute;
+  let startHour, startMinute
   if (date === today.toISOString().split('T')[0]) {
     // If today, start from current hour and nearest multiple of 10 for minute
-    startHour = currentHour;
-    startMinute = Math.ceil(currentMinute / 10) * 10;
+    startHour = currentHour
+    startMinute = Math.ceil(currentMinute / 10) * 10
   } else {
     // If not today, start from 09:00
-    startHour = 9;
-    startMinute = 0;
+    startHour = 9
+    startMinute = 0
   }
 
-  const endHour = 23;
+  const endHour = 23
 
   for (let hour = startHour; hour <= endHour; hour++) {
-    const maxMinute = hour === endHour ? Math.floor(currentMinute / 10) * 10 : 60;
-    const startLoopMinute = hour === startHour ? startMinute : 0;
+    const maxMinute =
+      hour === endHour ? Math.floor(currentMinute / 10) * 10 : 60
+    const startLoopMinute = hour === startHour ? startMinute : 0
     for (let minute = startLoopMinute; minute < maxMinute; minute += 10) {
-      const formattedHour = hour.toString().padStart(2, '0');
-      const formattedMinute = minute.toString().padStart(2, '0');
-      const time = `${formattedHour}:${formattedMinute}`;
-      if (!bookedSlots.some(slot => isTimeBetween(time, slot[0], slot[1]))) {
-        times.push(time);
+      const formattedHour = hour.toString().padStart(2, '0')
+      const formattedMinute = minute.toString().padStart(2, '0')
+      const time = `${formattedHour}:${formattedMinute}`
+
+      // Check if bookedSlots has any entries before checking time availability
+      if (
+        bookedSlots.length === 0 ||
+        !bookedSlots.some((slot) =>
+          isTimeBetween(time, slot.startTime, slot.endTime),
+        )
+      ) {
+        times.push(time)
       }
     }
   }
-  return times;
-};
+  return times
+}
 
 // Helper function to check if a time is between two other times
 const isTimeBetween = (time, startTime, endTime) => {
-  return time >= startTime && time <= endTime;
-};
+  return time >= startTime && time <= endTime
+}
 
 const generateTimeSlots = (date, bookedSlots) => {
-  const startTime = new Date(date);
-  startTime.setHours(9, 0, 0, 0); // Set start time to 09:00
+  const startTime = new Date(date)
+  startTime.setHours(9, 0, 0, 0) // Set start time to 09:00
 
-  const endTime = new Date(date);
-  endTime.setHours(23, 30, 0, 0); // Set end time to 23:30
+  const endTime = new Date(date)
+  endTime.setHours(23, 30, 0, 0) // Set end time to 23:30
 
-  const timeSlots = [];
-  const currentTime = new Date(startTime);
+  const timeSlots = []
+  const currentTime = new Date(startTime)
 
   // Loop through each time slot from start time to end time
   while (currentTime <= endTime) {
-    const timeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const slot = { start_time: timeString };
+    const timeString = currentTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    const slot = { start_time: timeString }
 
     // Check if the current time slot is available (not booked)
-    const isBooked = bookedSlots.some(slot => {
-      const reserveDate = new Date(slot.reserve_date);
-      const startTime = new Date(reserveDate);
-      startTime.setHours(Number(slot.reserve_start_time.split(':')[0]), Number(slot.reserve_start_time.split(':')[1]), 0, 0);
-      const endTime = new Date(reserveDate);
-      endTime.setHours(Number(slot.reserve_end_time.split(':')[0]), Number(slot.reserve_end_time.split(':')[1]), 0, 0);
-      return currentTime >= startTime && currentTime < endTime;
-    });
+    const isBooked = bookedSlots.some((slot) => {
+      const reserveDate = new Date(slot.reserve_date)
+      const startTime = new Date(reserveDate)
+      startTime.setHours(
+        Number(slot.reserve_start_time.split(':')[0]),
+        Number(slot.reserve_start_time.split(':')[1]),
+        0,
+        0,
+      )
+      const endTime = new Date(reserveDate)
+      endTime.setHours(
+        Number(slot.reserve_end_time.split(':')[0]),
+        Number(slot.reserve_end_time.split(':')[1]),
+        0,
+        0,
+      )
+      return currentTime >= startTime && currentTime < endTime
+    })
 
     // If the time slot is available, add it to the list
     if (!isBooked) {
-      timeSlots.push(slot);
+      timeSlots.push(slot)
     }
 
     // Increment current time by 10 minutes
-    currentTime.setMinutes(currentTime.getMinutes() + 10);
+    currentTime.setMinutes(currentTime.getMinutes() + 10)
   }
 
-  return timeSlots;
-};
-
-
+  return timeSlots
+}
 
 export const generateTimeArrayWithStep = (selectedTime) => {
   const times = []
