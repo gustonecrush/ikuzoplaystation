@@ -71,6 +71,7 @@ export default function Reservation() {
   const [reserves, setReserves] = useState([])
   const [bookedSlots, setBookedSlots] = useState([])
   const [reservesPosition, setReservesPosition] = useState([])
+  const timeArray = generateTimeArrayWithStep(startTimeReservasi, bookedSlots)
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const getAllReservationsPositon = async (date) => {
@@ -753,7 +754,8 @@ export default function Reservation() {
                                                 <SelectLabel className="text-sm">
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
-                                                {startTimeReservasi != '' ? (
+                                                {startTimeReservasi != '' &&
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -775,7 +777,12 @@ export default function Reservation() {
                                                   })
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
-                                                    00.00
+                                                    <p className="text-gray-500">
+                                                      Pilih Waktu Mulai <br />
+                                                      Lainnya, Tidak Ada <br />
+                                                      Jam Main Tersedia, <br />
+                                                      Minimal Main 1 Jam!
+                                                    </p>
                                                   </SelectItem>
                                                 )}
                                               </SelectGroup>
@@ -979,7 +986,8 @@ export default function Reservation() {
                                                 <SelectLabel className="text-sm">
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
-                                                {startTimeReservasi != '' ? (
+                                                {startTimeReservasi != '' &&
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1001,7 +1009,12 @@ export default function Reservation() {
                                                   })
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
-                                                    00.00
+                                                    <p className="text-gray-500">
+                                                      Pilih Waktu Mulai <br />
+                                                      Lainnya, Tidak Ada <br />
+                                                      Jam Main Tersedia, <br />
+                                                      Minimal Main 1 Jam!
+                                                    </p>
                                                   </SelectItem>
                                                 )}
                                               </SelectGroup>
@@ -1205,7 +1218,8 @@ export default function Reservation() {
                                                 <SelectLabel className="text-sm">
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
-                                                {startTimeReservasi != '' ? (
+                                                {startTimeReservasi != '' &&
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1222,7 +1236,12 @@ export default function Reservation() {
                                                   })
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
-                                                    00.00
+                                                    <p className="text-gray-500">
+                                                      Pilih Waktu Mulai <br />
+                                                      Lainnya, Tidak Ada <br />
+                                                      Jam Main Tersedia, <br />
+                                                      Minimal Main 1 Jam!
+                                                    </p>
                                                   </SelectItem>
                                                 )}
                                               </SelectGroup>
@@ -1434,7 +1453,8 @@ export default function Reservation() {
                                                 <SelectLabel className="text-sm">
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
-                                                {startTimeReservasi != '' ? (
+                                                {startTimeReservasi != '' &&
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1456,7 +1476,12 @@ export default function Reservation() {
                                                   })
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
-                                                    00.00
+                                                    <p className="text-gray-500">
+                                                      Pilih Waktu Mulai <br />
+                                                      Lainnya, Tidak Ada <br />
+                                                      Jam Main Tersedia, <br />
+                                                      Minimal Main 1 Jam!
+                                                    </p>
                                                   </SelectItem>
                                                 )}
                                               </SelectGroup>
@@ -1666,7 +1691,8 @@ export default function Reservation() {
                                                 <SelectLabel className="text-sm">
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
-                                                {startTimeReservasi != '' ? (
+                                                {startTimeReservasi != '' &&
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1688,7 +1714,12 @@ export default function Reservation() {
                                                   })
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
-                                                    00.00
+                                                    <p className="text-gray-500">
+                                                      Pilih Waktu Mulai <br />
+                                                      Lainnya, Tidak Ada <br />
+                                                      Jam Main Tersedia, <br />
+                                                      Minimal Main 1 Jam!
+                                                    </p>
                                                   </SelectItem>
                                                 )}
                                               </SelectGroup>
@@ -1907,7 +1938,8 @@ export default function Reservation() {
                                                 <SelectLabel className="text-sm">
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
-                                                {startTimeReservasi != '' ? (
+                                                {startTimeReservasi != '' &&
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1929,7 +1961,12 @@ export default function Reservation() {
                                                   })
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
-                                                    00.00
+                                                    <p className="text-gray-500">
+                                                      Pilih Waktu Mulai <br />
+                                                      Lainnya, Tidak Ada <br />
+                                                      Jam Main Tersedia, <br />
+                                                      Minimal Main 1 Jam!
+                                                    </p>
                                                   </SelectItem>
                                                 )}
                                               </SelectGroup>

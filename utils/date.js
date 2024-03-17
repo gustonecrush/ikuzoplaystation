@@ -184,11 +184,8 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
   const maxMinute = 30
 
   const [hourStr, minuteStr] = selectedTime.split(':')
-  let selectedHour = parseInt(hourStr)
-  let selectedMinute = parseInt(minuteStr)
-
-  // Add the selected time
-  times.push(selectedTime)
+  const selectedHour = parseInt(hourStr)
+  const selectedMinute = parseInt(minuteStr)
 
   // Check if bookedSlots is not empty
   if (bookedSlots.length !== 0) {
@@ -227,7 +224,11 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
         const formattedHour = hour.toString().padStart(2, '0')
         const formattedMinute = selectedMinute.toString().padStart(2, '0')
         const time = `${formattedHour}:${formattedMinute}`
-        times.push(time)
+
+        // Exclude selectedTime
+        if (time !== selectedTime) {
+          times.push(time)
+        }
 
         if (hour === maxHour && selectedMinute === maxMinute) {
           break
@@ -240,7 +241,11 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
       const formattedHour = hour.toString().padStart(2, '0')
       const formattedMinute = selectedMinute.toString().padStart(2, '0')
       const time = `${formattedHour}:${formattedMinute}`
-      times.push(time)
+
+      // Exclude selectedTime
+      if (time !== selectedTime) {
+        times.push(time)
+      }
 
       if (hour === maxHour && selectedMinute === maxMinute) {
         break

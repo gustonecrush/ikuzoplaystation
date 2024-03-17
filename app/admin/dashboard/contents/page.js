@@ -9,6 +9,7 @@ import Toast from '@/app/components/Toast'
 import Layout from '../components/Layout'
 import SwiperContentGames from '@/app/components/SwiperContentGames'
 import SwiperContentFacilities from '@/app/admin/dashboard/components/SwiperContentFacilities'
+import ListSections from '../components/ListSections'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -17,6 +18,7 @@ function page() {
   // Content Games Management
   const [games, setGames] = React.useState([])
   const [facilities, setFacilities] = React.useState([])
+  const [sections, setSections] = React.useState([])
 
   const fetchContents = async () => {
     setIsLoading(true)
@@ -28,8 +30,10 @@ function page() {
         const jsonData = await response.data
         if (selectedFeature == 'games') {
           setGames(jsonData.data)
-        } else {
+        } else if (selectedFeature == 'facilities') {
           setFacilities(jsonData.data)
+        } else {
+          setSections(jsonData.data)
         }
         console.log({ jsonData })
         setIsLoading(false)
@@ -151,6 +155,13 @@ function page() {
           {selectedFeature == 'facilities' && (
             <SwiperContentFacilities
               facilities={facilities}
+              fetchContentFacilities={fetchContents}
+            />
+          )}
+
+          {selectedFeature == 'sections' && (
+            <ListSections
+              sections={sections}
               fetchContentFacilities={fetchContents}
             />
           )}
