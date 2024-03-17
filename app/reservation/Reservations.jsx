@@ -778,10 +778,10 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih Waktu Mulai <br />
-                                                      Lainnya, Tidak Ada <br />
-                                                      Jam Main Tersedia, <br />
-                                                      Minimal Main 1 Jam!
+                                                      Pilih waktu mulai <br />
+                                                      lainnya. Tidak ada <br />
+                                                      jam main tersedia, <br />
+                                                      minimal main 1 jam!
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1010,10 +1010,10 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih Waktu Mulai <br />
-                                                      Lainnya, Tidak Ada <br />
-                                                      Jam Main Tersedia, <br />
-                                                      Minimal Main 1 Jam!
+                                                      Pilih waktu mulai <br />
+                                                      lainnya. Tidak ada <br />
+                                                      jam main tersedia, <br />
+                                                      minimal main 1 jam!
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1237,10 +1237,10 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih Waktu Mulai <br />
-                                                      Lainnya, Tidak Ada <br />
-                                                      Jam Main Tersedia, <br />
-                                                      Minimal Main 1 Jam!
+                                                      Pilih waktu mulai <br />
+                                                      lainnya. Tidak ada <br />
+                                                      jam main tersedia, <br />
+                                                      minimal main 1 jam!
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1477,10 +1477,10 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih Waktu Mulai <br />
-                                                      Lainnya, Tidak Ada <br />
-                                                      Jam Main Tersedia, <br />
-                                                      Minimal Main 1 Jam!
+                                                      Pilih waktu mulai <br />
+                                                      lainnya. Tidak ada <br />
+                                                      jam main tersedia, <br />
+                                                      minimal main 1 jam!
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1715,10 +1715,10 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih Waktu Mulai <br />
-                                                      Lainnya, Tidak Ada <br />
-                                                      Jam Main Tersedia, <br />
-                                                      Minimal Main 1 Jam!
+                                                      Pilih waktu mulai <br />
+                                                      lainnya. Tidak ada <br />
+                                                      jam main tersedia, <br />
+                                                      minimal main 1 jam!
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1962,10 +1962,10 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih Waktu Mulai <br />
-                                                      Lainnya, Tidak Ada <br />
-                                                      Jam Main Tersedia, <br />
-                                                      Minimal Main 1 Jam!
+                                                      Pilih waktu mulai <br />
+                                                      lainnya. Tidak ada <br />
+                                                      jam main tersedia, <br />
+                                                      minimal main 1 jam!
                                                     </p>
                                                   </SelectItem>
                                                 )}
