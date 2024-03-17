@@ -9,69 +9,18 @@ import ScrollDown from './ScrollDown'
 import Link from 'next/link'
 import FadeContainer from './FadeContainer'
 import { IoLogoGameControllerB } from 'react-icons/io'
+import Content from './Content'
+import Hero from './Hero'
 
 export default function Home() {
   return (
     <>
       <section className="flex flex-col h-full w-full scroll-smooth overflow-x-hidden">
         <Navbar />
-        <HeroSection />
-
-        <BounceContainer>
-          <div
-            className="flex bg-black bg-opacity-35 flex-col relative items-center justify-center"
-            id="reserve"
-          >
-            <Image
-              className="-z-50 w-full h-screen object-cover bg-opacity-10"
-              alt="Facilites Image"
-              width={0}
-              priority
-              height={0}
-              title="Facilities Image"
-              src={'/facilities.png'}
-            />
-
-            <div className="absolute w-full md:w-[60%] px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2 items-center py-12 pt-16">
-              <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5rem] md:mt-16">
-                PRIVATE ROOM, <span className="text-orange">REGULAR SPOT</span>{' '}
-                , AND FACILITIES
-              </h1>
-              <p className="text-white font-normal text-center text-base md:text-lg">
-                suasana "Homey" saat bermain pada Gaming Space Keluarga No. 1 di
-                Kota Bandung. Maksimalkan pengalamanmu dengan beragam fasilitas
-                seru pelayan terbaik yang bisa kamu dapatkan !
-              </p>
-
-              <ReserveButton />
-            </div>
-          </div>
-        </BounceContainer>
-
-        <BounceContainer>
-          <div className="flex bg-black bg-opacity-35 flex-col relative items-center justify-center">
-            <Image
-              className="-z-50 w-full h-screen object-cover bg-opacity-10"
-              alt="Facilites Image"
-              width={0}
-              height={0}
-              priority
-              title="Facilities Image"
-              src={'/fasilitas/regular-plus.png'}
-            />
-
-            <div className="absolute w-full md:w-1/2 px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2">
-              <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5rem] md:mt-16">
-                COMING SOON <span className="text-orange">MEMBERSHIP</span>{' '}
-                IKUZO!
-              </h1>
-              <p className="text-white font-normal text-center text-base md:text-lg">
-                Nantikan membership di Ikuzo Playstation! dan nikmati layanan
-                serta benefit dari bergabung membership segera
-              </p>
-            </div>
-          </div>
-        </BounceContainer>
+        <Hero>
+          <Video />
+        </Hero>
+        <Content />
 
         {/* Game Section */}
         <div className="flex flex-col gap-2 mt-9 items-center justify-center py-10 bg-white w-full  h-fit z-20">
@@ -126,35 +75,6 @@ function CTAButton() {
     >
       <IoLogoGameControllerB className="text-white text-4xl w-10 " />
     </Link>
-  )
-}
-
-function HeroSection() {
-  return (
-    <section className="flex flex-col relative items-center justify-center bg-black bg-opacity-35 h-full w-full">
-      <Video />
-      <FadeContainer>
-        <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col gap-4 w-full px-3 items-center justify-center md:-mt-5">
-          <Image
-            src="/logo-orange.png"
-            alt="Ikuzo Playstation's Logo"
-            title="Ikuzo Playstation's Logo"
-            width={0}
-            height={0}
-            className="w-[110px] md:w-[140px] md:block hidden"
-          />
-          <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5.5rem] md:-mt-5">
-            BETTER GAMING AT <span className="text-orange">IKUZO!</span>
-          </h1>
-          <p className="text-white font-normal text-center text-base md:text-lg">
-            Discover the unforgettable gaming experience with your family,
-            friends, or as a couple. Feel it and tell the world how excited it
-            was!
-          </p>
-          <ScrollDown />
-        </div>
-      </FadeContainer>
-    </section>
   )
 }
 

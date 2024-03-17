@@ -802,7 +802,7 @@ export default function Reservation() {
 
                           <div
                             className={`flex flex-row justify-around w-24 bottom-10 absolute z-50 left-7 gap-[${
-                              8 + scale * 10
+                              9 + scale * 10
                             }] `}
                             ref={imageRef}
                             style={{
@@ -817,7 +817,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 ml-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
@@ -1027,7 +1027,7 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row justify-around w-fit bottom-10 absolute z-50 left-40 -ml-3 gap-${
+                            className={`flex flex-row justify-around w-fit bottom-10 absolute z-50 left-40 -ml-2 gap-${
                               8 + scale * 10
                             } `}
                             ref={imageRef}
@@ -1043,7 +1043,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-8  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer w-9  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
