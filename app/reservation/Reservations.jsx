@@ -122,6 +122,29 @@ export default function Reservation() {
     }
   }
 
+  const [positions, setPositions] = useState([])
+
+  const getAllPositions = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/content-facilities`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        setPositions(jsonData.data)
+        console.log(response.data)
+
+        setIsLoading(false)
+      } else {
+        setIsLoading(false)
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+      setIsLoading(false)
+    }
+  }
+
   /***********************************************************
    * functions & states for scaling image
    ***********************************************************/
@@ -295,11 +318,11 @@ export default function Reservation() {
       }
     }
 
+    getAllPositions()
+
     const intervalTime = 500
     const interval = setInterval(() => {
       getAllReservationWithoutState
-      // const availableTimeSlots = generateTimeSlots(selectedDate, bookedSlots);
-      // setAvailableTimes(availableTimeSlots)
     }, intervalTime)
 
     return () => {
@@ -574,7 +597,7 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
-                                        setPricePerReserve(20000)
+                                        setPricePerReserve(positions[0].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
                                           number,
@@ -592,12 +615,12 @@ export default function Reservation() {
                                   <DrawerContent className="active:border-none border-none outline-none">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
-                                        Detail Tempat & Waktu
+                                        {positions[0].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        Lihat detail tempat yang ingin
-                                        direservasi dan pilih waktu yang
-                                        tersedia.
+                                        IDR{positions[0].price}/hour and can
+                                        only accomodate {positions[0].capacity}{' '}
+                                        person.
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -610,7 +633,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={'/fasilitas/regular.png'}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[0].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -622,11 +645,7 @@ export default function Reservation() {
                                     </div>
 
                                     {reserves.length > 0 ? (
-                                      <Fade
-                                        delay={9}
-                                        duration={1500}
-                                        className="px-5 "
-                                      >
+                                      <Fade className="px-5 ">
                                         <div className="flex gap-1 w-full my-2">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                             <label
@@ -666,11 +685,7 @@ export default function Reservation() {
                                       </Fade>
                                     ) : null}
 
-                                    <Fade
-                                      delay={9}
-                                      duration={1500}
-                                      className="px-5 "
-                                    >
+                                    <Fade className="px-5 ">
                                       <div className="flex gap-1 w-full mt-2 mb-3">
                                         <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -804,7 +819,7 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
-                                        setPricePerReserve(20000)
+                                        setPricePerReserve(positions[1].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
                                           number,
@@ -822,12 +837,12 @@ export default function Reservation() {
                                   <DrawerContent className="active:border-none border-none outline-none">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
-                                        Detail Tempat & Waktu
+                                        {positions[1].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        Lihat detail tempat yang ingin
-                                        direservasi dan pilih waktu yang
-                                        tersedia.
+                                        IDR{positions[1].price}/hour and can
+                                        only accomodate {positions[1].capacity}{' '}
+                                        person.
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -840,7 +855,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={'/fasilitas/simulator.png'}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[1].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -852,11 +867,7 @@ export default function Reservation() {
                                     </div>
 
                                     {reserves.length > 0 ? (
-                                      <Fade
-                                        delay={9}
-                                        duration={1500}
-                                        className="px-5 "
-                                      >
+                                      <Fade className="px-5 ">
                                         <div className="flex gap-1 w-full my-2">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                             <label
@@ -895,11 +906,7 @@ export default function Reservation() {
                                       </Fade>
                                     ) : null}
 
-                                    <Fade
-                                      delay={9}
-                                      duration={1500}
-                                      className="px-5 "
-                                    >
+                                    <Fade className="px-5 ">
                                       <div className="flex gap-1 w-full mt-2 mb-3">
                                         <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -1014,7 +1021,7 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row justify-around w-fit bottom-10 absolute z-50 left-40 -ml-2 gap-${
+                            className={`flex flex-row justify-around w-fit bottom-10 absolute z-50 left-40 -ml-3 gap-${
                               8 + scale * 10
                             } `}
                             ref={imageRef}
@@ -1033,7 +1040,7 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
-                                        setPricePerReserve(20000)
+                                        setPricePerReserve(positions[0].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
                                           number,
@@ -1051,12 +1058,12 @@ export default function Reservation() {
                                   <DrawerContent className="active:border-none border-none outline-none">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
-                                        Detail Tempat & Waktu
+                                        {positions[0].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        Lihat detail tempat yang ingin
-                                        direservasi dan pilih waktu yang
-                                        tersedia.
+                                        IDR{positions[0].price}/hour and can
+                                        only accomodate {positions[0].capacity}{' '}
+                                        person.
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1069,7 +1076,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={'/fasilitas/regular.png'}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[0].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -1081,11 +1088,7 @@ export default function Reservation() {
                                     </div>
 
                                     {reserves.length > 0 ? (
-                                      <Fade
-                                        delay={9}
-                                        duration={1500}
-                                        className="px-5 "
-                                      >
+                                      <Fade className="px-5 ">
                                         <div className="flex gap-1 w-full my-2">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                             <label
@@ -1124,11 +1127,7 @@ export default function Reservation() {
                                       </Fade>
                                     ) : null}
 
-                                    <Fade
-                                      delay={9}
-                                      duration={1500}
-                                      className="px-5 "
-                                    >
+                                    <Fade className="px-5 ">
                                       <div className="flex gap-1 w-full mt-2 mb-3">
                                         <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -1266,7 +1265,7 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
-                                        setPricePerReserve(20000)
+                                        setPricePerReserve(positions[4].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
                                           number,
@@ -1288,12 +1287,12 @@ export default function Reservation() {
                                   <DrawerContent className="active:border-none border-none outline-none">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
-                                        Detail Tempat & Waktu
+                                        {positions[4].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        Lihat detail tempat yang ingin
-                                        direservasi dan pilih waktu yang
-                                        tersedia.
+                                        IDR{positions[4].price}/hour and can
+                                        only accomodate {positions[4].capacity}{' '}
+                                        person.
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1306,7 +1305,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={`/fasilitas/vip-plus.png`}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -1318,11 +1317,7 @@ export default function Reservation() {
                                     </div>
 
                                     {reserves.length > 0 ? (
-                                      <Fade
-                                        delay={9}
-                                        duration={1500}
-                                        className="px-5 "
-                                      >
+                                      <Fade className="px-5 ">
                                         <div className="flex gap-1 w-full my-2">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                             <label
@@ -1360,11 +1355,7 @@ export default function Reservation() {
                                       </Fade>
                                     ) : null}
 
-                                    <Fade
-                                      delay={9}
-                                      duration={1500}
-                                      className="px-5 "
-                                    >
+                                    <Fade className="px-5 ">
                                       <div className="flex gap-1 w-full mt-2 mb-3">
                                         <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -1500,7 +1491,7 @@ export default function Reservation() {
                                       }`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
-                                        setPricePerReserve(20000)
+                                        setPricePerReserve(positions[2].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
                                           number,
@@ -1522,12 +1513,12 @@ export default function Reservation() {
                                   <DrawerContent className="active:border-none border-none outline-none">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
-                                        Detail Tempat & Waktu
+                                        {positions[2].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        Lihat detail tempat yang ingin
-                                        direservasi dan pilih waktu yang
-                                        tersedia.
+                                        IDR{positions[2].price}/hour and can
+                                        only accomodate {positions[2].capacity}{' '}
+                                        person.
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1540,7 +1531,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={`/fasilitas/regular-plus.png`}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -1552,11 +1543,7 @@ export default function Reservation() {
                                     </div>
 
                                     {reserves.length > 0 ? (
-                                      <Fade
-                                        delay={9}
-                                        duration={1500}
-                                        className="px-5 "
-                                      >
+                                      <Fade className="px-5 ">
                                         <div className="flex gap-1 w-full my-2">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                             <label
@@ -1594,11 +1581,7 @@ export default function Reservation() {
                                       </Fade>
                                     ) : null}
 
-                                    <Fade
-                                      delay={9}
-                                      duration={1500}
-                                      className="px-5 "
-                                    >
+                                    <Fade className="px-5 ">
                                       <div className="flex gap-1 w-full mt-2 mb-3">
                                         <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -1747,7 +1730,7 @@ export default function Reservation() {
                                       className={`cursor-pointer w-8 h-8 ml-1 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
-                                        setPricePerReserve(20000)
+                                        setPricePerReserve(positions[3].price)
                                         fetchingAvailableReservation(
                                           selectedDate,
                                           number,
@@ -1765,12 +1748,12 @@ export default function Reservation() {
                                   <DrawerContent className="active:border-none border-none outline-none">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
-                                        Detail Tempat & Waktu
+                                        {positions[3].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        Lihat detail tempat yang ingin
-                                        direservasi dan pilih waktu yang
-                                        tersedia.
+                                        IDR {positions[3].price}/hour and can
+                                        only accomodate {positions[3].capacity}{' '}
+                                        person.
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1783,7 +1766,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={'/fasilitas/ps2.png'}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[3].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -1795,11 +1778,7 @@ export default function Reservation() {
                                     </div>
 
                                     {reserves.length > 0 ? (
-                                      <Fade
-                                        delay={9}
-                                        duration={1500}
-                                        className="px-5 "
-                                      >
+                                      <Fade className="px-5 ">
                                         <div className="flex gap-1 w-full my-2">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                             <label
@@ -1837,11 +1816,7 @@ export default function Reservation() {
                                       </Fade>
                                     ) : null}
 
-                                    <Fade
-                                      delay={9}
-                                      duration={1500}
-                                      className="px-5 "
-                                    >
+                                    <Fade className="px-5 ">
                                       <div className="flex gap-1 w-full mt-2 mb-3">
                                         <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
