@@ -191,7 +191,8 @@ export default function Reservation() {
       selectedDate &&
       startTimeReservasi &&
       endTimeReservasi &&
-      posisiReservasi
+      posisiReservasi &&
+      totalTime != 0
     ) {
       // Scroll to the top of the page
       window.scrollTo(0, 0)

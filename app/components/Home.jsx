@@ -33,7 +33,7 @@ export default function Home() {
             />
 
             <div className="absolute w-full md:w-[60%] px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2 items-center py-12 pt-16">
-              <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5.5rem] md:mt-16">
+              <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5rem] md:mt-16">
                 PRIVATE ROOM, <span className="text-orange">REGULAR SPOT</span>{' '}
                 , AND FACILITIES
               </h1>
@@ -61,7 +61,7 @@ export default function Home() {
             />
 
             <div className="absolute w-full md:w-1/2 px-2 flex flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2">
-              <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5.5rem] md:mt-16">
+              <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5rem] md:mt-16">
                 COMING SOON <span className="text-orange">MEMBERSHIP</span>{' '}
                 IKUZO!
               </h1>
@@ -93,7 +93,7 @@ export default function Home() {
         <div className="flex flex-col gap-2 items-center justify-center py-5 bg-white w-full h-fit z-20">
           <BounceContainer>
             <div className="flex flex-col gap-2 px-3">
-              <h1 className="text-orange font-extrabold font-montserrat text-4xl  md:text-[5rem] text-center uppercase">
+              <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
                 Fasilitas di <br />
                 Ikuzo Playstation!
               </h1>
@@ -134,7 +134,7 @@ function HeroSection() {
     <section className="flex flex-col relative items-center justify-center bg-black bg-opacity-35 h-full w-full">
       <Video />
       <FadeContainer>
-        <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col gap-4 w-full px-3 items-center justify-center ">
+        <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col gap-4 w-full px-3 items-center justify-center md:-mt-5">
           <Image
             src="/logo-orange.png"
             alt="Ikuzo Playstation's Logo"
@@ -143,7 +143,7 @@ function HeroSection() {
             height={0}
             className="w-[110px] md:w-[140px] md:block hidden"
           />
-          <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[6rem] md:mt-5">
+          <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5.5rem] md:-mt-5">
             BETTER GAMING AT <span className="text-orange">IKUZO!</span>
           </h1>
           <p className="text-white font-normal text-center text-base md:text-lg">

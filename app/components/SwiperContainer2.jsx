@@ -9,7 +9,7 @@ import 'swiper/css/pagination'
 
 import { EffectCoverflow, Pagination } from 'swiper/modules'
 
-import './styles.css'
+import '../admin/dashboard/components/styles2.css'
 
 import Image from 'next/image'
 import Toast from './Toast'
@@ -73,7 +73,7 @@ export default function SwiperContainer2() {
         className="mySwiper mx-10"
       >
         {facilities.map((facility, index) => (
-          <SwiperSlide key={index}>
+          <SwiperSlide key={index} className="w-fit wide">
             <Image
               alt={facility.name}
               width={0}
