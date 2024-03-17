@@ -556,13 +556,11 @@ export default function Reservation() {
                     </div>
 
                     <img
-                      ref={imageRef}
                       src={`/${
                         floorSelected == 'first-floor'
                           ? 'first-floor.jpg'
                           : 'second-floor.jpg'
                       }`}
-                      useMap="#image-map"
                       alt=""
                       style={{
                         width: '100%',
@@ -570,7 +568,6 @@ export default function Reservation() {
                         transform: `scale(1.4) translate(${position.x}px, ${position.y}px)`,
                         cursor: 'move',
                       }}
-                      draggable={false}
                     />
 
                     <div className="">
