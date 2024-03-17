@@ -79,10 +79,13 @@ import { Fade } from 'react-awesome-reveal'
 import { handleLogout } from '../../utils/logout'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
+import { IoDocument, IoGameControllerSharp } from 'react-icons/io5'
+import { Cross2Icon } from '@radix-ui/react-icons'
 
 function page() {
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
+  const [open, setOpen] = React.useState(false)
 
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
@@ -202,6 +205,26 @@ function page() {
       cell: ({ row }) => (
         <div className={`text-center capitalize`}>
           {row.getValue('reserve_id')}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'invoice',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className={''}
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Invoice
+            <IoDocument className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => (
+        <div className={`text-center capitalize`}>
+          {row.getValue('invoice')}
         </div>
       ),
     },
@@ -705,11 +728,6 @@ function page() {
                       >
                         Tambah Reservasi <IoMdAdd className="ml-2 h-4 w-4" />
                       </Button>
-
-                      {/* <ExcelExport
-                  apiData={dataExcel}
-                  fileName={'IKU PNBP Satker Puslatluh'}
-                /> */}
                     </div>
                   </div>
 

@@ -90,12 +90,15 @@ function LoginLayout() {
           </Label>
 
           <div class="relative">
-            <Input
+            <input
               type="text"
-              class="w-full rounded-lg border-gray-200 bg-transparent focus:outline-orange border text-white placeholder:text-white p-4 pe-12 text-sm shadow-sm"
-              placeholder="Enter Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              name="nama"
+              id="nama"
+              placeholder="Masukkan username"
+              className="border py-3 w-full border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg px-3 active:border-orange focus:border-orange outline-none focus:outline-orange   "
+              required
             />
 
             <span class="absolute inset-y-0 end-0 grid place-content-center px-4">
@@ -123,12 +126,15 @@ function LoginLayout() {
           </Label>
 
           <div class="relative">
-            <Input
+            <input
               type="password"
-              class="w-full rounded-lg border-gray-200 bg-transparent focus:outline-orange border text-white placeholder:text-white p-4 pe-12 text-sm shadow-sm"
-              placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              id="password"
+              placeholder="Masukkan password"
+              className="border py-3 w-full border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg px-3 active:border-orange focus:border-orange outline-none focus:outline-orange   "
+              required
             />
 
             <span class="absolute inset-y-0 end-0 grid place-content-center px-4">
@@ -156,10 +162,10 @@ function LoginLayout() {
           </div>
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex w-full items-center justify-between">
           <button
             type="submit"
-            class="inline-block rounded-lg bg-orange px-5 py-3 text-sm font-medium text-white"
+            class="inline-block rounded-lg w-full bg-orange px-5 py-3 text-sm font-medium text-white"
           >
             Sign in
           </button>

@@ -46,7 +46,7 @@ const Invoice = () => {
 
     html2canvas(invoice).then(function (canvas) {
       const link = document.createElement('a')
-      link.download = 'IKUPLAY009lksd83u.png'
+      link.download = `${order_id}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
     })
