@@ -64,8 +64,8 @@ function LoginLayout() {
   }
 
   return (
-    <div class="top-0 mx-auto max-w-screen-xl px-4 py-16 mt-10 sm:px-6 lg:px-8 absolute !text-white">
-      <div class="mx-auto max-w-lg text-center">
+    <div className="top-0 mx-auto max-w-screen-xl px-4 py-16 mt-10 sm:px-6 lg:px-8 absolute !text-white">
+      <div className="mx-auto max-w-lg text-center">
         <Image
           src={'/logo-orange.png'}
           width={0}
@@ -73,7 +73,7 @@ function LoginLayout() {
           className="w-[450px] mx-auto"
         />
 
-        <p class="text-white font-plusSansJakarta -mt-6">
+        <p className="text-white font-plusSansJakarta -mt-6">
           Silahkan login sebagai admin untuk melakukan reservasi ditempat dan
           memanajemen konten website.
         </p>
@@ -82,14 +82,14 @@ function LoginLayout() {
       <form
         action="#"
         onSubmit={handleLogin}
-        class="mx-auto mb-0 max-w-md space-y-4 mt-3"
+        className="mx-auto mb-0 max-w-md space-y-4 mt-3"
       >
         <div>
-          <Label for="email" class="sr-only text-white">
+          <Label for="email" className="sr-only text-white">
             Username
           </Label>
 
-          <div class="relative">
+          <div className="relative">
             <input
               type="text"
               value={username}
@@ -101,10 +101,10 @@ function LoginLayout() {
               required
             />
 
-            <span class="absolute inset-y-0 end-0 grid place-content-center px-4">
+            <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="size-4 text-gray-400"
+                className="size-4 text-gray-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -121,11 +121,11 @@ function LoginLayout() {
         </div>
 
         <div>
-          <Label for="password" class="sr-only text-white">
+          <Label for="password" className="sr-only text-white">
             Password
           </Label>
 
-          <div class="relative">
+          <div className="relative">
             <input
               type="password"
               value={password}
@@ -137,10 +137,10 @@ function LoginLayout() {
               required
             />
 
-            <span class="absolute inset-y-0 end-0 grid place-content-center px-4">
+            <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="size-4 text-gray-400"
+                className="size-4 text-gray-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -162,10 +162,10 @@ function LoginLayout() {
           </div>
         </div>
 
-        <div class="flex w-full items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <button
             type="submit"
-            class="inline-block rounded-lg w-full bg-orange px-5 py-3 text-sm font-medium text-white"
+            className="inline-block rounded-lg w-full bg-orange px-5 py-3 text-sm font-medium text-white"
           >
             Sign in
           </button>

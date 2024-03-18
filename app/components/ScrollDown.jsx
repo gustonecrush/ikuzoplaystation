@@ -6,12 +6,12 @@ const ScrollDown = () => {
   return (
     <Link
       href={'#reserve'}
-      class="container  z-50 relative w-full  scroll-smooth mt-10 left-[38.5%] md:left-[47%]"
+      className="container  z-50 relative w-full  scroll-smooth mt-10 left-[38.5%] md:left-[47%]"
     >
-      <div class="chevron"></div>
-      <div class="chevron"></div>
-      <div class="chevron"></div>
-      <span class="text">Scroll down</span>
+      <div className="chevron"></div>
+      <div className="chevron"></div>
+      <div className="chevron"></div>
+      <span className="text">Scroll down</span>
     </Link>
   )
 }

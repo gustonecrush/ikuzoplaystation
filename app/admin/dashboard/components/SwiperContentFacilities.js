@@ -138,6 +138,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
     setPrice('')
     setCapacity('')
     setIdSelected(null)
+    setInitialValue('')
     setPict(null)
   }
 
