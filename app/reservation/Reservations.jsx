@@ -778,10 +778,12 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih waktu mulai <br />
-                                                      lainnya. Tidak ada <br />
-                                                      jam main tersedia, <br />
-                                                      minimal main 1 jam!
+                                                      Waktu yang kamu pilih{' '}
+                                                      <br />
+                                                      sudah terisi. Silakan{' '}
+                                                      <br />
+                                                      pilih waktu bermain <br />
+                                                      di jam yang lain
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1010,10 +1012,12 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih waktu mulai <br />
-                                                      lainnya. Tidak ada <br />
-                                                      jam main tersedia, <br />
-                                                      minimal main 1 jam!
+                                                      Waktu yang kamu pilih{' '}
+                                                      <br />
+                                                      sudah terisi. Silakan{' '}
+                                                      <br />
+                                                      pilih waktu bermain <br />
+                                                      di jam yang lain
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1237,10 +1241,13 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih waktu mulai <br />
-                                                      lainnya. Tidak ada <br />
-                                                      jam main tersedia, <br />
-                                                      minimal main 1 jam!
+                                                      {' '}
+                                                      Waktu yang kamu pilih{' '}
+                                                      <br />
+                                                      sudah terisi. Silakan{' '}
+                                                      <br />
+                                                      pilih waktu bermain <br />
+                                                      di jam yang lain
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1477,10 +1484,12 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih waktu mulai <br />
-                                                      lainnya. Tidak ada <br />
-                                                      jam main tersedia, <br />
-                                                      minimal main 1 jam!
+                                                      Waktu yang kamu pilih{' '}
+                                                      <br />
+                                                      sudah terisi. Silakan{' '}
+                                                      <br />
+                                                      pilih waktu bermain <br />
+                                                      di jam yang lain
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1715,10 +1724,12 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih waktu mulai <br />
-                                                      lainnya. Tidak ada <br />
-                                                      jam main tersedia, <br />
-                                                      minimal main 1 jam!
+                                                      Waktu yang kamu pilih{' '}
+                                                      <br />
+                                                      sudah terisi. Silakan{' '}
+                                                      <br />
+                                                      pilih waktu bermain <br />
+                                                      di jam yang lain
                                                     </p>
                                                   </SelectItem>
                                                 )}
@@ -1962,10 +1973,12 @@ export default function Reservation() {
                                                 ) : (
                                                   <SelectItem value={'00.00'}>
                                                     <p className="text-gray-500">
-                                                      Pilih waktu mulai <br />
-                                                      lainnya. Tidak ada <br />
-                                                      jam main tersedia, <br />
-                                                      minimal main 1 jam!
+                                                      Waktu yang kamu pilih{' '}
+                                                      <br />
+                                                      sudah terisi. Silakan{' '}
+                                                      <br />
+                                                      pilih waktu bermain <br />
+                                                      di jam yang lain
                                                     </p>
                                                   </SelectItem>
                                                 )}
