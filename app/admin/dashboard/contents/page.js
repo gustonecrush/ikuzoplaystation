@@ -35,7 +35,6 @@ function page() {
         } else {
           setSections(jsonData.data)
         }
-        console.log({ jsonData })
         setIsLoading(false)
       } else {
         setIsLoading(false)
@@ -85,9 +84,6 @@ function page() {
   React.useEffect(() => {
     fetchContents()
   }, [])
-
-  console.log({ games })
-  console.log({ facilities })
 
   return (
     <Layout>

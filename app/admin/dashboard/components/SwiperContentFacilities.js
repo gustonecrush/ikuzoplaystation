@@ -50,6 +50,8 @@ import axios from 'axios'
 import Toast from '@/app/components/Toast'
 import Image from 'next/image'
 import { Cross2Icon } from '@radix-ui/react-icons'
+import { FiEdit3 } from 'react-icons/fi'
+import { HashLoader } from 'react-spinners'
 
 const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
   // base url & token
@@ -58,6 +60,9 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
 
   // state variables for utilization process
   const [isUploading, setIsUploading] = React.useState(false)
+  const [idSelected, setIdSelected] = React.useState(null)
+  const [isWillUpdate, setIsWillUpdate] = React.useState(false)
+  const [pictFacilitySelected, setPictFacilitySelected] = React.useState('')
   const [open, setOpen] = React.useState(false)
 
   // state variables for upload and update facility contents
@@ -65,6 +70,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
   const [price, setPrice] = React.useState('')
   const [capacity, setCapacity] = React.useState('')
   const benefits = React.useRef(null)
+  const [initialValue, setInitialValue] = React.useState('')
   const [pict, setPict] = React.useState(null)
 
   // function to handle upload
@@ -91,16 +97,22 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
         icon: 'success',
         title: `Data content facility berhasil diupload!`,
       })
+      setIsUploading(false)
 
       clearStateVariables()
       setOpen(false)
+
       fetchContentFacilities()
     } catch (error) {
+      setIsUploading(false)
+
       console.error({ error })
+      clearStateVariables()
+
       setOpen(false)
       Toast.fire({
         icon: 'error',
-        title: `Data content facility gagal diupload!`,
+        title: error.response.data.data,
       })
     }
   }
@@ -113,7 +125,9 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
     data.append('price', price)
     data.append('capacity', capacity)
     data.append('benefits', benefits.current.getContent())
-    data.append('pict', pict)
+    if (pict != null) {
+      data.append('pict', pict)
+    }
 
     return data
   }
@@ -123,7 +137,69 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
     setName('')
     setPrice('')
     setCapacity('')
+    setIdSelected(null)
     setPict(null)
+  }
+
+  // function to handle update
+  const handleOpenFormForUpdating = (facility) => {
+    setIdSelected(facility.id)
+    setOpen(true)
+    setIsWillUpdate(true)
+    setName(facility.name)
+    setPrice(facility.price)
+    setCapacity(facility.capacity)
+    setPictFacilitySelected(facility.pict)
+    setInitialValue(facility.benefits)
+    console.log({ facility })
+  }
+
+  const handleUpdateFacilityContent = async (e) => {
+    e.preventDefault()
+
+    setIsUploading(true)
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/content-facilities/${idSelected}`,
+        dataObjectFromStateVariables(),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+      console.log(dataObjectFromStateVariables())
+      console.log({ response })
+
+      setIsUploading(false)
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data content facility berhasil diupdate!`,
+      })
+
+      setIsWillUpdate(false)
+
+      clearStateVariables()
+
+      setOpen(false)
+      fetchContentFacilities()
+    } catch (error) {
+      setIsWillUpdate(false)
+
+      setIsUploading(false)
+      clearStateVariables()
+
+      console.error({ error })
+
+      setOpen(false)
+      Toast.fire({
+        icon: 'error',
+        title: error.response.data.data,
+      })
+    }
   }
 
   // function to handle delete
@@ -181,7 +257,13 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
-          <form onSubmit={handleUploadFacilityContent}>
+          <form
+            onSubmit={
+              isWillUpdate
+                ? handleUpdateFacilityContent
+                : handleUploadFacilityContent
+            }
+          >
             <DialogHeader>
               <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
                 <GiSofa className="w-10 text-3xl" />
@@ -193,81 +275,98 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
                 </div>
               </div>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="flex flex-col items-start gap-1">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Input Facility Name..."
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="col-span-3"
-                />
+            {isUploading ? (
+              <div className="flex items-center justify-center p-10">
+                <HashLoader color="#FF6200" />
               </div>
-              <div className="flex gap-2 w-full">
-                <div className="flex flex-col items-start gap-1 w-full">
-                  <Label htmlFor="price" className="text-right">
-                    Price
+            ) : (
+              <div className="grid gap-4 py-4">
+                <div className="flex flex-col items-start gap-1">
+                  <Label htmlFor="name" className="text-right">
+                    Name
                   </Label>
                   <Input
-                    id="price"
-                    placeholder="Input Price..."
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    id="name"
+                    type="text"
+                    placeholder="Input Facility Name..."
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="flex gap-2 w-full">
+                  <div className="flex flex-col items-start gap-1 w-full">
+                    <Label htmlFor="price" className="text-right">
+                      Price
+                    </Label>
+                    <Input
+                      id="price"
+                      placeholder="Input Price..."
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex flex-col items-start gap-1 w-full">
+                    <Label htmlFor="capacity" className="text-right">
+                      Capacity
+                    </Label>
+                    <Input
+                      id="capacity"
+                      type="number"
+                      placeholder="Input Capacity..."
+                      value={capacity}
+                      onChange={(e) => setCapacity(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-start gap-1 w-full">
+                  <Label htmlFor="benefits" className="text-right">
+                    Benefits
+                  </Label>
+                  <Editor
+                    initialValue={initialValue}
+                    apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
+                    onInit={(evt, benefit) => (benefits.current = benefit)}
+                    init={{
+                      height: 200,
+                      width: '100%',
+
+                      menubar: false,
+                      plugins: ['lists', 'fullscreen', 'wordcount'],
+                      toolbar: 'bullist numlist',
+                      content_style:
+                        'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
+                    }}
                     className="w-full"
                   />
                 </div>
-                <div className="flex flex-col items-start gap-1 w-full">
-                  <Label htmlFor="capacity" className="text-right">
-                    Capacity
+                <div className="flex flex-col items-start gap-1">
+                  <Label htmlFor="pict" className="text-right">
+                    Picture
                   </Label>
+                  {isWillUpdate && (
+                    <Image
+                      alt={pictFacilitySelected}
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${pictFacilitySelected}`}
+                      width={0}
+                      height={0}
+                      className="w-full object-cover h-[100px] rounded-lg"
+                    />
+                  )}
                   <Input
-                    id="capacity"
-                    type="number"
-                    placeholder="Input Capacity..."
-                    value={capacity}
-                    onChange={(e) => setCapacity(e.target.value)}
-                    className="w-full"
+                    id="pict"
+                    onChange={handleFileChange}
+                    type="file"
+                    className="col-span-3"
                   />
                 </div>
               </div>
+            )}
 
-              <div className="flex flex-col items-start gap-1 w-full">
-                <Label htmlFor="benefits" className="text-right">
-                  Benefits
-                </Label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
-                  onInit={(evt, benefit) => (benefits.current = benefit)}
-                  init={{
-                    height: 200,
-                    width: '100%',
-
-                    menubar: false,
-                    plugins: ['lists', 'fullscreen', 'wordcount'],
-                    toolbar: 'bullist numlist',
-                    content_style:
-                      'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
-                  }}
-                  className="w-full"
-                />
-              </div>
-              <div className="flex flex-col items-start gap-1">
-                <Label htmlFor="pict" className="text-right">
-                  Picture
-                </Label>
-                <Input
-                  id="pict"
-                  onChange={handleFileChange}
-                  type="file"
-                  className="col-span-3"
-                />
-              </div>
-            </div>
             <DialogFooter>
               <Button type="submit" className="bg-orange hover:bg-orange">
                 Upload
@@ -293,6 +392,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
               width={0}
               height={0}
               className="w-[200px]"
+              alt={'No content available'}
             />
             <p className="text-base font-normal text-gray-400">
               There is no any contents right now ikuzo!
@@ -320,45 +420,52 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
           {facilities.map((facility, index) => (
             <SwiperSlide key={index} className="wide">
               <div className="relative">
-                <form
-                  action=""
-                  method="post"
-                  className="absolute top-4 right-4"
-                >
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="ml-auto border border-red-500 bg-red-500 hover:bg-red-300 bg-opacity-10 hover:text-red-500 text-base text-red-500"
-                      >
-                        <AiOutlineDelete className="h-7 w-5" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete your content and remove your data from our
-                          servers.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={(e) =>
-                            handleDeleteFacilityContent(facility.id)
-                          }
+                <div className="flex flex-row gap-1 absolute top-4 right-4 w-fit p-1 bg-gray-700  bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 rounded-lg">
+                  <Button
+                    onClick={() => handleOpenFormForUpdating(facility)}
+                    variant="outline"
+                    className="ml-auto border border-yellow-500 bg-transparent hover:bg-yellow-600  hover:text-white text-base text-yellow-500"
+                  >
+                    <FiEdit3 className="h-7 w-5" />
+                  </Button>
+                  <form action="" method="post" className="">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="ml-auto border border-red-500 bg-transparent hover:bg-red-600   hover:text-white text-base text-red-500"
                         >
-                          Continue
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </form>
+                          <AiOutlineDelete className="h-7 w-5" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your content and remove your data from our
+                            servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={(e) =>
+                              handleDeleteFacilityContent(facility.id)
+                            }
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </form>
+                </div>
+
                 <img
+                  alt={facility.name}
                   className="rounded-md"
                   src={process.env.NEXT_PUBLIC_IMAGE_URL + facility.pict}
                 />

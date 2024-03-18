@@ -73,8 +73,6 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
           },
         },
       )
-      console.log(dataObjectFromStateVariables())
-      console.log({ response })
 
       Toast.fire({
         icon: 'success',
@@ -123,7 +121,6 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
       )
       if (response.status == 200) {
         const jsonData = await response.data
-        console.log({ jsonData })
       } else {
         console.error({ error })
         throw new Error('Failed to fetch data')
