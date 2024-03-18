@@ -10,6 +10,7 @@ import Layout from '../components/Layout'
 import SwiperContentGames from '@/app/components/SwiperContentGames'
 import SwiperContentFacilities from '@/app/admin/dashboard/components/SwiperContentFacilities'
 import ListSections from '../components/ListSections'
+import { useRouter } from 'next/navigation'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -19,6 +20,7 @@ function page() {
   const [games, setGames] = React.useState([])
   const [facilities, setFacilities] = React.useState([])
   const [sections, setSections] = React.useState([])
+  const router = useRouter()
 
   const fetchContents = async () => {
     setIsLoading(true)
@@ -82,6 +84,10 @@ function page() {
   const [selectedFeature, setSelectedFeature] = React.useState('games')
 
   React.useEffect(() => {
+    if (!Cookies.get('token')) {
+      router.push('/admin/login')
+    }
+
     fetchContents()
   }, [])
 
