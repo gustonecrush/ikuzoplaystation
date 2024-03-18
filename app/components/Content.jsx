@@ -77,7 +77,7 @@ function DynamicSection({ content }) {
         />
 
         <div className="absolute w-full md:w-1/2 px-2 flex items-center justify-center flex-col gap-2 left-1/2 transform -translate-x-1/2 top-1/2 z-40 -translate-y-1/2">
-          <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5rem] md:mt-16">
+          <h1 className="text-orange font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5rem] md:mt-16">
             {content.title}
           </h1>
           <p className="text-white font-normal text-center text-base md:text-lg">

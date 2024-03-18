@@ -58,7 +58,7 @@ function Hero({ children }) {
                   height={0}
                   className="w-[110px] md:w-[140px] md:block hidden"
                 />
-                <h1 className="text-white font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5.5rem] md:-mt-5">
+                <h1 className="text-orange font-extrabold font-montserrat text-5xl leading-none text-center md:text-[5.5rem] md:-mt-5">
                   {content.title}
                 </h1>
                 <p className="text-white font-normal text-center text-base md:text-lg">
