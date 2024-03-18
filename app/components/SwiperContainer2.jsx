@@ -73,7 +73,7 @@ export default function SwiperContainer2() {
         className="mySwiper mx-10"
       >
         {facilities.map((facility, index) => (
-          <SwiperSlide key={index} className="w-fit wide">
+          <SwiperSlide key={index} className="md:!w-[700px] relative">
             <Image
               alt={facility.name}
               width={0}
