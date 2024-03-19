@@ -596,10 +596,6 @@ function page() {
   ] = React.useState(false)
 
   React.useEffect(() => {
-    if (!Cookies.get('token')) {
-      router.push('/admin/login')
-    }
-
     getAllDataReservations()
   }, [])
 

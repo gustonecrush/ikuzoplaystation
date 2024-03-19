@@ -84,9 +84,6 @@ function page() {
   const [selectedFeature, setSelectedFeature] = React.useState('games')
 
   React.useEffect(() => {
-    if (!Cookies.get('token')) {
-      router.push('/admin/login')
-    }
 
     fetchContents()
   }, [])
