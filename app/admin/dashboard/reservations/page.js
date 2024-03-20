@@ -113,9 +113,12 @@ function page() {
         title: `Data reservasi berhasil dihapus!`,
       })
 
-      fetchContentFacilities()
+      getAllDataReservations()
+      setOpen(false)
     } catch (error) {
       console.error({ error })
+      setOpen(false)
+
       if (error.code == 'ERR_NETWORK') {
         Toast.fire({
           icon: 'error',
@@ -195,38 +198,36 @@ function page() {
           >
             <FiEdit3 className="h-4 w-4" /> Edit
           </Button>
-          <form action="" method="post">
-            <AlertDialog open={open}>
-              <AlertDialogTrigger asChild>
-                <Button
-                  onClick={(e) => setOpen(true)}
-                  variant="outline"
-                  className="ml-auto border border-red-500 bg-transparent hover:bg-red-600   hover:text-white text-base text-red-500"
+          <AlertDialog className="bg-black/20" open={open}>
+            <AlertDialogTrigger asChild>
+              <Button
+                onClick={(e) => setOpen(true)}
+                variant="outline"
+                className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
+              >
+                <AiOutlineDelete className="h-4 w-4" /> Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your content and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(e) =>
+                    handleDeleteFacilityContent(row.getValue('reserve_id'))
+                  }
                 >
-                  <AiOutlineDelete className="h-7 w-5" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your content and remove your data from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={(e) =>
-                      handleDeleteFacilityContent(row.getValue('reserve_id'))
-                    }
-                  >
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </form>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       ),
     },
