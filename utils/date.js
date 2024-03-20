@@ -255,3 +255,16 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
 
   return times
 }
+
+export const formatDateOnTheUI = (dateStr) => {
+  const date = new Date(dateStr)
+
+  const options = {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }
+  const formattedDate = date.toLocaleDateString('en-US', options)
+  return formattedDate
+}

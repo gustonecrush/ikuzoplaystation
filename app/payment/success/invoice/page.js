@@ -10,6 +10,7 @@ import Image from 'next/image'
 import axios from 'axios'
 import Loading from '@/app/loading'
 import { useEffect } from 'react'
+import { formatDateOnTheUI } from '@/utils/date'
 
 const Invoice = () => {
   const searchParam = useSearchParams()
@@ -168,7 +169,7 @@ const Invoice = () => {
                         <p className="text-sm font-normal text-slate-700">
                           Invoice Date
                         </p>
-                        <p>Sunday, 10 August 2024 - 10:00 WIB</p>
+                        <p>{formatDateOnTheUI(data.created_at)}</p>
                       </div>
                     </div>
                   </div>
@@ -189,13 +190,13 @@ const Invoice = () => {
                             scope="col"
                             className="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell"
                           >
-                            Quantity
+                            Duration
                           </th>
                           <th
                             scope="col"
                             className="hidden py-3.5 px-3 text-right text-sm font-normal text-slate-700 sm:table-cell"
                           >
-                            Rate
+                            Price
                           </th>
                           <th
                             scope="col"
@@ -209,7 +210,7 @@ const Invoice = () => {
                         <tr className="border-b border-slate-200">
                           <td className="py-4 pl-4 pr-3 text-xs sm:pl-6 md:pl-0">
                             <div className="font-medium text-slate-700 text-sm">
-                              {data.location}
+                              {data.location} in Position {data.position}
                             </div>
                             <div className="mt-0.5 text-slate-500 sm:hidden">
                               12 Hours
@@ -219,7 +220,7 @@ const Invoice = () => {
                             </div>
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
-                            48
+                            {data.reserve_start_time} - {data.reserve_end_time}
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
                             IDR {data.price}
@@ -263,7 +264,7 @@ const Invoice = () => {
                             Tax
                           </th>
                           <td className="pt-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
-                            IDR 4500
+                            IDR 4000
                           </td>
                         </tr>
                         <tr>
@@ -281,7 +282,7 @@ const Invoice = () => {
                             Total
                           </th>
                           <td className="pt-4 pl-3 pr-4 text-sm font-normal text-right text-slate-700 sm:pr-6 md:pr-0">
-                            IDR 50000
+                            IDR {parseInt(data.price) + 4000}
                           </td>
                         </tr>
                       </tfoot>

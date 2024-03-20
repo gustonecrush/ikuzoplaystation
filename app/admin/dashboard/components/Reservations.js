@@ -274,7 +274,7 @@ export default function Reservation() {
         reserve_start_time: startTimeReservasi,
         reserve_end_time: endTimeReservasi,
         status_reserve: 'settlement',
-        price: (totalTime * pricePerReserve).toString(),
+        price: (totalTime * pricePerReserve + 4000).toString(),
         position: posisiReservasi,
       }
 
@@ -2248,7 +2248,7 @@ export default function Reservation() {
             {selectedPay == 'non-cash' && (
               <Checkout
                 id={idReservasi}
-                price={totalTime * parseInt(pricePerReserve)}
+                price={totalTime * parseInt(pricePerReserve) + 4000}
                 productName={`Reservation ${namaPosisiReservasi}`}
                 detailCustomer={{
                   name: namaReservasi,

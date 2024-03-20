@@ -2139,7 +2139,7 @@ export default function Reservation() {
           <div className="flex flex-col gap-1 w-full mt-5">
             <Checkout
               id={idReservasi}
-              price={totalTime * parseInt(pricePerReserve)}
+              price={totalTime * parseInt(pricePerReserve) + 4000}
               productName={`Reservation ${namaPosisiReservasi}`}
               detailCustomer={{
                 name: namaReservasi,

@@ -82,6 +82,7 @@ import Cookies from 'js-cookie'
 import { IoDocument, IoGameControllerSharp } from 'react-icons/io5'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import Link from 'next/link'
+import { formatDateOnTheUI } from '@/utils/date'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -429,7 +430,9 @@ function page() {
         )
       },
       cell: ({ row }) => (
-        <div className="w-full text-center">{row.getValue('reserve_date')}</div>
+        <div className="w-full text-center">
+          {formatDateOnTheUI(row.getValue('reserve_date'))}
+        </div>
       ),
     },
     {
@@ -486,8 +489,8 @@ function page() {
         )
       },
       cell: ({ row }) => (
-        <div className="text-center uppercase">
-          {row.getValue('created_at').toString().slice(0, 11)}
+        <div className="text-center">
+          {formatDateOnTheUI(row.getValue('created_at'))}
         </div>
       ),
     },
@@ -505,8 +508,8 @@ function page() {
         )
       },
       cell: ({ row }) => (
-        <div className="text-center uppercase">
-          {row.getValue('updated_at').toString().slice(0, 11)}
+        <div className="text-center">
+          {formatDateOnTheUI(row.getValue('updated_at'))}
         </div>
       ),
     },
