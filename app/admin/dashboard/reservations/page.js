@@ -81,6 +81,7 @@ import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { IoDocument, IoGameControllerSharp } from 'react-icons/io5'
 import { Cross2Icon } from '@radix-ui/react-icons'
+import Link from 'next/link'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -223,9 +224,18 @@ function page() {
         )
       },
       cell: ({ row }) => (
-        <div className={`text-center capitalize`}>
-          {row.getValue('invoice')}
-        </div>
+        <Link
+          target="_blank"
+          href={process.env.NEXT_PUBLIC_IMAGE_URL + row.getValue('invoice')}
+          className={`text-center text-black`}
+        >
+          <Badge
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 border-gray-500 bg-gray-500 text-gray-500 hover:bg-gray-600
+            `}
+          >
+            {<IoDocument />} invoice
+          </Badge>
+        </Link>
       ),
     },
     {

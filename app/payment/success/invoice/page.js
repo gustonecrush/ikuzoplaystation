@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useRef } from 'react'
 import html2canvas from 'html2canvas'
 
 import { Button } from '@/components/ui/button'
@@ -9,69 +9,129 @@ import Link from 'next/link'
 import Image from 'next/image'
 import axios from 'axios'
 import Loading from '@/app/loading'
+import { useEffect } from 'react'
 
 const Invoice = () => {
   const searchParam = useSearchParams()
   const order_id = searchParam.get('order_id')
+  const invoiceRef = useRef(null)
 
   const [showInvoice, setShowInvoice] = React.useState(false)
   const [data, setData] = React.useState(null)
-
-  console.log(order_id)
-  console.log(data)
 
   const getReservationByID = async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/reservations?reserve_id=${order_id}`,
       )
-      console.log(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/reservations?reserve_id=${order_id}`,
-      )
-      if (response.status == 200) {
+      if (response.status === 200) {
         const jsonData = await response.data
-        console.log(response.data)
         setData(jsonData[0])
       } else {
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
+      console.error('Error while fetching reservation data:', error)
     }
   }
 
+  function base64ToFile(base64String, fileName) {
+    // Split the base64 string to get the MIME type and the data
+    const base64Parts = base64String.split(';base64,')
+    const mimeType = base64Parts[0].split(':')[1]
+    const base64Data = base64Parts[1]
+
+    // Convert the base64 string to a byte array
+    const byteCharacters = atob(base64Data)
+    const byteNumbers = new Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+
+    // Create a Blob from the byte array
+    const blob = new Blob([byteArray], { type: mimeType })
+
+    // Create a File from the Blob
+    const file = new File([blob], fileName, { type: mimeType })
+
+    return file
+  }
+
   const downloadInvoice = () => {
-    const invoice = document.getElementById('invoice-container')
+    const invoice = invoiceRef.current
+    if (!invoice) {
+      console.error('Element with ID "invoice-container" not found in the DOM')
+      return
+    }
 
     html2canvas(invoice).then(function (canvas) {
-      console.log({ canvas })
-      console.log(canvas.toBlob())
-
       const link = document.createElement('a')
       link.download = `${order_id}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
+
+      const imageDataURL = canvas.toDataURL('image/png')
+      console.log(imageDataURL)
+      handleUpdateContent(base64ToFile(imageDataURL))
     })
   }
 
-  React.useEffect(() => {
+  const handleUpdateContent = async (file) => {
+    const formData = new FormData()
+
+    formData.append('reserve_id', data.reserve_name)
+    formData.append('reserve_name', data.reserve_name)
+    formData.append('location', data.location)
+    formData.append('reserve_contact', data.reserve_contact)
+    formData.append('reserve_date', data.reserve_date)
+    formData.append('reserve_start_time', data.reserve_start_time)
+    formData.append('reserve_end_time', data.reserve_end_time)
+    formData.append('status_reserve', data.status_reserve)
+    formData.append('price', data.price)
+    formData.append('position', data.position)
+    formData.append('invoice', file)
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/reservations/${order_id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', // Important for file uploads
+          },
+        },
+      )
+      console.log('Invoice upload successful:', response)
+    } catch (error) {
+      console.error('Error while uploading invoice:', error)
+    }
+  }
+
+  useEffect(() => {
     getReservationByID()
+  }, [order_id])
 
-    const timer = setTimeout(() => {
+  useEffect(() => {
+    if (data) {
       setShowInvoice(true)
+      // Trigger downloadInvoice directly after showInvoice is set to true
       downloadInvoice()
-    }, 2000)
+    }
+  }, [data])
 
-    return () => clearTimeout(timer)
-  }, [downloadInvoice])
+  // Render your component here
 
   return (
     <>
       {data && showInvoice ? (
         <section className="bg-white md:flex md:items-center md:justify-center">
           <div className="max-w-5xl pt-5 bg-white md:shadow-md mx-auto md:h-screen">
-            <article className="overflow-hidden" id="invoice-container">
+            <article
+              className="overflow-hidden"
+              id="invoice-container"
+              ref={invoiceRef}
+            >
               <div className="bg-[white] rounded-b-md">
                 <div className="px-9">
                   <div className="space-y-2 text-slate-700">
@@ -173,7 +233,7 @@ const Invoice = () => {
                         <tr>
                           <th
                             scope="row"
-                            colspan="3"
+                            colSpan="3"
                             className="hidden pt-0 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0"
                           >
                             Subtotal
@@ -191,7 +251,7 @@ const Invoice = () => {
                         <tr>
                           <th
                             scope="row"
-                            colspan="3"
+                            colSpan="3"
                             className="hidden pt-4 pl-6 pr-3 text-sm font-light text-right text-slate-500 sm:table-cell md:pl-0"
                           >
                             Tax
@@ -209,7 +269,7 @@ const Invoice = () => {
                         <tr>
                           <th
                             scope="row"
-                            colspan="3"
+                            colSpan="3"
                             className="hidden pt-4 pl-6 pr-3 text-sm font-normal text-right text-slate-700 sm:table-cell md:pl-0"
                           >
                             Total
