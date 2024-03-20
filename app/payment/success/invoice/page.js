@@ -114,11 +114,8 @@ const Invoice = () => {
   }, [order_id])
 
   useEffect(() => {
-    if (data) {
-      setShowInvoice(true)
-      // Trigger downloadInvoice directly after showInvoice is set to true
-      downloadInvoice()
-    }
+    setShowInvoice(true)
+    downloadInvoice()
   }, [data])
 
   // Render your component here
