@@ -1402,7 +1402,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -1642,7 +1642,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
