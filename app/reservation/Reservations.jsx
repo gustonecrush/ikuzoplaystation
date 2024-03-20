@@ -612,7 +612,7 @@ export default function Reservation() {
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
-                                  <DrawerContent className="active:border-none border-none outline-none max-w-3xl mx-auto">
+                                  <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
                                         {positions[0].name}
@@ -847,7 +847,7 @@ export default function Reservation() {
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
-                                  <DrawerContent className="active:border-none border-none outline-none">
+                                  <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
                                         {positions[1].name}
@@ -1081,7 +1081,7 @@ export default function Reservation() {
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
-                                  <DrawerContent className="active:border-none border-none outline-none">
+                                  <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
                                         {positions[0].name}
@@ -1319,7 +1319,7 @@ export default function Reservation() {
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
-                                  <DrawerContent className="active:border-none border-none outline-none">
+                                  <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
                                         {positions[4].name}
@@ -1559,7 +1559,7 @@ export default function Reservation() {
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
-                                  <DrawerContent className="active:border-none border-none outline-none">
+                                  <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
                                         {positions[2].name}
@@ -1808,7 +1808,7 @@ export default function Reservation() {
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
-                                  <DrawerContent className="active:border-none border-none outline-none">
+                                  <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
                                         {positions[3].name}
