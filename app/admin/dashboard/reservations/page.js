@@ -33,15 +33,14 @@ import {
 } from '@tanstack/react-table'
 
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 import {
   AlertDialog,
@@ -87,7 +86,10 @@ import { formatDateOnTheUI } from '@/utils/date'
 function page() {
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
+  const [statusPlaying, setStatusPlaying] = React.useState('')
+
   const [open, setOpen] = React.useState(false)
+  const [openUpdate, setOpenUpdate] = React.useState(false)
 
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
@@ -114,13 +116,61 @@ function page() {
       })
 
       getAllDataReservations()
+      setOpenUpdate(false)
     } catch (error) {
       console.error({ error })
+      setOpenUpdate(false)
 
       if (error.code == 'ERR_NETWORK') {
         Toast.fire({
           icon: 'error',
           title: `Data reservasi gagal dihapus!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
+  const handleOpenUpdate = () => {
+    setOpenUpdate(true)
+  }
+  const handleUpdateFacilityContent = async (id) => {
+    const payload = {
+      status_payment: statusPlaying,
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/reservations/${id}`,
+        payload,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        console.log({ jsonData })
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data reservasi berhasil diupdate!`,
+      })
+
+      getAllDataReservations()
+      setStatusPlaying('')
+    } catch (error) {
+      console.error({ error })
+      setStatusPlaying('')
+
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data reservasi gagal diupdate!`,
         })
       } else {
         Toast.fire({
@@ -165,37 +215,77 @@ function page() {
       },
       cell: ({ row }) => (
         <div className={`flex items-center justify-center gap-1`}>
-          <Drawer>
-            <DrawerTrigger>
-              <Button
-                variant="outline"
-                className="border-black border-opacity-5 bg-black bg-opacity-10 text-xs text-black"
-              >
-                <IoIosInformationCircle className="h-4 w-4" /> Info
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="h-3/4">
-              <DrawerHeader>
-                <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-                <DrawerDescription>
-                  This action cannot be undone.
-                </DrawerDescription>
-              </DrawerHeader>
-              <DrawerFooter>
-                <Button>Submit</Button>
-                <DrawerClose>
-                  <Button variant="outline">Cancel</Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
-
           <Button
             variant="outline"
-            className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
+            className="border-black border-opacity-5 bg-black bg-opacity-10 text-xs text-black"
           >
-            <FiEdit3 className="h-4 w-4" /> Edit
+            <IoIosInformationCircle className="h-4 w-4" /> Info
           </Button>
+
+          <AlertDialog className="bg-black/20" open={openUpdate}>
+            <AlertDialogTrigger asChild>
+              <Button
+                onClick={(e) => handleOpenUpdate()}
+                variant="outline"
+                className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
+              >
+                <FiEdit3 className="h-4 w-4" /> Edit
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Status Playing Reservation</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Pastikan Telah Melakukan Pengecekan/Verifikasi Invoice
+                  Customer Dengan Yang Ada di Admin!
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <fieldset>
+                <Select
+                  value={statusPlaying}
+                  onValueChange={(value) => setStatusPlaying(value)}
+                  required
+                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                >
+                  <SelectTrigger className="py-5 px-3 text-base text-black">
+                    <SelectValue
+                      className="text-base text-black placeholder:text-black"
+                      placeholder="Pilih Status Playing"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup className="">
+                      <SelectLabel className="text-base">
+                        Status Playing
+                      </SelectLabel>
+                      <SelectItem className="text-base" value="playing">
+                        Playing
+                      </SelectItem>
+                      <SelectItem className="text-base" value="not playing">
+                        Not Playing
+                      </SelectItem>
+                      <SelectItem className="text-base" value="done">
+                        Done
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </fieldset>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={(e) => setOpenUpdate(false)}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(e) =>
+                    handleUpdateFacilityContent(row.getValue('reserve_id'))
+                  }
+                >
+                  Update
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <AlertDialog className="bg-black/20">
             <AlertDialogTrigger asChild>

@@ -17,7 +17,6 @@ function Content() {
       if (response.status == 200) {
         const jsonData = response.data
         setContents(jsonData.data)
-        console.log({ jsonData })
       } else {
         console.error({ error })
         throw new Error('Failed to fetch data')
