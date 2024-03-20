@@ -11,11 +11,13 @@ import axios from 'axios'
 import Loading from '@/app/loading'
 import { useEffect } from 'react'
 import { formatDateOnTheUI } from '@/utils/date'
+import Cookies from 'js-cookie'
 
 const Invoice = () => {
   const searchParam = useSearchParams()
   const order_id = searchParam.get('order_id')
   const invoiceRef = useRef(null)
+  const token = Cookies.get('token')
 
   const [showInvoice, setShowInvoice] = React.useState(false)
   const [data, setData] = React.useState(null)
@@ -309,7 +311,7 @@ const Invoice = () => {
               >
                 Download
               </Button>
-              <Link href={'/'}>
+              <Link href={token ? '/admin/dashboard/reservations' : '/'}>
                 <Button className="bg-white text-black border-gray-400 rounded-lg px-5 -mt-2 py-6 text-sm font-jakarta hover:bg-white w-full font-medium">
                   Kembali
                 </Button>

@@ -355,7 +355,7 @@ export default function Reservation() {
 
   return (
     <>
-      <section className="bg-transparent w-full h-full font-jakarta px-5 py-5 absolute z-50">
+      <section className="bg-transparent w-full h-full md:max-w-4xl md:mx-auto font-jakarta px-5 py-5 md:pb-10 absolute z-50">
         <div className="flex items-center justify-between">
           <Fade>
             <Image
@@ -590,7 +590,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
@@ -810,9 +810,9 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row justify-around w-24 bottom-10 absolute z-50 left-7 gap-[${
+                            className={`flex flex-row justify-around md:w-64 w-24 bottom-10 absolute z-50 left-7 gap-[${
                               9 + scale * 10
-                            }] `}
+                            }]  md:left-20 md:gap-[${10 + scale * 10}]`}
                             ref={imageRef}
                             style={{
                               height: 'auto',
@@ -826,7 +826,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 ml-2 flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 ml-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
@@ -1046,7 +1046,7 @@ export default function Reservation() {
                           <div
                             className={`flex flex-row justify-around w-fit bottom-10 absolute z-50 left-40 -ml-2 gap-${
                               8 + scale * 10
-                            } `}
+                            } bottom-10  md:left-[51.5%] -ml-2 `}
                             ref={imageRef}
                             style={{
                               height: 'auto',
@@ -1060,7 +1060,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-9  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer md:w-28 md:h-28 w-9  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
@@ -1278,7 +1278,7 @@ export default function Reservation() {
                       {floorSelected == 'second-floor' && selectedDate != '' && (
                         <div className="flex flex-col mb-6">
                           <div
-                            className={`flex flex-row w-auto top-16 absolute left-[36%] z-50 gap-[${
+                            className={`flex flex-row w-auto top-16 absolute left-[36%] md:top-48  z-50 gap-[${
                               5 + scale * 10
                             }]`}
                             ref={imageRef}
@@ -1294,7 +1294,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
@@ -1516,7 +1516,7 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row w-full justify-end top-24 absolute right-5 z-50 gap-[${
+                            className={`flex flex-row w-full justify-end top-24 absolute right-5 md:top-64  md:right-36 z-50 gap-[${
                               5 + scale * 10
                             }]`}
                             ref={imageRef}
@@ -1532,7 +1532,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${
+                                      className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${
                                         number == 10 && 'mr-16'
                                       }`}
                                       onClick={() => {
@@ -1756,7 +1756,7 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row justify-around bottom-14 absolute left-5 z-50 gap-${
+                            className={`flex flex-row justify-around bottom-14 absolute left-5 md:bottom-28  md:left-16 z-50 gap-${
                               5 + scale * 10
                             }`}
                             ref={imageRef}
@@ -1787,7 +1787,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-8 h-8 ml-1 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 ml-1 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(

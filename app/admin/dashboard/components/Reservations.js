@@ -284,6 +284,9 @@ export default function Reservation() {
       )
       console.log(reserveResponse.data)
       setOpen(false)
+      router.push(
+        `/payment/success/invoice?order_id=${idReservasi}&status_code=200&transaction_status=settlement`,
+      )
       Toast.fire({
         icon: 'success',
         title: `Pembayaran Berhasil Dilakukan!`,

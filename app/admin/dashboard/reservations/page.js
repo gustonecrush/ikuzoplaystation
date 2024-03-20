@@ -90,6 +90,7 @@ function page() {
 
   const [open, setOpen] = React.useState(false)
   const [openUpdate, setOpenUpdate] = React.useState(false)
+  const [idSelected, setIdSelected] = React.useState('')
 
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
@@ -116,10 +117,10 @@ function page() {
       })
 
       getAllDataReservations()
-      setOpenUpdate(false)
+      setIdSelected('')
     } catch (error) {
       console.error({ error })
-      setOpenUpdate(false)
+      setIdSelected('')
 
       if (error.code == 'ERR_NETWORK') {
         Toast.fire({
@@ -129,13 +130,14 @@ function page() {
       } else {
         Toast.fire({
           icon: 'error',
-          title: `Internal server sedang error, coba lagi nanti!`,
+          title: error.response.data,
         })
       }
     }
   }
 
-  const handleOpenUpdate = () => {
+  const handleOpenUpdate = (id) => {
+    setIdSelected(id)
     setOpenUpdate(true)
   }
   const handleUpdateFacilityContent = async (id) => {
@@ -163,6 +165,7 @@ function page() {
 
       getAllDataReservations()
       setStatusPlaying('')
+      setOpenUpdate(false)
     } catch (error) {
       console.error({ error })
       setStatusPlaying('')
@@ -178,6 +181,7 @@ function page() {
           title: `Internal server sedang error, coba lagi nanti!`,
         })
       }
+      setOpenUpdate(false)
     }
   }
   const columns = [
@@ -221,71 +225,13 @@ function page() {
           >
             <IoIosInformationCircle className="h-4 w-4" /> Info
           </Button>
-
-          <AlertDialog className="bg-black/20" open={openUpdate}>
-            <AlertDialogTrigger asChild>
-              <Button
-                onClick={(e) => handleOpenUpdate()}
-                variant="outline"
-                className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
-              >
-                <FiEdit3 className="h-4 w-4" /> Edit
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Status Playing Reservation</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Pastikan Telah Melakukan Pengecekan/Verifikasi Invoice
-                  Customer Dengan Yang Ada di Admin!
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <fieldset>
-                <Select
-                  value={statusPlaying}
-                  onValueChange={(value) => setStatusPlaying(value)}
-                  required
-                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                >
-                  <SelectTrigger className="py-5 px-3 text-base text-black">
-                    <SelectValue
-                      className="text-base text-black placeholder:text-black"
-                      placeholder="Pilih Status Playing"
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup className="">
-                      <SelectLabel className="text-base">
-                        Status Playing
-                      </SelectLabel>
-                      <SelectItem className="text-base" value="playing">
-                        Playing
-                      </SelectItem>
-                      <SelectItem className="text-base" value="not playing">
-                        Not Playing
-                      </SelectItem>
-                      <SelectItem className="text-base" value="done">
-                        Done
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </fieldset>
-
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={(e) => setOpenUpdate(false)}>
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) =>
-                    handleUpdateFacilityContent(row.getValue('reserve_id'))
-                  }
-                >
-                  Update
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <Button
+            onClick={(e) => handleOpenUpdate(row.getValue('reserve_id'))}
+            variant="outline"
+            className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
+          >
+            <FiEdit3 className="h-4 w-4" /> Edit
+          </Button>
 
           <AlertDialog className="bg-black/20">
             <AlertDialogTrigger asChild>
@@ -356,7 +302,9 @@ function page() {
       cell: ({ row }) => (
         <Link
           target="_blank"
-          href={process.env.NEXT_PUBLIC_IMAGE_URL + row.getValue('invoice')}
+          href={`${process.env.NEXT_PUBLIC_IMAGE_URL}${row.getValue(
+            'invoice',
+          )}`}
           className={`text-center text-black`}
         >
           <Badge
@@ -912,6 +860,67 @@ function page() {
                   </div>
                 </div>
               </Card>
+
+              <AlertDialog className="bg-black/20" open={openUpdate}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Status Playing Reservation
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Pastikan Telah Melakukan Pengecekan/Verifikasi Invoice
+                      Customer Dengan Yang Ada di Admin!
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <fieldset>
+                    <form>
+                      <Select
+                        value={statusPlaying}
+                        onValueChange={(value) => setStatusPlaying(value)}
+                        required
+                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                      >
+                        <SelectTrigger className="py-5 px-3 text-base text-black">
+                          <SelectValue
+                            className="text-base text-black placeholder:text-black"
+                            placeholder="Pilih Status Playing"
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup className="">
+                            <SelectLabel className="text-base">
+                              Status Playing
+                            </SelectLabel>
+                            <SelectItem className="text-base" value="playing">
+                              Playing
+                            </SelectItem>
+                            <SelectItem
+                              className="text-base"
+                              value="not playing"
+                            >
+                              Not Playing
+                            </SelectItem>
+                            <SelectItem className="text-base" value="done">
+                              Done
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </form>
+                  </fieldset>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={(e) => setOpenUpdate(false)}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={(e) => handleUpdateFacilityContent(idSelected)}
+                    >
+                      Update
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </section>
           </>
         )}

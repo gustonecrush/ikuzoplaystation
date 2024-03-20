@@ -99,7 +99,7 @@ export async function Video({ extra = '' }) {
         muted
         loop
         title="Ikuzo Playstation"
-        className={`h-screen w-full object-cover -z-30 block md:hidden ${extra}`}
+        className={`h-screen w-full md:h-full lg:h-full object-cover -z-30 block md:hidden ${extra}`}
       >
         <source src="/ikuzoplaystation.mp4" type="video/mp4" />
         <track src="/ikuzoplaystation.mp4" srcLang="en" label="English" />
@@ -107,13 +107,12 @@ export async function Video({ extra = '' }) {
       </video>
       <video
         width="320"
-        height="240"
         preload="none"
         autoPlay
         muted
         loop
         title="Ikuzo Playstation"
-        className="h-screen w-full object-cover -z-30 hidden md:block"
+        className="h-screen md:h-full lg:h-full w-full object-cover -z-30 hidden md:block"
       >
         <source src="/ikuzo-dekstop.mp4" type="video/mp4" />
         <track src="/ikuzoplaystation.mp4" srcLang="en" label="English" />
