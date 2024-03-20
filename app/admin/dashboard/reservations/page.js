@@ -96,6 +96,39 @@ function page() {
     false,
   )
   const [rowSelection, setRowSelection] = React.useState({})
+  // function to handle delete
+  const handleDeleteFacilityContent = async (id) => {
+    try {
+      const response = await axios.delete(`${baseUrl}/reservations/${id}`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+        console.log({ jsonData })
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data reservasi berhasil dihapus!`,
+      })
+
+      fetchContentFacilities()
+    } catch (error) {
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data reservasi gagal dihapus!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
   const columns = [
     {
       accessorKey: 'reserve_id',
@@ -163,13 +196,14 @@ function page() {
             <FiEdit3 className="h-4 w-4" /> Edit
           </Button>
           <form action="" method="post">
-            <AlertDialog>
+            <AlertDialog open={open}>
               <AlertDialogTrigger asChild>
                 <Button
+                  onClick={(e) => setOpen(true)}
                   variant="outline"
-                  className="ml-auto border border-red-500 bg-red-500 hover:bg-red-200 bg-opacity-10 text-xs text-red-500"
+                  className="ml-auto border border-red-500 bg-transparent hover:bg-red-600   hover:text-white text-base text-red-500"
                 >
-                  <AiOutlineDelete className="h-4 w-4" /> Delete
+                  <AiOutlineDelete className="h-7 w-5" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -177,12 +211,18 @@ function page() {
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
+                    your content and remove your data from our servers.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>Continue</AlertDialogAction>
+                  <AlertDialogAction
+                    onClick={(e) =>
+                      handleDeleteFacilityContent(row.getValue('reserve_id'))
+                    }
+                  >
+                    Continue
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
