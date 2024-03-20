@@ -84,7 +84,6 @@ function page() {
   const [selectedFeature, setSelectedFeature] = React.useState('games')
 
   React.useEffect(() => {
-
     fetchContents()
   }, [])
 
