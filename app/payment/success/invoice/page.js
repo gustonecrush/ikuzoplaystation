@@ -282,7 +282,7 @@ const Invoice = () => {
                             Total
                           </th>
                           <td className="pt-4 pl-3 pr-4 text-sm font-normal text-right text-slate-700 sm:pr-6 md:pr-0">
-                            IDR {parseInt(data.price) + 4000}
+                            IDR {parseInt(data.price)}
                           </td>
                         </tr>
                       </tfoot>

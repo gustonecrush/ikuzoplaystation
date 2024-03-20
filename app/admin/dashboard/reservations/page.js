@@ -217,7 +217,9 @@ function page() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel onClick={(e) => setOpen(false)}>
+                  Cancel
+                </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={(e) =>
                     handleDeleteFacilityContent(row.getValue('reserve_id'))
