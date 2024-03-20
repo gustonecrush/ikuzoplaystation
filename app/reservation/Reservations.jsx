@@ -612,7 +612,7 @@ export default function Reservation() {
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
-                                  <DrawerContent className="active:border-none border-none outline-none">
+                                  <DrawerContent className="active:border-none border-none outline-none max-w-3xl mx-auto">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
                                         {positions[0].name}
@@ -1340,7 +1340,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
@@ -1580,7 +1580,7 @@ export default function Reservation() {
                                         }}
                                       >
                                         <img
-                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
+                                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
                                           useMap="#image-map"
                                           alt=""
                                           style={{
