@@ -114,10 +114,8 @@ function page() {
       })
 
       getAllDataReservations()
-      setOpen(false)
     } catch (error) {
       console.error({ error })
-      setOpen(false)
 
       if (error.code == 'ERR_NETWORK') {
         Toast.fire({
@@ -198,10 +196,10 @@ function page() {
           >
             <FiEdit3 className="h-4 w-4" /> Edit
           </Button>
-          <AlertDialog className="bg-black/20" open={open}>
+
+          <AlertDialog className="bg-black/20">
             <AlertDialogTrigger asChild>
               <Button
-                onClick={(e) => setOpen(true)}
                 variant="outline"
                 className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
               >
@@ -217,9 +215,7 @@ function page() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel onClick={(e) => setOpen(false)}>
-                  Cancel
-                </AlertDialogCancel>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={(e) =>
                     handleDeleteFacilityContent(row.getValue('reserve_id'))

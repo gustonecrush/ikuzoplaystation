@@ -2124,10 +2124,10 @@ export default function Reservation() {
 
                     <Fade>
                       <div className="space-y-1">
-                        <h4 className="text-base font-jakarta font-medium leading-none text-black">
+                        <h4 className="text-base font-jakarta font-medium leading-none text-white">
                           Pajak
                         </h4>
-                        <p className="text-base font-jakarta text-gray-600">
+                        <p className="ttext-base font-jakarta text-gray-300">
                           Rp {4000}
                         </p>
                       </div>
