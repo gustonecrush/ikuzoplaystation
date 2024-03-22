@@ -111,7 +111,7 @@ function DrawerInfoFacility({ facility }) {
           <InfoIcon className="w-6 h-6" />
         </div>
       </DrawerTrigger>
-      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+      <DrawerContent className="active:border-none z-[1200] border-none outline-none md:max-w-3xl md:mx-auto">
         <DrawerHeader className="text-left">
           <DrawerTitle className="text-xl">{facility.name}</DrawerTitle>
           <DrawerDescription>
