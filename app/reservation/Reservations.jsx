@@ -102,7 +102,7 @@ export default function Reservation() {
   const getAllReservation = async (date, position) => {
     try {
       const response = await axios.get(
-        `${baseUrl}/reservations?reserve_date=${date}&position=${position}`,
+        `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
       console.log(`${baseUrl}/reservations?reserve_date=${date}`)
       if (response.status == 200) {
