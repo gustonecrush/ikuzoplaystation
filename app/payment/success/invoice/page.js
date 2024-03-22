@@ -16,6 +16,7 @@ import Cookies from 'js-cookie'
 const Invoice = () => {
   const searchParam = useSearchParams()
   const order_id = searchParam.get('order_id')
+  const cash = searchParam.get('cash')
   const invoiceRef = useRef(null)
   const token = Cookies.get('token')
 
@@ -263,7 +264,7 @@ const Invoice = () => {
                             Tax
                           </th>
                           <td className="pt-4 pl-3 pr-4 text-sm text-right text-slate-500 sm:pr-6 md:pr-0">
-                            IDR 4000
+                            {cash != null ? 'IDR 0' : 'IDR 4000'}
                           </td>
                         </tr>
                         <tr>

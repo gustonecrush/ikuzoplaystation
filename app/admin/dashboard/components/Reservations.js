@@ -274,7 +274,7 @@ export default function Reservation() {
         reserve_start_time: startTimeReservasi,
         reserve_end_time: endTimeReservasi,
         status_reserve: 'settlement',
-        price: (totalTime * pricePerReserve + 4000).toString(),
+        price: (totalTime * pricePerReserve).toString(),
         position: posisiReservasi,
       }
 
@@ -285,7 +285,7 @@ export default function Reservation() {
       console.log(reserveResponse.data)
       setOpen(false)
       router.push(
-        `/payment/success/invoice?order_id=${idReservasi}&status_code=200&transaction_status=settlement`,
+        `/payment/success/invoice?order_id=${idReservasi}&status_code=200&transaction_status=settlement&cash=true`,
       )
       Toast.fire({
         icon: 'success',
@@ -2236,7 +2236,7 @@ export default function Reservation() {
                     <Fade>
                       <div className="space-y-1">
                         <h4 className="text-base font-jakarta font-medium leading-none text-black">
-                          Pajak
+                          Pajak (Bila Non Cash)
                         </h4>
                         <p className="text-base font-jakarta text-gray-600">
                           Rp {4000}
