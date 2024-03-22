@@ -682,7 +682,7 @@ export default function Reservation() {
                                       <DrawerDescription>
                                         IDR {positions[0].price}/hour and can
                                         only accomodate {positions[0].capacity}{' '}
-                                        person (position ${number}).
+                                        person (position {number}).
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -917,7 +917,7 @@ export default function Reservation() {
                                       <DrawerDescription>
                                         IDR {positions[1].price}/hour and can
                                         only accomodate {positions[1].capacity}{' '}
-                                        person (position ${number}).
+                                        person (position {number}).
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1151,7 +1151,7 @@ export default function Reservation() {
                                       <DrawerDescription>
                                         IDR {positions[0].price}/hour and can
                                         only accomodate {positions[0].capacity}{' '}
-                                        person (position ${number}).
+                                        person (position {number}).
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1389,7 +1389,7 @@ export default function Reservation() {
                                       <DrawerDescription>
                                         IDR {positions[4].price}/hour and can
                                         only accomodate {positions[4].capacity}{' '}
-                                        person (position ${number}).
+                                        person (position {number}).
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1629,7 +1629,7 @@ export default function Reservation() {
                                       <DrawerDescription>
                                         IDR {positions[2].price}/hour and can
                                         only accomodate {positions[2].capacity}{' '}
-                                        person (position ${number}).
+                                        person (position {number}).
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
@@ -1878,7 +1878,7 @@ export default function Reservation() {
                                       <DrawerDescription>
                                         IDR {positions[3].price}/hour and can
                                         only accomodate {positions[3].capacity}{' '}
-                                        person (position ${number}).
+                                        person (position {number}).
                                       </DrawerDescription>
                                     </DrawerHeader>
                                     <div className="flex-relative w-full h-fit px-5">
