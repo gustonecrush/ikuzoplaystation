@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import 'swiper/css'
@@ -14,6 +14,20 @@ import '../admin/dashboard/components/styles2.css'
 import Image from 'next/image'
 import Toast from './Toast'
 import axios from 'axios'
+
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
+import { InfoIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 export default function SwiperContainer2() {
   const [facilities, setFacilities] = React.useState([])
@@ -74,6 +88,7 @@ export default function SwiperContainer2() {
       >
         {facilities.map((facility, index) => (
           <SwiperSlide key={index} className="md:!w-[700px] relative">
+            <DrawerInfoFacility facility={facility} />
             <Image
               alt={facility.name}
               width={0}
@@ -85,5 +100,67 @@ export default function SwiperContainer2() {
         ))}
       </Swiper>
     </section>
+  )
+}
+
+function DrawerInfoFacility({ facility }) {
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <div className="absolute right-0 m-5 top-0 rounded-full w-12 h-12 flex items-center justify-center bg-orange text-white">
+          <InfoIcon className="w-6 h-6" />
+        </div>
+      </DrawerTrigger>
+      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+        <DrawerHeader className="text-left">
+          <DrawerTitle className="text-xl">{facility.name}</DrawerTitle>
+          <DrawerDescription>
+            IDR {facility.price}/hour and can only accomodate{' '}
+            {facility.capacity} person.
+          </DrawerDescription>
+        </DrawerHeader>
+
+        <div className="flex-relative w-full h-fit px-4">
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '10px',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <Image
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
+              useMap="#image-map"
+              alt={facility.name}
+              width={0}
+              height={0}
+              style={{
+                width: '100%',
+                height: 'auto',
+              }}
+            />
+          </div>
+        </div>
+
+        <div
+          className="prose-sm prose-li:list-disc px-4 prose-li:m-0 prose-li:p-0 "
+          dangerouslySetInnerHTML={{
+            __html: facility && facility.benefits,
+          }}
+        ></div>
+
+        <DrawerFooter className="pt-2">
+          <Link href={'/reservation'} className="w-full">
+            <Button
+              variant="outline"
+              className={`bg-orange w-full text-white border-orange py-5`}
+            >
+              Reserve Now
+            </Button>
+          </Link>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   )
 }
