@@ -1367,7 +1367,7 @@ export default function Reservation() {
                                                     (reserve, index) => (
                                                       <div
                                                         className={`text-xs px-2 py-1 border ${
-                                                          ireserve.status_reserve ===
+                                                          reserve.status_reserve ===
                                                           'pending'
                                                             ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
                                                             : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
