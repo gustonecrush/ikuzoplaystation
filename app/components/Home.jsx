@@ -88,7 +88,7 @@ function ReserveButton({ type }) {
   )
 }
 
-export async function Video({ extra = '' }) {
+export function Video({ extra = '' }) {
   return (
     <>
       <video

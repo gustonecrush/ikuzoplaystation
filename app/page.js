@@ -1,9 +1,9 @@
 'use client'
 
 import React from 'react'
-import Loading from './loading'
-import Home from './components/Home'
 import { initializeGoogleTagManager } from '@/utils/googleTagManager'
+import Home from './components/Home'
+import LoaderHome from './components/LoaderHome'
 
 export default function Page() {
   const [loading, setLoading] = React.useState(true)
@@ -15,8 +15,8 @@ export default function Page() {
 
     setTimeout(() => {
       setLoading(false)
-    }, 5000)
+    }, 3000)
   }, [])
 
-  return <>{!loading ? <Home /> : <Loading />}</>
+  return <>{!loading ? <Home /> : <LoaderHome />}</>
 }

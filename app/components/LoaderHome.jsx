@@ -1,9 +1,7 @@
-'use client'
-
 import React from 'react'
-import './loading.scss'
+import '../styles/loader-home.scss'
 
-const Loading = () => {
+const LoaderHome = () => {
   return (
     <main>
       <div className="dank-ass-loader">
@@ -44,4 +42,4 @@ const Loading = () => {
   )
 }
 
-export default Loading
+export default LoaderHome

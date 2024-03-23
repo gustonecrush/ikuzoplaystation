@@ -78,6 +78,11 @@ export const formatDate = (dateString) => {
 }
 
 export const generateTimeArray = (
+  customTimeSelected = {
+    open_time: 9,
+    close_time: 23,
+    date: new Date().toISOString().split('T')[0],
+  },
   date = new Date().toISOString().split('T')[0],
   bookedSlots,
 ) => {
@@ -94,15 +99,34 @@ export const generateTimeArray = (
     startMinute = Math.ceil(currentMinute / 10) * 10
   } else {
     // If not today, start from 09:00
-    startHour = 9
-    startMinute = 0
+    if (customTimeSelected != null) {
+      if (date == customTimeSelected.date) {
+        startHour = customTimeSelected.open_time
+        startMinute = 0
+      }
+    } else {
+      startHour = 9
+      startMinute = 0
+    }
   }
 
-  const endHour = 23
+  let endHour
+
+  if (customTimeSelected != null) {
+    if (date == customTimeSelected.date) {
+      endHour = parseInt(customTimeSelected.close_time)
+    }
+  } else {
+    endHour = 23
+  }
 
   for (let hour = startHour; hour <= endHour; hour++) {
-    const maxMinute =
-      hour === endHour ? Math.floor(currentMinute / 10) * 10 : 60
+    let maxMinute = 60 // Initialize maxMinute to 60
+    if (hour === endHour) {
+      // If it's the last hour, set maxMinute to the current minute rounded down to the nearest 10
+      maxMinute = Math.floor(currentMinute / 10) * 10
+      if (maxMinute === 0) maxMinute = 60 // If the current minute is 00, set maxMinute to 60
+    }
     const startLoopMinute = hour === startHour ? startMinute : 0
     for (let minute = startLoopMinute; minute < maxMinute; minute += 10) {
       const formattedHour = hour.toString().padStart(2, '0')

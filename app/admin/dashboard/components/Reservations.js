@@ -170,6 +170,32 @@ export default function Reservation() {
     }
   }
 
+  const [customTimeSelected, setCustomTimeSelected] = React.useState(null)
+
+  const getTimeSelected = async (date) => {
+    try {
+      const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
+      console.log(`${baseUrl}/times?selected_date=${date}`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        if (jsonData.data.length > 0) {
+          setCustomTimeSelected(jsonData.data[0])
+        } else {
+          setCustomTimeSelected(null)
+        }
+
+        console.log({ customTimeSelected })
+      } else {
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+      setIsLoading(false)
+    }
+  }
+
   console.log({ bookedSlots })
 
   /***********************************************************
@@ -527,6 +553,7 @@ export default function Reservation() {
                           getAllReservationsPositon(
                             nextDay.toISOString().split('T')[0],
                           )
+                          getTimeSelected(nextDay.toISOString().split('T')[0])
                         }}
                         disabled={(date) =>
                           date > new addDays(new Date(), 15) ||
@@ -776,6 +803,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1010,6 +1038,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1244,6 +1273,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1482,6 +1512,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1722,6 +1753,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1971,6 +2003,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (

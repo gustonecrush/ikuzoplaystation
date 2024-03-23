@@ -49,7 +49,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
-import Loading from '../loading'
+import LoaderHome from '../components/LoaderHome'
 
 export default function Reservation() {
   // RESERVATION STATE DATA
@@ -104,7 +104,9 @@ export default function Reservation() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
-      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
+      console.log(
+        `${baseUrl}/reservations?reserve_date=${date}&status=settlement&pending=pending`,
+      )
       if (response.status == 200) {
         const jsonData = await response.data
 
@@ -152,7 +154,34 @@ export default function Reservation() {
     }
   }
 
+  const [customTimeSelected, setCustomTimeSelected] = React.useState(null)
+
+  const getTimeSelected = async (date) => {
+    try {
+      const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
+      console.log(`${baseUrl}/times?selected_date=${date}`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        if (jsonData.data.length > 0) {
+          setCustomTimeSelected(jsonData.data[0])
+        } else {
+          setCustomTimeSelected(null)
+        }
+
+        console.log({ customTimeSelected })
+      } else {
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+      setIsLoading(false)
+    }
+  }
+
   console.log({ bookedSlots })
+  console.log({ customTimeSelected })
 
   /***********************************************************
    * functions & states for scaling image
@@ -353,6 +382,9 @@ export default function Reservation() {
           .filter((time) => time !== null)
       : []
 
+  console.error({ selectedDate })
+  console.error({ date })
+
   return (
     <>
       <section className="bg-transparent w-full h-full md:max-w-4xl md:mx-auto font-jakarta px-5 py-5 md:pb-10 absolute z-50">
@@ -465,6 +497,7 @@ export default function Reservation() {
                           getAllReservationsPositon(
                             nextDay.toISOString().split('T')[0],
                           )
+                          getTimeSelected(nextDay.toISOString().split('T')[0])
                         }}
                         disabled={(date) =>
                           date > new addDays(new Date(), 15) ||
@@ -714,6 +747,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -948,6 +982,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1182,6 +1217,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1420,6 +1456,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1660,6 +1697,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -1909,6 +1947,7 @@ export default function Reservation() {
                                                   Pilih Waktu Mulai
                                                 </SelectLabel>
                                                 {generateTimeArray(
+                                                  customTimeSelected,
                                                   selectedDate,
                                                   bookedSlots,
                                                 ).map((time, index) => (
@@ -2039,7 +2078,7 @@ export default function Reservation() {
                 {isLoading ? (
                   <div className="flex items-center justify-center w-full">
                     {' '}
-                    <Loading />
+                    <LoaderHome />
                   </div>
                 ) : (
                   <div>

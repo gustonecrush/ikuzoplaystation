@@ -8,10 +8,10 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import axios from 'axios'
-import Loading from '@/app/loading'
 import { useEffect } from 'react'
 import { formatDateOnTheUI } from '@/utils/date'
 import Cookies from 'js-cookie'
+import LoaderHome from '@/app/components/LoaderHome'
 
 const Invoice = () => {
   const searchParam = useSearchParams()
@@ -321,7 +321,7 @@ const Invoice = () => {
           </div>
         </section>
       ) : showInvoice ? (
-        <Loading />
+        <LoaderHome />
       ) : (
         <section className="flex flex-col justify-center items-center min-h-screen gap-4 px-10">
           <Image

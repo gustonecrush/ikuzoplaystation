@@ -1,5 +1,5 @@
 import { initializeGoogleTagManager } from '@/utils/googleTagManager'
-import { Video } from '../components/Home'
+
 import Reservation from './Reservations'
 
 import { Plus_Jakarta_Sans } from 'next/font/google'
@@ -7,6 +7,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { Video } from '../components/Home'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
