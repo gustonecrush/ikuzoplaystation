@@ -1,16 +1,7 @@
-'use client'
-
 import React, { Suspense } from 'react'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import LoginLayout from '../dashboard/components/LoginLayout'
-import Cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  const router = useRouter()
-  React.useEffect(() => {}, [])
   return (
     <>
       <section className="flex flex-col h-full w-full scroll-smooth overflow-x-hidden">
