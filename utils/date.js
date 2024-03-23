@@ -99,11 +99,9 @@ export const generateTimeArray = (
     startMinute = Math.ceil(currentMinute / 10) * 10
   } else {
     // If not today, start from 09:00
-    if (customTimeSelected != null) {
-      if (date == customTimeSelected.date) {
-        startHour = customTimeSelected.open_time
-        startMinute = 0
-      }
+    if (customTimeSelected != null && date == customTimeSelected.date) {
+      startHour = customTimeSelected.open_time
+      startMinute = 0
     } else {
       startHour = 9
       startMinute = 0
@@ -111,21 +109,18 @@ export const generateTimeArray = (
   }
 
   let endHour
-
-  if (customTimeSelected != null) {
-    if (date == customTimeSelected.date) {
-      endHour = parseInt(customTimeSelected.close_time)
-    }
+  if (customTimeSelected != null && date == customTimeSelected.date) {
+    endHour = parseInt(customTimeSelected.close_time)
   } else {
     endHour = 23
   }
 
   for (let hour = startHour; hour <= endHour; hour++) {
-    let maxMinute = 60 // Initialize maxMinute to 60
+    let maxMinute
     if (hour === endHour) {
-      // If it's the last hour, set maxMinute to the current minute rounded down to the nearest 10
-      maxMinute = Math.floor(currentMinute / 10) * 10
-      if (maxMinute === 0) maxMinute = 60 // If the current minute is 00, set maxMinute to 60
+      maxMinute = 0 // Stop at 00 minutes for the end hour
+    } else {
+      maxMinute = 60 // Allow all minutes for other hours
     }
     const startLoopMinute = hour === startHour ? startMinute : 0
     for (let minute = startLoopMinute; minute < maxMinute; minute += 10) {
