@@ -117,10 +117,14 @@ export const generateTimeArray = (
 
   for (let hour = startHour; hour <= endHour; hour++) {
     let maxMinute
-    if (hour === endHour) {
-      maxMinute = 0 // Stop at 00 minutes for the end hour
+    if (
+      hour === endHour &&
+      customTimeSelected != null &&
+      date == customTimeSelected.date
+    ) {
+      maxMinute = 0 // Stop at 00 minutes for the end hour when customTimeSelected is not null
     } else {
-      maxMinute = 60 // Allow all minutes for other hours
+      maxMinute = hour === endHour ? 60 : 50 // If endHour, allow until 00 minutes, otherwise 50 minutes
     }
     const startLoopMinute = hour === startHour ? startMinute : 0
     for (let minute = startLoopMinute; minute < maxMinute; minute += 10) {
