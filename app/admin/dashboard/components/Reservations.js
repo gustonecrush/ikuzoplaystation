@@ -258,6 +258,8 @@ export default function Reservation() {
     }
   }
 
+  const [discountPrice, setDiscountPrice] = React.useState('')
+
   const handleCancle = async (alt) => {
     try {
       const response = await axios
@@ -275,6 +277,7 @@ export default function Reservation() {
           setPosisiReservasi(0)
           setNamaPosisiReservasi('')
           setContinueTapped(!continueTapped)
+          setDiscountPrice('')
           console.log(response)
         })
         .catch((error) => {
@@ -300,7 +303,10 @@ export default function Reservation() {
         reserve_start_time: startTimeReservasi,
         reserve_end_time: endTimeReservasi,
         status_reserve: 'settlement',
-        price: (totalTime * pricePerReserve).toString(),
+        price:
+          discountPrice != ''
+            ? discountPrice
+            : (totalTime * pricePerReserve).toString(),
         position: posisiReservasi,
       }
 
@@ -339,6 +345,7 @@ export default function Reservation() {
     setNamaPosisiReservasi('')
     setPricePerReserve(null)
     setTotalTime(0)
+    setDiscountPrice('')
     setIdReservasi('')
   }
 
@@ -2350,7 +2357,7 @@ export default function Reservation() {
                 </div>
               </div>
             </DialogHeader>
-            <DialogDescription className="py-3">
+            <div className="py-2 text-gray-600">
               Pastikan customer telah membayar kepada kasir dengan nominal
               sebesar{' '}
               <span className="font-bold text-orange text-lg">{`IDR ${
@@ -2361,7 +2368,16 @@ export default function Reservation() {
                 permainan {`${totalTime}`} jam di{' '}
                 {`${namaPosisiReservasi} posisi ${posisiReservasi}`}
               </span>
-            </DialogDescription>
+            </div>
+            <input
+              type="text"
+              value={discountPrice}
+              onChange={(e) => setDiscountPrice(e.target.value)}
+              name="nama"
+              id="nama"
+              placeholder="Masukkan Harga Setelah Discount"
+              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange   "
+            />
             <DialogFooter>
               <Button
                 type="submit"
