@@ -65,28 +65,28 @@ function Layout({ children }) {
         <nav className="relative flex flex-col py-4 items-center">
           <a
             href="/admin/dashboard/reservations"
-            className="w-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
+            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
           >
-            <IoGameController className="text-2xl" />
+            <IoGameController className="text-4xl" />
           </a>
           <a
             href="/admin/dashboard/contents"
-            className="relative w-16 p-4 flex items-center justify-center bg-yellow-100 text-orange rounded-2xl mb-4 "
+            className="relative w-16 h-16 p-4 flex items-center justify-center bg-yellow-100 text-orange rounded-2xl mb-4 "
           >
-            <IoLaptopSharp className="text-2xl" />
+            <IoLaptopSharp className="text-4xl" />
           </a>
           <a
             href="/admin/dashboard/times"
-            className="w-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
+            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
           >
-            <IoTime className="text-2xl" />
+            <IoTime className="text-4xl" />
           </a>
           <a
             href="#"
             onClick={() => handleLogout()}
-            className="w-16 p-4 mt-10 border text-gray-400 rounded-2xl"
+            className="w-16 h-16 p-4 mt-10 border text-gray-400 rounded-2xl"
           >
-            <IoLogOut className="text-2xl" />
+            <IoLogOut className="text-4xl" />
           </a>
         </nav>
       </section>
