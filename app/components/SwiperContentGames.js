@@ -150,54 +150,105 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
 
   return (
     <section className={`w-full flex flex-col gap-5`}>
-      <Dialog open={open}>
-        <DialogTrigger asChild onClick={() => setOpen(!open)}>
-          <Button variant="outline" className="w-fit">
-            Upload New Game Content
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <form onSubmit={handleUploadGameContent}>
-            <DialogHeader>
-              <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
-                <IoGameControllerSharp className="w-10 text-3xl" />
-                <div className="flex flex-col gap-1">
-                  <DialogTitle>Ikuzo Games Content</DialogTitle>
-                  <DialogDescription>
-                    {`Upload New Ikuzo Playstation Game Content!`}
-                  </DialogDescription>
+      <div className="flex flex-row gap-2">
+        <Dialog open={open}>
+          <DialogTrigger asChild onClick={() => setOpen(!open)}>
+            <Button variant="outline" className="w-fit">
+              Upload New Game Content
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={handleUploadGameContent}>
+              <DialogHeader>
+                <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
+                  <IoGameControllerSharp className="w-10 text-3xl" />
+                  <div className="flex flex-col gap-1">
+                    <DialogTitle>Ikuzo Games Content</DialogTitle>
+                    <DialogDescription>
+                      {`Upload New Ikuzo Playstation Game Content!`}
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="flex flex-col items-start gap-1">
+                  <Label htmlFor="pict" className="text-right">
+                    Picture
+                  </Label>
+                  <Input
+                    id="pict"
+                    onChange={handleFileChange}
+                    type="file"
+                    className="col-span-3"
+                  />
                 </div>
               </div>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="flex flex-col items-start gap-1">
-                <Label htmlFor="pict" className="text-right">
-                  Picture
-                </Label>
-                <Input
-                  id="pict"
-                  onChange={handleFileChange}
-                  type="file"
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit" className="bg-orange hover:bg-orange">
-                Upload
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button type="submit" className="bg-orange hover:bg-orange">
+                  Upload
+                </Button>
+              </DialogFooter>
+            </form>
 
-          <DialogClose
-            onClick={() => setOpen(!open)}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-          >
-            <Cross2Icon className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
+            <DialogClose
+              onClick={() => setOpen(!open)}
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <Cross2Icon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={open}>
+          <DialogTrigger asChild onClick={() => setOpen(!open)}>
+            <Button variant="outline" className="w-fit">
+              Update Game Section
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={handleUploadGameContent}>
+              <DialogHeader>
+                <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
+                  <IoGameControllerSharp className="w-10 text-3xl" />
+                  <div className="flex flex-col gap-1">
+                    <DialogTitle>Ikuzo Games Content</DialogTitle>
+                    <DialogDescription>
+                      {`Upload New Ikuzo Playstation Game Content!`}
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="flex flex-col items-start gap-1">
+                  <Label htmlFor="pict" className="text-right">
+                    Picture
+                  </Label>
+                  <Input
+                    id="pict"
+                    onChange={handleFileChange}
+                    type="file"
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" className="bg-orange hover:bg-orange">
+                  Upload
+                </Button>
+              </DialogFooter>
+            </form>
+
+            <DialogClose
+              onClick={() => setOpen(!open)}
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <Cross2Icon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {games.length == 0 ? (
         <div className="w-full mt-14 mb-16 flex items-center justify-center">

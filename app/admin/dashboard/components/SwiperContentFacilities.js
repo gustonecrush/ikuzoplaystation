@@ -251,139 +251,274 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
 
   return (
     <section className={`w-full flex flex-col gap-5`}>
-      <Dialog open={open}>
-        <DialogTrigger asChild onClick={() => setOpen(!open)}>
-          <Button variant="outline" className="w-fit">
-            Upload New Facility Content
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <form
-            onSubmit={
-              isWillUpdate
-                ? handleUpdateFacilityContent
-                : handleUploadFacilityContent
-            }
-          >
-            <DialogHeader>
-              <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
-                <GiSofa className="w-10 text-3xl" />
-                <div className="flex flex-col gap-1">
-                  <DialogTitle>Ikuzo Facility Content</DialogTitle>
-                  <DialogDescription>
-                    {`Upload New Ikuzo Playstation Facility Content!`}
-                  </DialogDescription>
+      <div className="flex flex-row gap-2">
+        <Dialog open={open}>
+          <DialogTrigger asChild onClick={() => setOpen(!open)}>
+            <Button variant="outline" className="w-fit">
+              Upload New Facility Content
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form
+              onSubmit={
+                isWillUpdate
+                  ? handleUpdateFacilityContent
+                  : handleUploadFacilityContent
+              }
+            >
+              <DialogHeader>
+                <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
+                  <GiSofa className="w-10 text-3xl" />
+                  <div className="flex flex-col gap-1">
+                    <DialogTitle>Ikuzo Facility Content</DialogTitle>
+                    <DialogDescription>
+                      {`Upload New Ikuzo Playstation Facility Content!`}
+                    </DialogDescription>
+                  </div>
                 </div>
-              </div>
-            </DialogHeader>
-            {isUploading ? (
-              <div className="flex items-center justify-center p-10">
-                <HashLoader color="#FF6200" />
-              </div>
-            ) : (
-              <div className="grid gap-4 py-4">
-                <div className="flex flex-col items-start gap-1">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Input Facility Name..."
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="col-span-3"
-                  />
+              </DialogHeader>
+              {isUploading ? (
+                <div className="flex items-center justify-center p-10">
+                  <HashLoader color="#FF6200" />
                 </div>
-                <div className="flex gap-2 w-full">
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <Label htmlFor="price" className="text-right">
-                      Price
+              ) : (
+                <div className="grid gap-4 py-4">
+                  <div className="flex flex-col items-start gap-1">
+                    <Label htmlFor="name" className="text-right">
+                      Name
                     </Label>
                     <Input
-                      id="price"
-                      placeholder="Input Price..."
-                      type="number"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
+                      id="name"
+                      type="text"
+                      placeholder="Input Facility Name..."
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="flex gap-2 w-full">
+                    <div className="flex flex-col items-start gap-1 w-full">
+                      <Label htmlFor="price" className="text-right">
+                        Price
+                      </Label>
+                      <Input
+                        id="price"
+                        placeholder="Input Price..."
+                        type="number"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="flex flex-col items-start gap-1 w-full">
+                      <Label htmlFor="capacity" className="text-right">
+                        Capacity
+                      </Label>
+                      <Input
+                        id="capacity"
+                        type="number"
+                        placeholder="Input Capacity..."
+                        value={capacity}
+                        onChange={(e) => setCapacity(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-start gap-1 w-full">
+                    <Label htmlFor="benefits" className="text-right">
+                      Benefits
+                    </Label>
+                    <Editor
+                      initialValue={initialValue}
+                      apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
+                      onInit={(evt, benefit) => (benefits.current = benefit)}
+                      init={{
+                        height: 200,
+                        width: '100%',
+
+                        menubar: false,
+                        plugins: ['lists', 'fullscreen', 'wordcount'],
+                        toolbar: 'bullist numlist',
+                        content_style:
+                          'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
+                      }}
                       className="w-full"
                     />
                   </div>
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <Label htmlFor="capacity" className="text-right">
-                      Capacity
+                  <div className="flex flex-col items-start gap-1">
+                    <Label htmlFor="pict" className="text-right">
+                      Picture
                     </Label>
+                    {isWillUpdate && (
+                      <Image
+                        alt={pictFacilitySelected}
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${pictFacilitySelected}`}
+                        width={0}
+                        height={0}
+                        className="w-full object-cover h-[100px] rounded-lg"
+                      />
+                    )}
                     <Input
-                      id="capacity"
-                      type="number"
-                      placeholder="Input Capacity..."
-                      value={capacity}
-                      onChange={(e) => setCapacity(e.target.value)}
-                      className="w-full"
+                      id="pict"
+                      onChange={handleFileChange}
+                      type="file"
+                      className="col-span-3"
                     />
                   </div>
                 </div>
+              )}
 
-                <div className="flex flex-col items-start gap-1 w-full">
-                  <Label htmlFor="benefits" className="text-right">
-                    Benefits
-                  </Label>
-                  <Editor
-                    initialValue={initialValue}
-                    apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
-                    onInit={(evt, benefit) => (benefits.current = benefit)}
-                    init={{
-                      height: 200,
-                      width: '100%',
+              <DialogFooter>
+                <Button type="submit" className="bg-orange hover:bg-orange">
+                  Upload
+                </Button>
+              </DialogFooter>
+            </form>
 
-                      menubar: false,
-                      plugins: ['lists', 'fullscreen', 'wordcount'],
-                      toolbar: 'bullist numlist',
-                      content_style:
-                        'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
-                    }}
-                    className="w-full"
-                  />
+            <DialogClose
+              onClick={() => setOpen(!open)}
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <Cross2Icon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={open}>
+          <DialogTrigger asChild onClick={() => setOpen(!open)}>
+            <Button variant="outline" className="w-fit">
+              Update Facility Section
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form
+              onSubmit={
+                isWillUpdate
+                  ? handleUpdateFacilityContent
+                  : handleUploadFacilityContent
+              }
+            >
+              <DialogHeader>
+                <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
+                  <GiSofa className="w-10 text-3xl" />
+                  <div className="flex flex-col gap-1">
+                    <DialogTitle>Ikuzo Facility Content</DialogTitle>
+                    <DialogDescription>
+                      {`Upload New Ikuzo Playstation Facility Content!`}
+                    </DialogDescription>
+                  </div>
                 </div>
-                <div className="flex flex-col items-start gap-1">
-                  <Label htmlFor="pict" className="text-right">
-                    Picture
-                  </Label>
-                  {isWillUpdate && (
-                    <Image
-                      alt={pictFacilitySelected}
-                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${pictFacilitySelected}`}
-                      width={0}
-                      height={0}
-                      className="w-full object-cover h-[100px] rounded-lg"
+              </DialogHeader>
+              {isUploading ? (
+                <div className="flex items-center justify-center p-10">
+                  <HashLoader color="#FF6200" />
+                </div>
+              ) : (
+                <div className="grid gap-4 py-4">
+                  <div className="flex flex-col items-start gap-1">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Input Facility Name..."
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="col-span-3"
                     />
-                  )}
-                  <Input
-                    id="pict"
-                    onChange={handleFileChange}
-                    type="file"
-                    className="col-span-3"
-                  />
+                  </div>
+                  <div className="flex gap-2 w-full">
+                    <div className="flex flex-col items-start gap-1 w-full">
+                      <Label htmlFor="price" className="text-right">
+                        Price
+                      </Label>
+                      <Input
+                        id="price"
+                        placeholder="Input Price..."
+                        type="number"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="flex flex-col items-start gap-1 w-full">
+                      <Label htmlFor="capacity" className="text-right">
+                        Capacity
+                      </Label>
+                      <Input
+                        id="capacity"
+                        type="number"
+                        placeholder="Input Capacity..."
+                        value={capacity}
+                        onChange={(e) => setCapacity(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-start gap-1 w-full">
+                    <Label htmlFor="benefits" className="text-right">
+                      Benefits
+                    </Label>
+                    <Editor
+                      initialValue={initialValue}
+                      apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
+                      onInit={(evt, benefit) => (benefits.current = benefit)}
+                      init={{
+                        height: 200,
+                        width: '100%',
+
+                        menubar: false,
+                        plugins: ['lists', 'fullscreen', 'wordcount'],
+                        toolbar: 'bullist numlist',
+                        content_style:
+                          'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex flex-col items-start gap-1">
+                    <Label htmlFor="pict" className="text-right">
+                      Picture
+                    </Label>
+                    {isWillUpdate && (
+                      <Image
+                        alt={pictFacilitySelected}
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${pictFacilitySelected}`}
+                        width={0}
+                        height={0}
+                        className="w-full object-cover h-[100px] rounded-lg"
+                      />
+                    )}
+                    <Input
+                      id="pict"
+                      onChange={handleFileChange}
+                      type="file"
+                      className="col-span-3"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <DialogFooter>
-              <Button type="submit" className="bg-orange hover:bg-orange">
-                Upload
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button type="submit" className="bg-orange hover:bg-orange">
+                  Upload
+                </Button>
+              </DialogFooter>
+            </form>
 
-          <DialogClose
-            onClick={() => setOpen(!open)}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-          >
-            <Cross2Icon className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
+            <DialogClose
+              onClick={() => setOpen(!open)}
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <Cross2Icon className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {facilities.length == 0 ? (
         <div className="w-full mt-14 mb-16  flex items-center justify-center">
