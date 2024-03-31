@@ -64,6 +64,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
   const [isWillUpdate, setIsWillUpdate] = React.useState(false)
   const [pictFacilitySelected, setPictFacilitySelected] = React.useState('')
   const [open, setOpen] = React.useState(false)
+  const [openUpdateSection, setOpenUpdateSection] = React.useState(false)
 
   // state variables for upload and update facility contents
   const [name, setName] = React.useState('')
@@ -385,8 +386,11 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
             </DialogClose>
           </DialogContent>
         </Dialog>
-        <Dialog open={open}>
-          <DialogTrigger asChild onClick={() => setOpen(!open)}>
+        <Dialog open={openUpdateSection}>
+          <DialogTrigger
+            asChild
+            onClick={() => setOpenUpdateSection(!openUpdateSection)}
+          >
             <Button variant="outline" className="w-fit">
               Update Facility Section
             </Button>
@@ -403,9 +407,9 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
                 <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
                   <GiSofa className="w-10 text-3xl" />
                   <div className="flex flex-col gap-1">
-                    <DialogTitle>Ikuzo Facility Content</DialogTitle>
+                    <DialogTitle>Ikuzo Facility Section</DialogTitle>
                     <DialogDescription>
-                      {`Upload New Ikuzo Playstation Facility Content!`}
+                      {`Update Ikuzo Playstation Facility Section!`}
                     </DialogDescription>
                   </div>
                 </div>
@@ -418,49 +422,21 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
                 <div className="grid gap-4 py-4">
                   <div className="flex flex-col items-start gap-1">
                     <Label htmlFor="name" className="text-right">
-                      Name
+                      Title
                     </Label>
                     <Input
-                      id="name"
+                      id="title"
                       type="text"
-                      placeholder="Input Facility Name..."
+                      placeholder="Input Title..."
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="col-span-3"
                     />
                   </div>
-                  <div className="flex gap-2 w-full">
-                    <div className="flex flex-col items-start gap-1 w-full">
-                      <Label htmlFor="price" className="text-right">
-                        Price
-                      </Label>
-                      <Input
-                        id="price"
-                        placeholder="Input Price..."
-                        type="number"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="flex flex-col items-start gap-1 w-full">
-                      <Label htmlFor="capacity" className="text-right">
-                        Capacity
-                      </Label>
-                      <Input
-                        id="capacity"
-                        type="number"
-                        placeholder="Input Capacity..."
-                        value={capacity}
-                        onChange={(e) => setCapacity(e.target.value)}
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
 
                   <div className="flex flex-col items-start gap-1 w-full">
                     <Label htmlFor="benefits" className="text-right">
-                      Benefits
+                      Description
                     </Label>
                     <Editor
                       initialValue={initialValue}
@@ -479,26 +455,6 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex flex-col items-start gap-1">
-                    <Label htmlFor="pict" className="text-right">
-                      Picture
-                    </Label>
-                    {isWillUpdate && (
-                      <Image
-                        alt={pictFacilitySelected}
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${pictFacilitySelected}`}
-                        width={0}
-                        height={0}
-                        className="w-full object-cover h-[100px] rounded-lg"
-                      />
-                    )}
-                    <Input
-                      id="pict"
-                      onChange={handleFileChange}
-                      type="file"
-                      className="col-span-3"
-                    />
-                  </div>
                 </div>
               )}
 
@@ -510,7 +466,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
             </form>
 
             <DialogClose
-              onClick={() => setOpen(!open)}
+              onClick={() => setOpenUpdateSection(!openUpdateSection)}
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
             >
               <Cross2Icon className="h-4 w-4" />

@@ -44,6 +44,7 @@ import Image from 'next/image'
 import Cookies from 'js-cookie'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { IoGameControllerSharp } from 'react-icons/io5'
+import { Editor } from '@tinymce/tinymce-react'
 
 const SwiperContentGames = ({ games, fetchContentGames }) => {
   // base url & token
@@ -202,7 +203,10 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
         </Dialog>
 
         <Dialog open={openUpdateSection}>
-          <DialogTrigger asChild onClick={() => setOpenUpdateSection(!open)}>
+          <DialogTrigger
+            asChild
+            onClick={() => setOpenUpdateSection(!openUpdateSection)}
+          >
             <Button variant="outline" className="w-fit">
               Update Game Section
             </Button>
@@ -232,13 +236,21 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
                 />
               </div>
               <div className="flex flex-col items-start gap-1 w-full mt-2 mb-3">
-                <Label htmlFor="price" className="text-right">
+                <Label htmlFor="benefits" className="text-right">
                   Description
                 </Label>
-                <Input
-                  id="description"
-                  placeholder="Input Description..."
-                  type="text"
+                <Editor
+                  apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
+                  init={{
+                    height: 200,
+                    width: '100%',
+
+                    menubar: false,
+                    plugins: ['lists', 'fullscreen', 'wordcount'],
+                    toolbar: 'bullist numlist',
+                    content_style:
+                      'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
+                  }}
                   className="w-full"
                 />
               </div>
@@ -250,7 +262,7 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
             </form>
 
             <DialogClose
-              onClick={() => setOpenUpdateSection(!open)}
+              onClick={() => setOpenUpdateSection(!openUpdateSection)}
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
             >
               <Cross2Icon className="h-4 w-4" />
