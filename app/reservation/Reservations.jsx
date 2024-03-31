@@ -50,6 +50,7 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import LoaderHome from '../components/LoaderHome'
+import { pricePackageDetermination } from '@/utils/price'
 
 export default function Reservation() {
   // RESERVATION STATE DATA
@@ -2155,7 +2156,12 @@ export default function Reservation() {
                           Total Harga
                         </h4>
                         <p className="text-base font-jakarta text-gray-300">
-                          Rp {totalTime * pricePerReserve}
+                          Rp{' '}
+                          {pricePackageDetermination(
+                            posisiReservasi,
+                            totalTime,
+                            pricePerReserve,
+                          )}
                         </p>
                       </div>
                     </Fade>
@@ -2190,7 +2196,13 @@ export default function Reservation() {
           <div className="flex flex-col gap-1 w-full mt-5">
             <Checkout
               id={idReservasi}
-              price={totalTime * parseInt(pricePerReserve) + 4000}
+              price={
+                pricePackageDetermination(
+                  posisiReservasi,
+                  totalTime,
+                  pricePerReserve,
+                ) + 4000
+              }
               productName={`Reservation ${namaPosisiReservasi}`}
               detailCustomer={{
                 name: namaReservasi,

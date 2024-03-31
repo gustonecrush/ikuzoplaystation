@@ -64,6 +64,7 @@ import { BiMoney } from 'react-icons/bi'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { redirect, useRouter } from 'next/navigation'
 import Toast from '@/app/components/Toast'
+import { pricePackageDetermination } from '@/utils/price'
 
 export default function Reservation() {
   // RESERVATION STATE DATA
@@ -2267,7 +2268,12 @@ export default function Reservation() {
                           Harga Reservasi
                         </h4>
                         <p className="text-base font-jakarta text-gray-600">
-                          Rp {totalTime * pricePerReserve}
+                          Rp{' '}
+                          {pricePackageDetermination(
+                            posisiReservasi,
+                            totalTime,
+                            pricePerReserve,
+                          )}
                         </p>
                       </div>
                     </Fade>
@@ -2303,7 +2309,13 @@ export default function Reservation() {
             {selectedPay == 'non-cash' && (
               <Checkout
                 id={idReservasi}
-                price={totalTime * parseInt(pricePerReserve) + 4000}
+                price={
+                  pricePackageDetermination(
+                    posisiReservasi,
+                    totalTime,
+                    pricePerReserve,
+                  ) + 4000
+                }
                 productName={`Reservation ${namaPosisiReservasi}`}
                 detailCustomer={{
                   name: namaReservasi,
