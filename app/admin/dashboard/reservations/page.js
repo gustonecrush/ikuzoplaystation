@@ -308,9 +308,11 @@ function page() {
       cell: ({ row }) => (
         <Link
           target="_blank"
-          href={`${process.env.NEXT_PUBLIC_IMAGE_URL}${row.getValue(
-            'invoice',
-          )}`}
+          href={
+            row.getValue('invoice') != null
+              ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${row.getValue('invoice')}`
+              : `/payment/failed/invoice`
+          }
           className={`text-center text-black`}
         >
           <Badge
