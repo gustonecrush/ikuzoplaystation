@@ -72,7 +72,40 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
   const [capacity, setCapacity] = React.useState('')
   const benefits = React.useRef(null)
   const [initialValue, setInitialValue] = React.useState('')
+  const [titleUpdate, setTitleUpdate] = React.useState('')
+  const description = React.useRef(null)
   const [pict, setPict] = React.useState(null)
+  const [sectionsUpdate, setSectionsUpdate] = React.useState([])
+
+  const fetchSections = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/sections`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setSectionsUpdate(jsonData.data)
+        setTitleUpdate(jsonData.data[1].title)
+        setInitialValue(jsonData.data[1].description)
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
 
   // function to handle upload
   const handleUploadFacilityContent = async (e) => {
@@ -204,6 +237,48 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
     }
   }
 
+  const handleUpdateFacilitySection = async (e) => {
+    e.preventDefault()
+
+    setIsUploading(true)
+
+    const data = new FormData()
+
+    data.append('title', titleUpdate)
+    data.append('description', description.current.getContent())
+
+    try {
+      const response = await axios.post(`${baseUrl}/sections/2`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      console.log({ response })
+
+      setIsUploading(false)
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data section facility berhasil diupdate!`,
+      })
+
+      setOpenUpdateSection(false)
+      fetchContentFacilities()
+      fetchSections()
+    } catch (error) {
+      setIsUploading(false)
+      fetchSections()
+
+      console.error({ error })
+
+      setOpenUpdateSection(false)
+      Toast.fire({
+        icon: 'error',
+        title: error.response.data.data,
+      })
+    }
+  }
+
   // function to handle delete
   const handleDeleteFacilityContent = async (id) => {
     try {
@@ -249,6 +324,10 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
   const handleFileChange = (e) => {
     setPict(e.target.files[0])
   }
+
+  React.useEffect(() => {
+    fetchSections()
+  }, [])
 
   return (
     <section className={`w-full flex flex-col gap-5`}>
@@ -396,13 +475,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
-            <form
-              onSubmit={
-                isWillUpdate
-                  ? handleUpdateFacilityContent
-                  : handleUploadFacilityContent
-              }
-            >
+            <form onSubmit={handleUpdateFacilitySection}>
               <DialogHeader>
                 <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
                   <GiSofa className="w-10 text-3xl" />
@@ -428,8 +501,8 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
                       id="title"
                       type="text"
                       placeholder="Input Title..."
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      value={titleUpdate}
+                      onChange={(e) => setTitleUpdate(e.target.value)}
                       className="col-span-3"
                     />
                   </div>
@@ -441,7 +514,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
                     <Editor
                       initialValue={initialValue}
                       apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
-                      onInit={(evt, benefit) => (benefits.current = benefit)}
+                      onInit={(evt, desc) => (description.current = desc)}
                       init={{
                         height: 200,
                         width: '100%',

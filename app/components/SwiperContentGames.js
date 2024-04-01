@@ -51,6 +51,82 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
 
+  const [initialValue, setInitialValue] = React.useState('')
+  const description = React.useRef(null)
+  const [titleUpdate, setTitleUpdate] = React.useState('')
+  const [sectionsUpdate, setSectionsUpdate] = React.useState([])
+
+  const fetchSections = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/sections`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setSectionsUpdate(jsonData.data)
+        setTitleUpdate(jsonData.data[0].title)
+        setInitialValue(jsonData.data[0].description)
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
+  const handleUpdateGameSection = async (e) => {
+    e.preventDefault()
+
+    setIsUploading(true)
+
+    const data = new FormData()
+
+    data.append('title', titleUpdate)
+    data.append('description', description.current.getContent())
+
+    try {
+      const response = await axios.post(`${baseUrl}/sections/1`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      console.log({ response })
+
+      setIsUploading(false)
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data section game berhasil diupdate!`,
+      })
+
+      setOpenUpdateSection(false)
+      fetchContentFacilities()
+      fetchSections()
+    } catch (error) {
+      setIsUploading(false)
+      console.error({ error })
+      fetchSections()
+
+      setOpenUpdateSection(false)
+      Toast.fire({
+        icon: 'error',
+        title: error.response.data.data,
+      })
+    }
+  }
+
   // state variables for utilization process
   const [isUploading, setIsUploading] = React.useState(false)
   const [open, setOpen] = React.useState(false)
@@ -150,6 +226,10 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
     }
   }
 
+  React.useEffect(() => {
+    fetchSections()
+  }, [])
+
   return (
     <section className={`w-full flex flex-col gap-5`}>
       <div className="flex flex-row gap-2">
@@ -212,7 +292,7 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
-            <form onSubmit={handleUploadGameContent}>
+            <form onSubmit={handleUpdateGameSection}>
               <DialogHeader>
                 <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
                   <IoGameControllerSharp className="w-10 text-3xl" />
@@ -233,6 +313,8 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
                   placeholder="Input Title..."
                   type="text"
                   className="w-full"
+                  value={titleUpdate}
+                  onChange={(e) => setTitleUpdate(e.target.value)}
                 />
               </div>
               <div className="flex flex-col items-start gap-1 w-full mt-2 mb-3">
@@ -240,7 +322,10 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
                   Description
                 </Label>
                 <Editor
+                  className="font-plusSansJakarta w-full"
+                  initialValue={initialValue}
                   apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
+                  onInit={(evt, desc) => (description.current = desc)}
                   init={{
                     height: 200,
                     width: '100%',
@@ -251,7 +336,6 @@ const SwiperContentGames = ({ games, fetchContentGames }) => {
                     content_style:
                       'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
                   }}
-                  className="w-full"
                 />
               </div>
               <DialogFooter>
