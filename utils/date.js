@@ -77,6 +77,12 @@ export const formatDate = (dateString) => {
   return date.toLocaleDateString('en-US', options)
 }
 
+export const convertToDate = (dateString) => {
+  const date = new Date(dateString)
+  const day = date.getDate()
+  return day
+}
+
 export const generateTimeArray = (
   customTimeSelected = {
     open_time: 9,

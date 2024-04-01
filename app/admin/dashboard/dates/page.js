@@ -77,6 +77,8 @@ function page() {
 
   const [date, setDate] = React.useState(null)
   const [selectedDate, setSelectedDate] = React.useState('')
+  const [date2, setDate2] = React.useState(null)
+  const [selectedDate2, setSelectedDate2] = React.useState('')
   const [currentDate, setCurrentDate] = React.useState(getCurrentDate)
   const [maxDate, setMaxDate] = React.useState(getMaxDate)
 
@@ -91,7 +93,7 @@ function page() {
   // function to handle delete
   const handleDeleteFacilityContent = async (id) => {
     try {
-      const response = await axios.delete(`${baseUrl}/times/${id}`, {
+      const response = await axios.delete(`${baseUrl}/dates/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -129,12 +131,8 @@ function page() {
     }
   }
 
-  const [openTime, setOpenTime] = React.useState('')
-  const [closeTime, setCloseTime] = React.useState('')
-
   const clearFormCustomTime = () => {
-    setOpenTime('')
-    setCloseTime('')
+    setSelectedDate2('')
     setSelectedDate('')
     setData('')
   }
@@ -143,13 +141,12 @@ function page() {
     e.preventDefault()
 
     const data = {
-      date: selectedDate,
-      open_time: openTime,
-      close_time: closeTime,
+      start_date: selectedDate,
+      end_date: selectedDate2 == '' ? selectedDate : selectedDate2,
     }
 
     try {
-      const response = await axios.post(`${baseUrl}/times`, data, {
+      const response = await axios.post(`${baseUrl}/dates`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -198,12 +195,12 @@ function page() {
   }
   const handleUpdateFacilityContent = async (id) => {
     const data = {
-      open_time: openTime,
-      close_time: closeTime,
+      start_date: selectedDate,
+      end_date: selectedDate2 == '' ? selectedDate : selectedDate2,
     }
 
     try {
-      const response = await axios.post(`${baseUrl}/times/${id}`, data, {
+      const response = await axios.post(`${baseUrl}/dates/${id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -218,7 +215,7 @@ function page() {
 
       Toast.fire({
         icon: 'success',
-        title: `Setting waktu berhasil diupdate!`,
+        title: `Setting tanggal berhasil diupdate!`,
       })
 
       getAllDataReservations()
@@ -327,7 +324,7 @@ function page() {
       ),
     },
     {
-      accessorKey: 'date',
+      accessorKey: 'start_date',
       header: ({ column }) => {
         return (
           <Button
@@ -335,19 +332,19 @@ function page() {
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="w-full"
           >
-            Tanggal Reservasi
+            Dari Tanggal
             <HiCalendar className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => (
         <div className="w-full text-center">
-          {formatDateOnTheUI(row.getValue('date'))}
+          {formatDateOnTheUI(row.getValue('start_date'))}
         </div>
       ),
     },
     {
-      accessorKey: 'open_time',
+      accessorKey: 'end_date',
       header: ({ column }) => {
         return (
           <Button
@@ -355,34 +352,15 @@ function page() {
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="w-full"
           >
-            Waktu Buka
-            <BiSolidTime className="ml-2 h-4 w-4" />
+            Sampai Tanggal
+            <HiCalendar className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => (
         <div className="w-full text-center ">
-          {row.getValue('open_time')}.00 WIB
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'close_time',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="w-full"
-          >
-            Waktu Tutup
-            <BiSolidTimeFive className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (
-        <div className="w-full text-center ">
-          {row.getValue('close_time')}.00 WIB
+          {' '}
+          {formatDateOnTheUI(row.getValue('end_date'))}
         </div>
       ),
     },
@@ -447,7 +425,7 @@ function page() {
     setIsLoading(true)
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/times`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/dates`,
       )
       if (response.status == 200) {
         const jsonData = await response.data
@@ -512,13 +490,13 @@ function page() {
           </a>
           <a
             href="/admin/dashboard/times"
-            className="relative w-16 h-16 p-4 bg-yellow-100 flex items-center justify-center text-orange rounded-2xl mb-4"
+            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
           >
             <IoTime className="text-4xl" />
           </a>
           <a
             href="/admin/dashboard/dates"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
+            className="relative w-16 h-16 p-4 bg-yellow-100 flex items-center justify-center text-orange rounded-2xl mb-4"
           >
             <IoCalendarClear className="text-4xl" />
           </a>
@@ -546,10 +524,9 @@ function page() {
 
             <Fade>
               <div className="flex flex-col">
-                <h1 className="text-4xl font-semibold">Open/Close Time</h1>
+                <h1 className="text-4xl font-semibold">Holiday Dates</h1>
                 <p className="text-base font-normal text-gray-400">
-                  Atur waktu bukan dan tutup Ikuzo Playstation pada hari
-                  tertentu
+                  Atur tanggal libur Ikuzo Playstation!
                 </p>
               </div>
             </Fade>
@@ -560,10 +537,12 @@ function page() {
                 <div className="flex items-center justify-between py-4">
                   <Input
                     placeholder="Cari Tanggal..."
-                    value={table.getColumn('date')?.getFilterValue() ?? ''}
+                    value={
+                      table.getColumn('start_date')?.getFilterValue() ?? ''
+                    }
                     onChange={(event) =>
                       table
-                        .getColumn('date')
+                        .getColumn('start_date')
                         ?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
@@ -576,7 +555,7 @@ function page() {
                       variant="outline"
                       className="ml-auto"
                     >
-                      Setting Waktu <IoMdAdd className="ml-2 h-4 w-4" />
+                      Setting Hari Libur <IoMdAdd className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -627,18 +606,17 @@ function page() {
             >
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Setting Waktu</AlertDialogTitle>
+                  <AlertDialogTitle>Setting Hari Libur</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Setting waktu buka dan tutup Ikuzo Playstation pada tanggal
-                    tertentu
+                    <p className="-mt-2">Setting hari libur Playstation!</p>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <fieldset>
                   <form className="flex flex-col gap-2">
-                    {!openUpdate && (
+                    <>
                       <div>
                         <label className="text-black" htmlFor="nama">
-                          Tanggal Reservasi
+                          Dari Tanggal
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -648,7 +626,7 @@ function page() {
                               onChange={(e) => setSelectedDate(e.target.value)}
                               name="tanggal_reservasi"
                               id="tanggal_reservasi"
-                              placeholder="Pilih tanggal reservasi"
+                              placeholder="Pilih tanggal"
                               className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
                               min={currentDate}
                               max={maxDate}
@@ -675,40 +653,47 @@ function page() {
                           </PopoverContent>
                         </Popover>
                       </div>
-                    )}
 
-                    <div className="flex flex-row gap-2 w-full">
                       <div>
                         <label className="text-black" htmlFor="nama">
-                          Waktu Buka
+                          Sampai Tanggal
                         </label>
-                        <input
-                          type="number"
-                          value={openTime}
-                          onChange={(e) => setOpenTime(e.target.value)}
-                          name="tanggal_reservasi"
-                          id="tanggal_reservasi"
-                          placeholder="Waktu buka..."
-                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                          required
-                        />
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <input
+                              type="text"
+                              value={selectedDate2}
+                              onChange={(e) => setSelectedDate2(e.target.value)}
+                              name="tanggal_reservasi"
+                              id="tanggal_reservasi"
+                              placeholder="Pilih tanggal"
+                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                              min={currentDate}
+                              max={maxDate}
+                              required
+                            />
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={date2}
+                              onSelect={(date) => {
+                                setDate2(date)
+                                const nextDay = addDays(date, 1)
+                                setSelectedDate2(
+                                  nextDay.toISOString().split('T')[0],
+                                )
+                              }}
+                              disabled={(date) =>
+                                date > new addDays(new Date(), 15) ||
+                                date < subDays(new Date(), 1)
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                      <div>
-                        <label className="text-black" htmlFor="nama">
-                          Waktu Tutup
-                        </label>
-                        <input
-                          type="number"
-                          value={closeTime}
-                          onChange={(e) => setCloseTime(e.target.value)}
-                          name="tanggal_reservasi"
-                          id="tanggal_reservasi"
-                          placeholder="Waktu tutup..."
-                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                          required
-                        />
-                      </div>
-                    </div>
+                    </>
                   </form>
                 </fieldset>
 

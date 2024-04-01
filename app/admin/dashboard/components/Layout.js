@@ -7,6 +7,7 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import Toast from '@/app/components/Toast'
 import {
+  IoCalendarClear,
   IoGameController,
   IoLaptopSharp,
   IoLogOut,
@@ -80,6 +81,12 @@ function Layout({ children }) {
             className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
           >
             <IoTime className="text-4xl" />
+          </a>
+          <a
+            href="/admin/dashboard/dates"
+            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
+          >
+            <IoCalendarClear className="text-4xl" />
           </a>
           <a
             href="#"

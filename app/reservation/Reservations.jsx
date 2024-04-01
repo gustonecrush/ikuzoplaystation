@@ -502,7 +502,8 @@ export default function Reservation() {
                         }}
                         disabled={(date) =>
                           date > new addDays(new Date(), 15) ||
-                          date < subDays(new Date(), 1)
+                          date < subDays(new Date(), 1) ||
+                          (date.getDate() >= 6 && date.getDate() <= 12)
                         }
                         initialFocus
                       />
