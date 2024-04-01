@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Navbar from './Navbar'
 import BounceContainer from './BounceContainer'
@@ -8,8 +10,39 @@ import Link from 'next/link'
 import { IoLogoGameControllerB } from 'react-icons/io'
 import Content from './Content'
 import Hero from './Hero'
+import axios from 'axios'
 
 export default function Home() {
+  const [sectionsUpdate, setSectionsUpdate] = React.useState([])
+  const [isLoading, setIsLoading] = React.useState(false)
+
+  const fetchSections = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/sections`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setSectionsUpdate(jsonData.data)
+        setIsLoading(false)
+      } else {
+        console.error({ error })
+        setIsLoading(true)
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.error({ error })
+      setIsLoading(true)
+    }
+  }
+
+  console.log({ sectionsUpdate })
+
+  React.useEffect(() => {
+    fetchSections()
+  }, [])
+
   return (
     <>
       <section className="flex flex-col h-full w-full scroll-smooth overflow-x-hidden">
@@ -24,12 +57,14 @@ export default function Home() {
           <BounceContainer>
             <div className="flex flex-col gap-2 px-3">
               <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
-                Pilihan Game Terbaik Ikuzo Playstation!
+                {isLoading ? '' : sectionsUpdate[0]?.title}
               </h1>
-              <p className="text-gray-400 font-normal text-center text-base">
-                Mainkan dan dapatkan kepuasan dalam bermain game yang sedang
-                naik daun dan menantang!
-              </p>
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: sectionsUpdate && sectionsUpdate[0]?.description,
+                }}
+                className="text-gray-400 font-normal text-center prose-base"
+              ></p>
             </div>
           </BounceContainer>
           <SwiperContainer />
@@ -40,13 +75,14 @@ export default function Home() {
           <BounceContainer>
             <div className="flex flex-col gap-2 px-3">
               <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
-                Fasilitas di <br />
-                Ikuzo Playstation!
+                {isLoading ? '' : sectionsUpdate[1]?.title}
               </h1>
-              <p className="text-gray-400 font-normal text-center text-base">
-                Reservasi segera dengan pilihan layanan yang ada dan nikmati
-                keseruan bermain bersama Ikuzo!
-              </p>
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: sectionsUpdate && sectionsUpdate[1]?.description,
+                }}
+                className="text-gray-400 font-normal text-center prose-base"
+              ></p>
             </div>
           </BounceContainer>
           <SwiperContainer2 />
