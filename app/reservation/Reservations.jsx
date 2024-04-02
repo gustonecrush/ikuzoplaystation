@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
   calculateTimeDifference,
+  convertToDate,
   formatDate,
   generateTimeArray,
   generateTimeArrayWithStep,
@@ -156,6 +157,26 @@ export default function Reservation() {
   }
 
   const [customTimeSelected, setCustomTimeSelected] = React.useState(null)
+  const [dateClose, setDateClose] = React.useState([])
+
+  const getDateClosed = async (date) => {
+    try {
+      const response = await axios.get(`${baseUrl}/dates`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        setDateClose(jsonData.data)
+
+        console.log({ customTimeSelected })
+      } else {
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+      setIsLoading(false)
+    }
+  }
 
   const getTimeSelected = async (date) => {
     try {
@@ -277,6 +298,8 @@ export default function Reservation() {
     console.log('fetching', reserves)
   }
 
+  console.log({ dateClose })
+
   useEffect(() => {
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js'
     const clientKey = process.env.NEXT_PUBLIC_CLIENT
@@ -288,6 +311,7 @@ export default function Reservation() {
       startTimeReservasi,
       endTimeReservasi,
     )
+    getDateClosed()
     setTotalTime(getTimeDIfferent)
 
     document.body.appendChild(script)
@@ -501,9 +525,15 @@ export default function Reservation() {
                           getTimeSelected(nextDay.toISOString().split('T')[0])
                         }}
                         disabled={(date) =>
-                          date > new addDays(new Date(), 15) ||
-                          date < subDays(new Date(), 1) ||
-                          (date.getDate() >= 6 && date.getDate() <= 12)
+                          dateClose.length !== 0
+                            ? date > addDays(new Date(), 15) ||
+                              date < subDays(new Date(), 1) ||
+                              (date.getDate() >=
+                                convertToDate(dateClose[0]?.start_date) &&
+                                date.getDate() <=
+                                  convertToDate(dateClose[0]?.start_date))
+                            : date > addDays(new Date(), 15) ||
+                              date < subDays(new Date(), 1)
                         }
                         initialFocus
                       />
