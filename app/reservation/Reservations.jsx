@@ -531,7 +531,7 @@ export default function Reservation() {
                               (date.getDate() >=
                                 convertToDate(dateClose[0]?.start_date) &&
                                 date.getDate() <=
-                                  convertToDate(dateClose[0]?.start_date))
+                                  convertToDate(dateClose[0]?.end_date))
                             : date > addDays(new Date(), 15) ||
                               date < subDays(new Date(), 1)
                         }
