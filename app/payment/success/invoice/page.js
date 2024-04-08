@@ -115,7 +115,9 @@ const Invoice = () => {
   }
 
   useEffect(() => {
-    getReservationByID()
+    if (transaction_status == 'settlement') {
+      getReservationByID()
+    }
   }, [order_id])
 
   useEffect(() => {
