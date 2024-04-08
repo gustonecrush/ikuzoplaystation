@@ -4,7 +4,7 @@ import React, { useRef } from 'react'
 import html2canvas from 'html2canvas'
 
 import { Button } from '@/components/ui/button'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import axios from 'axios'
@@ -16,9 +16,11 @@ import LoaderHome from '@/app/components/LoaderHome'
 const Invoice = () => {
   const searchParam = useSearchParams()
   const order_id = searchParam.get('order_id')
+  const transaction_status = searchParam.get('transaction_status')
   const cash = searchParam.get('cash')
   const invoiceRef = useRef(null)
   const token = Cookies.get('token')
+  const router = useRouter()
 
   const [showInvoice, setShowInvoice] = React.useState(false)
   const [data, setData] = React.useState(null)
@@ -117,8 +119,12 @@ const Invoice = () => {
   }, [order_id])
 
   useEffect(() => {
-    setShowInvoice(true)
-    downloadInvoice()
+    if (transaction_status == 'settlement') {
+      setShowInvoice(true)
+      downloadInvoice()
+    } else {
+      router.push('/payment/failed')
+    }
   }, [data])
 
   // Render your component here
