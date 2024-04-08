@@ -203,9 +203,9 @@ export default function Reservation() {
         const jsonData = await response.data
 
         if (jsonData.data.length > 0) {
-          setCustomTimeSelected(jsonData.data[0])
+          setCustomTimeSelected(jsonData.data)
         } else {
-          setCustomTimeSelected(null)
+          setCustomTimeSelected([])
         }
 
         console.log({ customTimeSelected })

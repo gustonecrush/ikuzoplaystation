@@ -92,9 +92,11 @@ import {
   IoLaptopSharp,
   IoCalendarClear,
 } from 'react-icons/io5'
+import { Statistics } from '@/app/components'
 
 function page() {
   const [data, setData] = React.useState([])
+  const [total, setTotal] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(false)
   const [statusPlaying, setStatusPlaying] = React.useState('')
 
@@ -692,6 +694,39 @@ function page() {
     }
   }
 
+  const getAllDataStatistics = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/statistics`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setTotal(jsonData)
+        console.log({ jsonData })
+        setIsLoading(false)
+      } else {
+        setIsLoading(false)
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      setIsLoading(false)
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
   const [
     openCreateReservationForm,
     setOpenCreateReservationForm,
@@ -699,6 +734,7 @@ function page() {
 
   React.useEffect(() => {
     getAllDataReservations()
+    getAllDataStatistics()
   }, [])
 
   return (
@@ -772,6 +808,8 @@ function page() {
                 </div>
               </Fade>
             </div>
+            <Statistics total={total} />
+
             <section className="gap-3 px-5 ml-8 bg-white shadow-md rounded-lg mt-5 ">
               <Card extra="mt-6 p-5 text-base">
                 <div className="w-full">
