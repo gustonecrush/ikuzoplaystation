@@ -135,6 +135,7 @@ function page() {
 
       getAllDataReservations()
       setIdSelected('')
+      getAllDataStatistics()
     } catch (error) {
       console.error({ error })
       setIdSelected('')
@@ -181,6 +182,8 @@ function page() {
       })
 
       getAllDataReservations()
+      getAllDataStatistics()
+
       setStatusPlaying('')
       setOpenUpdate(false)
     } catch (error) {
