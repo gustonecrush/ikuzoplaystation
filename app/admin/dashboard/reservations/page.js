@@ -96,7 +96,12 @@ import { Statistics } from '@/app/components'
 
 function page() {
   const [data, setData] = React.useState([])
-  const [total, setTotal] = React.useState(null)
+  const [total, setTotal] = React.useState({
+    reservations: 0,
+    prices: 0,
+    success_payment: 0,
+    pending_payment: 0,
+  })
   const [isLoading, setIsLoading] = React.useState(false)
   const [statusPlaying, setStatusPlaying] = React.useState('')
 
@@ -713,17 +718,6 @@ function page() {
     } catch (error) {
       setIsLoading(false)
       console.error({ error })
-      if (error.code == 'ERR_NETWORK') {
-        Toast.fire({
-          icon: 'error',
-          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
-        })
-      } else {
-        Toast.fire({
-          icon: 'error',
-          title: `Internal server sedang error, coba lagi nanti!`,
-        })
-      }
     }
   }
 
