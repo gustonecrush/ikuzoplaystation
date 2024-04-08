@@ -2313,7 +2313,7 @@ export default function Reservation() {
                     <Fade>
                       <div className="space-y-1">
                         <h4 className="text-base font-jakarta font-medium leading-none text-black">
-                          Pajak (Bila Non Cash)
+                          Service Charge (Bila Non Cash)
                         </h4>
                         <p className="text-base font-jakarta text-gray-600">
                           Rp {4000}
