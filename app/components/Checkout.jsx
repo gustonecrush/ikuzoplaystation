@@ -2,14 +2,28 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import axios from 'axios'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+
 const Checkout = ({ id, productName, price, detailCustomer }) => {
   const [quantity, setQuantity] = useState(1)
   const [payClicked, setPayClicked] = useState(false)
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false)
 
   console.error({ productName })
 
   const checkout = async () => {
     console.log({ productName })
+    setAlertDialogOpen(false)
 
     try {
       const data = {
@@ -47,14 +61,50 @@ const Checkout = ({ id, productName, price, detailCustomer }) => {
       console.log(reserveResponse.data)
     } catch (error) {
       console.error(error)
+      setAlertDialogOpen(false)
     }
+  }
+
+  const handleCheckout = () => {
+    setAlertDialogOpen(true)
+    checkout()
+  }
+
+  function ConfirmDialog() {
+    return (
+      <AlertDialog open={alertDialogOpen}>
+        <AlertDialogContent className="w-3/4 rounded-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Anda sudah yakin untuk melakukan pembayaran?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Jika yakin maka pastikan koneksi jaringan mu stabil dan jangan
+              sampai halaman ini keluar ketika proses pembayaranmu!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={(e) => setAlertDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-orange hover:bg-orange"
+              onClick={(e) => handleCheckout()}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    )
   }
 
   return (
     <>
+      <ConfirmDialog />
       <Button
         type="button"
-        onClick={checkout}
+        onClick={(e) => setAlertDialogOpen(true)}
         className="bg-orange rounded-lg px-5 py-6 text-base font-jakarta hover:bg-orange"
       >
         Pay

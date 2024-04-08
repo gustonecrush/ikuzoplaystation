@@ -83,12 +83,83 @@ export const convertToDate = (dateString) => {
   return day
 }
 
+// export const generateTimeArray = (
+//   customTimeSelected = {
+//     open_time: 9,
+//     close_time: 23,
+//     date: new Date().toISOString().split('T')[0],
+//   },
+//   date = new Date().toISOString().split('T')[0],
+//   bookedSlots,
+// ) => {
+//   const times = []
+//   const today = new Date()
+//   const currentHour = today.getHours()
+//   const currentMinute = today.getMinutes()
+
+//   // Set start hour and minute
+//   let startHour, startMinute
+//   if (date === today.toISOString().split('T')[0]) {
+//     // If today, start from current hour and nearest multiple of 10 for minute
+//     startHour = currentHour
+//     startMinute = Math.ceil(currentMinute / 10) * 10
+//   } else {
+//     // If not today, start from 09:00
+//     if (customTimeSelected != null && date == customTimeSelected.date) {
+//       startHour = customTimeSelected.open_time
+//       startMinute = 0
+//     } else {
+//       startHour = 9
+//       startMinute = 0
+//     }
+//   }
+
+//   let endHour
+//   if (customTimeSelected != null && date == customTimeSelected.date) {
+//     endHour = parseInt(customTimeSelected.close_time)
+//   } else {
+//     endHour = 23
+//   }
+
+//   for (let hour = startHour; hour <= endHour; hour++) {
+//     let maxMinute
+//     if (
+//       hour === endHour &&
+//       customTimeSelected != null &&
+//       date == customTimeSelected.date
+//     ) {
+//       maxMinute = 0 // Stop at 00 minutes for the end hour when customTimeSelected is not null
+//     } else {
+//       maxMinute = hour === endHour ? 60 : 50 // If endHour, allow until 00 minutes, otherwise 50 minutes
+//     }
+//     const startLoopMinute = hour === startHour ? startMinute : 0
+//     for (let minute = startLoopMinute; minute < maxMinute; minute += 10) {
+//       const formattedHour = hour.toString().padStart(2, '0')
+//       const formattedMinute = minute.toString().padStart(2, '0')
+//       const time = `${formattedHour}:${formattedMinute}`
+
+//       // Check if bookedSlots has any entries before checking time availability
+//       if (
+//         bookedSlots.length === 0 ||
+//         !bookedSlots.some((slot) =>
+//           isTimeBetween(time, slot.startTime, slot.endTime),
+//         )
+//       ) {
+//         times.push(time)
+//       }
+//     }
+//   }
+//   return times
+// }
+
 export const generateTimeArray = (
-  customTimeSelected = {
-    open_time: 9,
-    close_time: 23,
-    date: new Date().toISOString().split('T')[0],
-  },
+  customTimeSelectedArray = [
+    {
+      open_time: 9,
+      close_time: 23,
+      date: new Date().toISOString().split('T')[0],
+    },
+  ],
   date = new Date().toISOString().split('T')[0],
   bookedSlots,
 ) => {
@@ -97,58 +168,52 @@ export const generateTimeArray = (
   const currentHour = today.getHours()
   const currentMinute = today.getMinutes()
 
-  // Set start hour and minute
-  let startHour, startMinute
-  if (date === today.toISOString().split('T')[0]) {
-    // If today, start from current hour and nearest multiple of 10 for minute
-    startHour = currentHour
-    startMinute = Math.ceil(currentMinute / 10) * 10
-  } else {
-    // If not today, start from 09:00
-    if (customTimeSelected != null && date == customTimeSelected.date) {
-      startHour = customTimeSelected.open_time
-      startMinute = 0
+  customTimeSelectedArray.forEach((customTimeSelected) => {
+    let startHour, startMinute
+    if (date === today.toISOString().split('T')[0]) {
+      startHour = currentHour
+      startMinute = Math.ceil(currentMinute / 10) * 10
     } else {
-      startHour = 9
-      startMinute = 0
-    }
-  }
-
-  let endHour
-  if (customTimeSelected != null && date == customTimeSelected.date) {
-    endHour = parseInt(customTimeSelected.close_time)
-  } else {
-    endHour = 23
-  }
-
-  for (let hour = startHour; hour <= endHour; hour++) {
-    let maxMinute
-    if (
-      hour === endHour &&
-      customTimeSelected != null &&
-      date == customTimeSelected.date
-    ) {
-      maxMinute = 0 // Stop at 00 minutes for the end hour when customTimeSelected is not null
-    } else {
-      maxMinute = hour === endHour ? 60 : 50 // If endHour, allow until 00 minutes, otherwise 50 minutes
-    }
-    const startLoopMinute = hour === startHour ? startMinute : 0
-    for (let minute = startLoopMinute; minute < maxMinute; minute += 10) {
-      const formattedHour = hour.toString().padStart(2, '0')
-      const formattedMinute = minute.toString().padStart(2, '0')
-      const time = `${formattedHour}:${formattedMinute}`
-
-      // Check if bookedSlots has any entries before checking time availability
-      if (
-        bookedSlots.length === 0 ||
-        !bookedSlots.some((slot) =>
-          isTimeBetween(time, slot.startTime, slot.endTime),
-        )
-      ) {
-        times.push(time)
+      if (customTimeSelected.date === date) {
+        startHour = customTimeSelected.open_time
+        startMinute = 0
+      } else {
+        startHour = 9
+        startMinute = 0
       }
     }
-  }
+
+    let endHour
+    if (customTimeSelected.date === date) {
+      endHour = parseInt(customTimeSelected.close_time)
+    } else {
+      endHour = 24 // Set endHour to 24 for the last hour of the day
+    }
+
+    for (let hour = startHour; hour <= endHour; hour++) {
+      const maxMinute = hour === endHour ? 0 : 60 // Set maxMinute to 0 for the last hour of the day
+
+      const startLoopMinute = hour === startHour ? startMinute : 0
+      const loopEndMinute =
+        hour === endHour ? Math.min(60, startMinute + 1) : maxMinute // Adjust loop end minute for the last hour
+
+      for (let minute = startLoopMinute; minute < loopEndMinute; minute += 10) {
+        const formattedHour = hour.toString().padStart(2, '0')
+        const formattedMinute = minute.toString().padStart(2, '0')
+        const time = `${formattedHour}:${formattedMinute}`
+
+        if (
+          bookedSlots.length === 0 ||
+          !bookedSlots.some((slot) =>
+            isTimeBetween(time, slot.startTime, slot.endTime),
+          )
+        ) {
+          times.push(time)
+        }
+      }
+    }
+  })
+
   return times
 }
 
@@ -206,6 +271,84 @@ const generateTimeSlots = (date, bookedSlots) => {
 
   return timeSlots
 }
+
+// export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
+//   const times = []
+//   const maxHour = 23
+//   const maxMinute = 30
+
+//   const [hourStr, minuteStr] = selectedTime.split(':')
+//   const selectedHour = parseInt(hourStr)
+//   const selectedMinute = parseInt(minuteStr)
+
+//   // Check if bookedSlots is not empty
+//   if (bookedSlots.length !== 0) {
+//     // Find the nearest startTime after the selected time
+//     let nearestStartTime = ''
+//     for (const slot of bookedSlots) {
+//       const [startHour, startMinute] = slot.startTime.split(':')
+//       const slotStartTime = parseInt(startHour) * 60 + parseInt(startMinute)
+//       const selectedTimeMinutes = selectedHour * 60 + selectedMinute
+//       if (slotStartTime > selectedTimeMinutes) {
+//         nearestStartTime = slot.startTime
+//         break
+//       }
+//     }
+
+//     // Generate times from the selected time to the nearest startTime with step one hour
+//     if (nearestStartTime) {
+//       for (let hour = selectedHour + 1; hour <= maxHour; hour++) {
+//         const formattedHour = hour.toString().padStart(2, '0')
+//         const formattedMinute = selectedMinute.toString().padStart(2, '0')
+//         const time = `${formattedHour}:${formattedMinute}`
+
+//         // Check if the time is within the range of selected time to nearestStartTime
+//         if (isTimeBetween(time, selectedTime, nearestStartTime)) {
+//           times.push(time)
+//         }
+
+//         // If the nearestStartTime is reached, break the loop
+//         if (`${hour}:00` === nearestStartTime) {
+//           break
+//         }
+//       }
+//     } else {
+//       // If no nearest startTime, generate times with step one hour until 23:30
+//       for (let hour = selectedHour + 1; hour <= maxHour; hour++) {
+//         const formattedHour = hour.toString().padStart(2, '0')
+//         const formattedMinute = selectedMinute.toString().padStart(2, '0')
+//         const time = `${formattedHour}:${formattedMinute}`
+
+//         // Exclude selectedTime
+//         if (time !== selectedTime) {
+//           times.push(time)
+//         }
+
+//         if (hour === maxHour && selectedMinute === maxMinute) {
+//           break
+//         }
+//       }
+//     }
+//   } else {
+//     // If bookedSlots is empty, generate times with step one hour until 23:30
+//     for (let hour = selectedHour + 1; hour <= maxHour; hour++) {
+//       const formattedHour = hour.toString().padStart(2, '0')
+//       const formattedMinute = selectedMinute.toString().padStart(2, '0')
+//       const time = `${formattedHour}:${formattedMinute}`
+
+//       // Exclude selectedTime
+//       if (time !== selectedTime) {
+//         times.push(time)
+//       }
+
+//       if (hour === maxHour && selectedMinute === maxMinute) {
+//         break
+//       }
+//     }
+//   }
+
+//   return times
+// }
 
 export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
   const times = []

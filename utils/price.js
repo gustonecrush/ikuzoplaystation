@@ -1,40 +1,42 @@
 export const pricePackageDetermination = (position, totalTime, price) => {
   switch (position) {
-    case (1, 2, 3, 4, 5, 8):
-      if (totalTime == 3) {
-        return 50000
-      } else if (totalTime == 5) {
-        return 80000
-      }
-      break
-    case (6, 7):
-      if (totalTime == 3) {
-        return 120000
-      } else if (totalTime == 5) {
-        return 210000
-      }
-      break
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 8:
+      return totalTime === 3
+        ? 50000
+        : totalTime === 5
+        ? 80000
+        : totalTime * price
+    case 6:
+    case 7:
+      return totalTime === 3
+        ? 120000
+        : totalTime === 5
+        ? 210000
+        : totalTime * price
     case 9:
-      if (totalTime == 3) {
-        return 140000
-      } else if (totalTime == 5) {
-        return 230000
-      }
-      break
-    case (10, 11):
-      if (totalTime == 3) {
-        return 95000
-      } else if (totalTime == 5) {
-        return 150000
-      }
-      break
+      return totalTime === 3
+        ? 140000
+        : totalTime === 5
+        ? 230000
+        : totalTime * price
+    case 10:
+    case 11:
+      return totalTime === 3
+        ? 95000
+        : totalTime === 5
+        ? 150000
+        : totalTime * price
     case 12:
-      if (totalTime == 3) {
-        return 36000
-      } else if (totalTime == 5) {
-        return 60000
-      }
-      break
+      return totalTime === 3
+        ? 36000
+        : totalTime === 5
+        ? 60000
+        : totalTime * price
     default:
       return totalTime * price
   }

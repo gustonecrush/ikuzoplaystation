@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import Checkout from '../components/Checkout'
 import React, { useEffect, useRef, useState } from 'react'
 
@@ -156,7 +157,7 @@ export default function Reservation() {
     }
   }
 
-  const [customTimeSelected, setCustomTimeSelected] = React.useState(null)
+  const [customTimeSelected, setCustomTimeSelected] = React.useState([])
   const [dateClose, setDateClose] = React.useState([])
 
   const getDateClosed = async (date) => {
@@ -186,9 +187,9 @@ export default function Reservation() {
         const jsonData = await response.data
 
         if (jsonData.data.length > 0) {
-          setCustomTimeSelected(jsonData.data[0])
+          setCustomTimeSelected(jsonData.data)
         } else {
-          setCustomTimeSelected(null)
+          setCustomTimeSelected([])
         }
 
         console.log({ customTimeSelected })
@@ -413,7 +414,7 @@ export default function Reservation() {
   return (
     <>
       <section className="bg-transparent w-full h-full md:max-w-4xl md:mx-auto font-jakarta px-5 py-5 md:pb-10 absolute z-50">
-        <div className="flex items-center justify-between">
+        <Link href="/" className="flex items-center justify-between">
           <Fade>
             <Image
               src={'/logo-orange.png'}
@@ -424,7 +425,7 @@ export default function Reservation() {
               className="w-[150px] h-fit"
             />
           </Fade>
-        </div>
+        </Link>
 
         <div className="px-5 py-5 text-black bg-gray-700 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 shadow-md rounded-lg flex flex-row gap-3 items-center">
           <Fade>
@@ -825,6 +826,7 @@ export default function Reservation() {
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
+                                                    customTimeSelected,
                                                   ).map((time, index) => {
                                                     const isDisabled = disableTimes.includes(
                                                       time,
@@ -1060,6 +1062,7 @@ export default function Reservation() {
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
+                                                    customTimeSelected,
                                                   ).map((time, index) => {
                                                     const isDisabled = disableTimes.includes(
                                                       time,
@@ -1295,6 +1298,7 @@ export default function Reservation() {
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
+                                                    customTimeSelected,
                                                   ).map((time, index) => {
                                                     return (
                                                       <SelectItem
@@ -1534,6 +1538,7 @@ export default function Reservation() {
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
+                                                    customTimeSelected,
                                                   ).map((time, index) => {
                                                     const isDisabled = disableTimes.includes(
                                                       time,
@@ -1775,6 +1780,7 @@ export default function Reservation() {
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
+                                                    customTimeSelected,
                                                   ).map((time, index) => {
                                                     const isDisabled = disableTimes.includes(
                                                       time,
@@ -2025,6 +2031,7 @@ export default function Reservation() {
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
+                                                    customTimeSelected,
                                                   ).map((time, index) => {
                                                     const isDisabled = disableTimes.includes(
                                                       time,
