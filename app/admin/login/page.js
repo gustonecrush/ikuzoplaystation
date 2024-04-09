@@ -18,6 +18,7 @@ async function Video() {
   return (
     <>
       <video
+        playsInline
         width="320"
         height="240"
         preload="none"
@@ -35,6 +36,7 @@ async function Video() {
         height="240"
         preload="none"
         autoPlay
+        playsInline
         muted
         loop
         className="h-screen w-full object-cover -z-30 hidden md:block"

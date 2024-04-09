@@ -131,6 +131,7 @@ export function Video({ extra = '' }) {
         width="320"
         preload="none"
         autoPlay
+        playsInline
         muted
         loop
         title="Ikuzo Playstation"
@@ -144,6 +145,7 @@ export function Video({ extra = '' }) {
         width="320"
         preload="none"
         autoPlay
+        playsInline
         muted
         loop
         title="Ikuzo Playstation"
