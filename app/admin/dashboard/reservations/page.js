@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { FiEdit3 } from 'react-icons/fi'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { ArrowUpDown } from 'lucide-react'
-import { IoIosInformationCircle } from 'react-icons/io'
+import { IoIosInformationCircle, IoMdCalendar } from 'react-icons/io'
 
 import {
   ColumnFiltersState,
@@ -41,6 +41,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 import {
   AlertDialog,
@@ -85,7 +91,7 @@ import {
 } from 'react-icons/io5'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import Link from 'next/link'
-import { formatDateOnTheUI } from '@/utils/date'
+import { convertToDate, formatDate, formatDateOnTheUI } from '@/utils/date'
 
 import {
   IoGameController,
@@ -93,6 +99,8 @@ import {
   IoCalendarClear,
 } from 'react-icons/io5'
 import { Statistics } from '@/app/components'
+import { Calendar } from '@/components/ui/calendar'
+import { addDays, subDays } from 'date-fns'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -669,12 +677,12 @@ function page() {
     }
   }
 
-  const getAllDataReservations = async () => {
+  const getAllDataReservations = async (date = null) => {
     setIsLoading(true)
+    const url = `${process.env.NEXT_PUBLIC_BASE_URL}/reservations`
+    const urlDate = `${process.env.NEXT_PUBLIC_BASE_URL}/reservations?reserve_date=${date}`
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/reservations`,
-      )
+      const response = await axios.get(date == null ? url : urlDate)
       if (response.status == 200) {
         const jsonData = await response.data
         setData(jsonData)
@@ -728,6 +736,9 @@ function page() {
     openCreateReservationForm,
     setOpenCreateReservationForm,
   ] = React.useState(false)
+
+  const [date, setDate] = React.useState(null)
+  const [selectedDate, setSelectedDate] = React.useState('')
 
   React.useEffect(() => {
     getAllDataReservations()
@@ -824,6 +835,29 @@ function page() {
                       className="max-w-sm"
                     />
                     <div className="flex gap-1">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="ml-auto">
+                            Tanggal {date != null && `: ${formatDate(date)}`}{' '}
+                            <IoMdCalendar className="ml-2 h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={(date) => {
+                              setDate(date)
+                              const nextDay = addDays(date, 1)
+                              getAllDataReservations(
+                                nextDay.toISOString().split('T')[0],
+                              )
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+
                       <Button
                         onClick={(e) =>
                           setOpenCreateReservationForm(
