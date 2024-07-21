@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 
-import { FiEdit3 } from 'react-icons/fi'
+import { FiEdit3, FiEye } from 'react-icons/fi'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { ArrowUpDown } from 'lucide-react'
 import { IoIosInformationCircle, IoMdCalendar } from 'react-icons/io'
@@ -73,8 +73,8 @@ import { MdOutlineDoneAll } from 'react-icons/md'
 import { HiPhone } from 'react-icons/hi2'
 import { HiCalendar } from 'react-icons/hi'
 import { FaMoneyBillWaveAlt } from 'react-icons/fa'
-import { PiHouseSimpleFill } from 'react-icons/pi'
-import { BiSolidTime } from 'react-icons/bi'
+import { PiGearBold, PiHouseSimpleFill } from 'react-icons/pi'
+import { BiHide, BiSolidTime } from 'react-icons/bi'
 import { BiSolidTimeFive } from 'react-icons/bi'
 import { TbNumber } from 'react-icons/tb'
 import { AiFillEdit } from 'react-icons/ai'
@@ -104,6 +104,19 @@ import { addDays, subDays } from 'date-fns'
 
 function page() {
   const [data, setData] = React.useState([])
+  const [isHide, setIsHide] = React.useState(false)
+  const hideSuccessPayment = () => {
+    if (!isHide) {
+      const filteredData = data.filter(
+        (item) => item.status_reserve !== 'settlement',
+      )
+
+      setData(filteredData)
+    } else {
+      getAllDataReservations()
+    }
+  }
+
   const [total, setTotal] = React.useState({
     reservations: 0,
     prices: 0,
@@ -835,6 +848,56 @@ function page() {
                       className="max-w-sm"
                     />
                     <div className="flex gap-1">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="ml-auto">
+                            Tools <PiGearBold className="ml-2 h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <div className="p-4 flex flex-col space-y-2">
+                            <Button
+                              variant="primary"
+                              onClick={(e) => {
+                                setIsHide(!isHide)
+                                hideSuccessPayment()
+                              }}
+                            >
+                              {isHide ? 'Unhide' : 'Hide'} Success Payment{' '}
+                              {!isHide ? (
+                                <BiHide className="ml-2 h-4 w-4" />
+                              ) : (
+                                <FiEye className="ml-2 h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="primary"
+                              onClick={() => console.log('Button 2 clicked')}
+                            >
+                              Button 2
+                            </Button>
+                            <Button
+                              variant="primary"
+                              onClick={() => console.log('Button 3 clicked')}
+                            >
+                              Button 3
+                            </Button>
+                            <Button
+                              variant="primary"
+                              onClick={() => console.log('Button 4 clicked')}
+                            >
+                              Button 4
+                            </Button>
+                            <Button
+                              variant="primary"
+                              onClick={() => console.log('Button 5 clicked')}
+                            >
+                              Button 5
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="ml-auto">
