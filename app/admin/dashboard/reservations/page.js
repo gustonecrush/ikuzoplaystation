@@ -106,15 +106,11 @@ function page() {
   const [data, setData] = React.useState([])
   const [isHide, setIsHide] = React.useState(false)
   const hideSuccessPayment = () => {
-    if (!isHide) {
-      const filteredData = data.filter(
-        (item) => item.status_reserve !== 'settlement',
-      )
+    const filteredData = data.filter(
+      (item) => item.status_reserve !== 'settlement',
+    )
 
-      setData(filteredData)
-    } else {
-      getAllDataReservations()
-    }
+    setData(filteredData)
   }
 
   const [total, setTotal] = React.useState({
@@ -690,7 +686,16 @@ function page() {
     }
   }
 
-  const getAllDataReservations = async (date = null) => {
+  const [date, setDate] = React.useState(
+    Cookies.get('selectedDate') ? Cookies.get('selectedDate') : new Date(),
+  )
+  console.log('DATE', date)
+
+  const getAllDataReservations = async (
+    date = Cookies.get('selectedDate')
+      ? addDays(Cookies.get('selectedDate'), 1).toISOString().split('T')[0]
+      : addDays(new Date(), 1).toISOString().split('T')[0],
+  ) => {
     setIsLoading(true)
     const url = `${process.env.NEXT_PUBLIC_BASE_URL}/reservations`
     const urlDate = `${process.env.NEXT_PUBLIC_BASE_URL}/reservations?reserve_date=${date}`
@@ -750,7 +755,6 @@ function page() {
     setOpenCreateReservationForm,
   ] = React.useState(false)
 
-  const [date, setDate] = React.useState(null)
   const [selectedDate, setSelectedDate] = React.useState('')
 
   React.useEffect(() => {
@@ -860,7 +864,18 @@ function page() {
                               variant="primary"
                               onClick={(e) => {
                                 setIsHide(!isHide)
-                                hideSuccessPayment()
+                                if (!isHide) {
+                                  hideSuccessPayment()
+                                } else {
+                                  const nextDay = addDays(
+                                    Cookies.get('selectedDate'),
+                                    1,
+                                  )
+                                  setDate(Cookies.get('selectedDate'))
+                                  getAllDataReservations(
+                                    nextDay.toISOString().split('T')[0],
+                                  )
+                                }
                               }}
                             >
                               {isHide ? 'Unhide' : 'Hide'} Success Payment{' '}
@@ -901,7 +916,7 @@ function page() {
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="ml-auto">
-                            Tanggal {date != null && `: ${formatDate(date)}`}{' '}
+                            Tanggal {formatDate(date)}{' '}
                             <IoMdCalendar className="ml-2 h-4 w-4" />
                           </Button>
                         </PopoverTrigger>
@@ -910,8 +925,9 @@ function page() {
                             mode="single"
                             selected={date}
                             onSelect={(date) => {
-                              setDate(date)
                               const nextDay = addDays(date, 1)
+                              setDate(date)
+                              Cookies.set('selectedDate', date)
                               getAllDataReservations(
                                 nextDay.toISOString().split('T')[0],
                               )
