@@ -10,7 +10,7 @@ async function updateDataStatus(order_id, transaction_status) {
   try {
     if (payload.status_reserve == 'expired') {
       const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/reservations/order/${order_id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/reservations/${order_id}`,
       )
       console.log('Response:', response.data)
     } else {
