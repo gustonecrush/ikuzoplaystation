@@ -20,6 +20,8 @@ import { FiEdit3, FiEye } from 'react-icons/fi'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { ArrowUpDown } from 'lucide-react'
 import { IoIosInformationCircle, IoMdCalendar } from 'react-icons/io'
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
 
 import {
   ColumnFiltersState,
@@ -73,7 +75,11 @@ import { MdOutlineDoneAll } from 'react-icons/md'
 import { HiPhone } from 'react-icons/hi2'
 import { HiCalendar } from 'react-icons/hi'
 import { FaMoneyBillWaveAlt } from 'react-icons/fa'
-import { PiGearBold, PiHouseSimpleFill } from 'react-icons/pi'
+import {
+  PiGearBold,
+  PiHouseSimpleFill,
+  PiMicrosoftExcelLogoFill,
+} from 'react-icons/pi'
 import { BiHide, BiSolidTime } from 'react-icons/bi'
 import { BiSolidTimeFive } from 'react-icons/bi'
 import { TbNumber } from 'react-icons/tb'
@@ -728,6 +734,20 @@ function page() {
     }
   }
 
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(data)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reservations')
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    })
+    const dataBlob = new Blob([excelBuffer], {
+      type: 'application/octet-stream',
+    })
+    saveAs(dataBlob, 'reservations.xlsx')
+  }
+
   const getAllDataStatistics = async () => {
     setIsLoading(true)
     try {
@@ -887,9 +907,10 @@ function page() {
                             </Button>
                             <Button
                               variant="primary"
-                              onClick={() => console.log('Button 2 clicked')}
+                              onClick={exportToExcel}
+                              disabled={data.length === 0}
                             >
-                              Button 2
+                              Export Data <PiMicrosoftExcelLogoFill />
                             </Button>
                             <Button
                               variant="primary"
