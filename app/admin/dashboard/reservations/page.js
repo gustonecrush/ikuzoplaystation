@@ -776,6 +776,8 @@ function page() {
   ] = React.useState(false)
 
   const [selectedDate, setSelectedDate] = React.useState('')
+  const [dateStart, setDateStart] = React.useState(null)
+  const [dateEnd, setDateEnd] = React.useState(null)
 
   React.useEffect(() => {
     getAllDataReservations()
@@ -905,13 +907,7 @@ function page() {
                                 <FiEye className="ml-2 h-4 w-4" />
                               )}
                             </Button>
-                            <Button
-                              variant="primary"
-                              onClick={exportToExcel}
-                              disabled={data.length === 0}
-                            >
-                              Export Data <PiMicrosoftExcelLogoFill />
-                            </Button>
+
                             <Button
                               variant="primary"
                               onClick={() => console.log('Button 3 clicked')}
@@ -933,7 +929,72 @@ function page() {
                           </div>
                         </PopoverContent>
                       </Popover>
-
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline">
+                            Export{' '}
+                            <PiMicrosoftExcelLogoFill className="ml-2 h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-full p-0 flex flex-col gap-2"
+                          align="start"
+                        >
+                          <div class="flex flex-row gap-2">
+                            <div>
+                              <label className="px-3 py-4 font-semibold text-sm">
+                                Select Start Date:
+                              </label>
+                              <Calendar
+                                mode="single"
+                                selected={dateStart}
+                                onSelect={(date) => {
+                                  setDateStart(date)
+                                  Cookies.set(
+                                    'dateStart',
+                                    date.toISOString().split('T')[0],
+                                  )
+                                  if (dateEnd) {
+                                    getAllDataReservations(
+                                      date.toISOString().split('T')[0],
+                                      dateEnd.toISOString().split('T')[0],
+                                    )
+                                  }
+                                }}
+                                initialFocus
+                              />
+                            </div>
+                            <div>
+                              <label className="px-3 py-4 font-semibold text-sm">
+                                Select End Date:
+                              </label>
+                              <Calendar
+                                mode="single"
+                                selected={dateEnd}
+                                onSelect={(date) => {
+                                  const nextDay = addDays(date, 1)
+                                  setDateEnd(nextDay)
+                                  Cookies.set(
+                                    'dateEnd',
+                                    nextDay.toISOString().split('T')[0],
+                                  )
+                                  if (dateStart) {
+                                    getAllDataReservations(
+                                      dateStart.toISOString().split('T')[0],
+                                      nextDay.toISOString().split('T')[0],
+                                    )
+                                  }
+                                }}
+                                initialFocus
+                              />
+                            </div>
+                          </div>
+                          <Button variant="outline" className="ml-auto">
+                            Export Data{' '}
+                            <PiMicrosoftExcelLogoFill className="ml-2 h-4 w-4" />
+                          </Button>
+                        </PopoverContent>
+                      </Popover>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="ml-auto">
