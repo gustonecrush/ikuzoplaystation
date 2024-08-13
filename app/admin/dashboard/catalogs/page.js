@@ -7,12 +7,11 @@ import TableReservations from '@/app/components/TableReservations'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 
 import { FiEdit3 } from 'react-icons/fi'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { ArrowUpDown } from 'lucide-react'
-import { IoIosInformationCircle } from 'react-icons/io'
+import { IoIosInformationCircle, IoMdImages } from 'react-icons/io'
 
 import {
   getCoreRowModel,
@@ -31,16 +30,6 @@ import {
 import { Calendar } from '@/components/ui/calendar'
 
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -57,8 +46,6 @@ import axios from 'axios'
 
 import { HiCalendar } from 'react-icons/hi'
 import { addDays, subDays } from 'date-fns'
-import { BiSolidTime } from 'react-icons/bi'
-import { BiSolidTimeFive } from 'react-icons/bi'
 import { AiFillEdit } from 'react-icons/ai'
 import Toast from '@/app/components/Toast'
 import Loading from '../components/loading'
@@ -69,6 +56,7 @@ import { IoBook, IoCalendarClear, IoLogOut, IoTime } from 'react-icons/io5'
 import { formatDateOnTheUI, getCurrentDate, getMaxDate } from '@/utils/date'
 
 import { IoGameController, IoLaptopSharp } from 'react-icons/io5'
+import { MdOutlineChair } from 'react-icons/md'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -111,7 +99,7 @@ function page() {
         title: `Setting waktu berhasil dihapus!`,
       })
 
-      getAllDataReservations()
+      getAllDataCatalogs()
       setIdSelected('')
     } catch (error) {
       console.error({ error })
@@ -165,7 +153,7 @@ function page() {
         title: `Setting waktu berhasil ditambahkan!`,
       })
 
-      getAllDataReservations()
+      getAllDataCatalogs()
       setOpenCreateReservationForm(false)
       clearFormCustomTime()
     } catch (error) {
@@ -218,7 +206,7 @@ function page() {
         title: `Setting tanggal berhasil diupdate!`,
       })
 
-      getAllDataReservations()
+      getAllDataCatalogs()
       clearFormCustomTime()
       setOpenUpdate(false)
       setOpenCreateReservationForm(false)
@@ -283,13 +271,6 @@ function page() {
           >
             <IoIosInformationCircle className="h-4 w-4" /> Info
           </Button>
-          <Button
-            onClick={(e) => handleOpenUpdate(row.getValue('id'))}
-            variant="outline"
-            className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
-          >
-            <FiEdit3 className="h-4 w-4" /> Edit
-          </Button>
 
           <AlertDialog className="bg-black/20">
             <AlertDialogTrigger asChild>
@@ -324,43 +305,44 @@ function page() {
       ),
     },
     {
-      accessorKey: 'start_date',
+      accessorKey: 'no_seat',
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="w-full"
+            className="w-fit px-0 text-left mx-0"
           >
-            Dari Tanggal
-            <HiCalendar className="ml-2 h-4 w-4" />
+            No Seat
+            <MdOutlineChair className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => (
-        <div className="w-full text-center">
-          {formatDateOnTheUI(row.getValue('start_date'))}
+        <div className="w-full text-left">
+            Seat {row.getValue('no_seat')}
+          <p>{row.original.catalog_txt}</p>
         </div>
       ),
     },
     {
-      accessorKey: 'end_date',
+      accessorKey: 'catalog_img',
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="w-full"
+            className="w-fit"
           >
-            Sampai Tanggal
-            <HiCalendar className="ml-2 h-4 w-4" />
+            Catalog Image
+            <IoMdImages className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => (
-        <div className="w-full text-center ">
+        <div className="w-fit text-center flex items-center">
           {' '}
-          {formatDateOnTheUI(row.getValue('end_date'))}
+          <Image src={process.env.NEXT_PUBLIC_IMAGE_URL + row.getValue('catalog_img')} width={0} height={0} className='w-24' />
         </div>
       ),
     },
@@ -421,15 +403,17 @@ function page() {
     }
   }
 
-  const getAllDataReservations = async () => {
+  console.log(data)
+
+  const getAllDataCatalogs = async () => {
     setIsLoading(true)
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/dates`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/catalogs`,
       )
       if (response.status == 200) {
         const jsonData = await response.data
-        setData(jsonData.data)
+        setData(jsonData)
         console.log({ jsonData })
         setIsLoading(false)
       } else {
@@ -454,13 +438,66 @@ function page() {
     }
   }
 
+  const [noSeat, setNoSeat] = React.useState(null)
+  const [catalogTxt, setCatalogTxt] = React.useState('')
+  const [catalogImg, setCatalogImg] = React.useState(null)
+
+  const handleFileChange = (e) => {
+    setCatalogImg(e.target.files[0])
+  }
+
+  const handleUploadNewCatalogOnSeat = async (e) => {
+    e.preventDefault()
+
+    const data = new FormData()
+    data.append('no_seat', noSeat)
+    data.append('catalog_img', catalogImg)
+    data.append('catalog_txt', catalogTxt)
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/catalogs`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data katalog seat berhasil diupload!`,
+      })
+
+      console.log(response)
+
+      setOpen(false)
+      getAllDataCatalogs()
+      setNoSeat(null)
+      setCatalogImg(null)
+      setCatalogTxt(null)
+      setOpenCreateReservationForm(false)
+    } catch (error) {
+      console.error({ error })
+      setOpenCreateReservationForm(false)
+      setOpen(false)
+      Toast.fire({
+        icon: 'error',
+        title: `Data katalog seat gagal diupload!`,
+      })
+    }
+  }
+
+
   const [
     openCreateReservationForm,
     setOpenCreateReservationForm,
   ] = React.useState(false)
 
   React.useEffect(() => {
-    getAllDataReservations()
+    getAllDataCatalogs()
   }, [])
 
   return (
@@ -496,13 +533,13 @@ function page() {
           </a>
           <a
             href="/admin/dashboard/catalogs"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
+            className="relative w-16 h-16 p-4 bg-yellow-100 flex items-center justify-center text-orange rounded-2xl mb-4"
           >
             <IoBook className="text-4xl" />
           </a>
           <a
             href="/admin/dashboard/dates"
-            className="relative w-16 h-16 p-4 bg-yellow-100 flex items-center justify-center text-orange rounded-2xl mb-4"
+            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4 "
           >
             <IoCalendarClear className="text-4xl" />
           </a>
@@ -530,9 +567,9 @@ function page() {
 
             <Fade>
               <div className="flex flex-col">
-                <h1 className="text-4xl font-semibold">Holiday Dates</h1>
+                <h1 className="text-4xl font-semibold">Catalogs</h1>
                 <p className="text-base font-normal text-gray-400">
-                  Atur tanggal libur Ikuzo Playstation!
+                 Tambahkan catalog game pada setiap seat!
                 </p>
               </div>
             </Fade>
@@ -561,7 +598,7 @@ function page() {
                       variant="outline"
                       className="ml-auto"
                     >
-                      Setting Hari Libur <IoMdAdd className="ml-2 h-4 w-4" />
+                      Tambahkan Catalog Game <IoMdAdd className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -612,9 +649,9 @@ function page() {
             >
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Setting Hari Libur</AlertDialogTitle>
+                  <AlertDialogTitle>Tambahkan Catalog</AlertDialogTitle>
                   <AlertDialogDescription>
-                    <p className="-mt-2">Setting hari libur Playstation!</p>
+                    <p className="-mt-2">Upload Catalog Sebanyak - Banyaknya pada Seat Booking!</p>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <fieldset>
@@ -622,83 +659,50 @@ function page() {
                     <>
                       <div>
                         <label className="text-black" htmlFor="nama">
-                          Dari Tanggal
+                         No Seat
                         </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <input
-                              type="text"
-                              value={selectedDate}
-                              onChange={(e) => setSelectedDate(e.target.value)}
-                              name="tanggal_reservasi"
-                              id="tanggal_reservasi"
-                              placeholder="Pilih tanggal"
+                        <input
+                              type="number"
+                              value={noSeat}
+                              onChange={(e) => setNoSeat(e.target.value)}
+                              name="no_seat"
+                              id="no_seat"
+                              placeholder="Masukkan No Seat"
                               className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                              min={currentDate}
-                              max={maxDate}
+                            
                               required
                             />
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={date}
-                              onSelect={(date) => {
-                                setDate(date)
-                                const nextDay = addDays(date, 1)
-                                setSelectedDate(
-                                  nextDay.toISOString().split('T')[0],
-                                )
-                              }}
-                              disabled={(date) =>
-                                date > new addDays(new Date(), 15) ||
-                                date < subDays(new Date(), 1)
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
                       </div>
 
                       <div>
                         <label className="text-black" htmlFor="nama">
-                          Sampai Tanggal
+                          Catalog Text
                         </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <input
+                        <textarea
                               type="text"
-                              value={selectedDate2}
-                              onChange={(e) => setSelectedDate2(e.target.value)}
-                              name="tanggal_reservasi"
-                              id="tanggal_reservasi"
-                              placeholder="Pilih tanggal"
+                              value={catalogTxt}
+                              onChange={(e) => setCatalogTxt(e.target.value)}
+                              name="catalog_txt"
+                              id="catalog_txt"
+                              placeholder="Masukkan deskripsi catalog"
                               className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                              min={currentDate}
-                              max={maxDate}
-                              required
-                            />
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={date2}
-                              onSelect={(date) => {
-                                setDate2(date)
-                                const nextDay = addDays(date, 1)
-                                setSelectedDate2(
-                                  nextDay.toISOString().split('T')[0],
-                                )
-                              }}
-                              disabled={(date) =>
-                                date > new addDays(new Date(), 15) ||
-                                date < subDays(new Date(), 1)
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                              
+                            ></textarea>
                       </div>
+
+                      <div className="grid gap-4 py-0">
+                <div className="flex flex-col items-start gap-1">
+                <label className="text-black" htmlFor="nama">
+                          Catalog Image
+                        </label>
+                  <Input
+                    id="pict"
+                    onChange={handleFileChange}
+                    type="file"
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
                     </>
                   </form>
                 </fieldset>
@@ -713,10 +717,10 @@ function page() {
                     onClick={(e) =>
                       openUpdate
                         ? handleUpdateFacilityContent(idSelected)
-                        : handleUploadCustomTime(e)
+                        : handleUploadNewCatalogOnSeat(e)
                     }
                   >
-                    Setting
+                    Upload
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

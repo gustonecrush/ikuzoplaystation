@@ -65,7 +65,7 @@ import Loading from '../components/loading'
 import { Fade } from 'react-awesome-reveal'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
-import { IoCalendarClear, IoLogOut, IoTime } from 'react-icons/io5'
+import { IoBook, IoCalendarClear, IoLogOut, IoTime } from 'react-icons/io5'
 import { formatDateOnTheUI, getCurrentDate, getMaxDate } from '@/utils/date'
 
 import { IoGameController, IoLaptopSharp } from 'react-icons/io5'
@@ -515,6 +515,12 @@ function page() {
             className="relative w-16 h-16 p-4 bg-yellow-100 flex items-center justify-center text-orange rounded-2xl mb-4"
           >
             <IoTime className="text-4xl" />
+          </a>
+          <a
+            href="/admin/dashboard/catalogs"
+            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
+          >
+            <IoBook className="text-4xl" />
           </a>
           <a
             href="/admin/dashboard/dates"

@@ -1,12 +1,13 @@
 import React from 'react'
 import Card from './Card'
-import { IoGameController } from 'react-icons/io5'
+import { IoEye, IoEyeOff, IoGameController } from 'react-icons/io5'
 import { MdAttachMoney } from 'react-icons/md'
 import { FaCircleCheck } from 'react-icons/fa6'
 import { RiCloseCircleFill } from 'react-icons/ri'
+import { IoMdEyeOff } from 'react-icons/io'
 
 export const Statistics = (total) => {
-  console.log({ total })
+  const [hideAmount, setHideAmount] = React.useState(true)
   return (
     <section className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 px-7">
       <Card extra="mt-6 px-3 py-5 items-center text-base bg-white shadow-md rounded-lg flex !flex-row w-full">
@@ -51,12 +52,20 @@ export const Statistics = (total) => {
         </div>
         <div>
           <span className="block text-2xl font-bold">
-            {' '}
-            IDR {total.total.prices}
+       {
+        hideAmount ? <span className='flex items-center gap-1 text-3xo cursor-pointer' onClick={(e) => setHideAmount(!hideAmount)}>
+          
+         -
+        </span> : <span className='flex flex-col gap-1'>{'IDR ' + (total.total.prices).toLocaleString('ID')} </span>
+       }
           </span>
-          <span className="block text-gray-500 text-sm">
-            Amount Success Payment
-          </span>
+          {
+            hideAmount ?  <span onClick={(e) => setHideAmount(!hideAmount)} className="flex gap-1 text-gray-500 text-sm items-center cursor-pointer">
+            <IoEye />  Unhide Amount Payment
+           
+          </span> :<span className='flex gap-1 text-gray-500 text-sm items-center cursor-pointer' onClick={(e) => setHideAmount(!hideAmount)}> <IoEyeOff /> Hide Amount Payment  </span>
+          }
+         
         </div>
       </Card>
     </section>

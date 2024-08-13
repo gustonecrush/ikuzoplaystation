@@ -9,6 +9,7 @@ export function middleware(request) {
       '/admin/dashboard/dates',
       '/admin/dashboard/reservations',
       '/admin/dashboard/times',
+      '/admin/dashboard/catalogs',
     ]
 
     if (protectedPaths.includes(request.nextUrl.pathname)) {
