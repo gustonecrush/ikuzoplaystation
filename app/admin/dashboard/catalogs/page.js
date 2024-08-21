@@ -79,9 +79,9 @@ function page() {
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
   // function to handle delete
-  const handleDeleteFacilityContent = async (id) => {
+  const handleDeleteCatalogData = async (id) => {
     try {
-      const response = await axios.delete(`${baseUrl}/dates/${id}`, {
+      const response = await axios.delete(`${baseUrl}/catalogs/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -96,7 +96,7 @@ function page() {
 
       Toast.fire({
         icon: 'success',
-        title: `Setting waktu berhasil dihapus!`,
+        title: `Catalog  berhasil dihapus!`,
       })
 
       getAllDataCatalogs()
@@ -108,7 +108,7 @@ function page() {
       if (error.code == 'ERR_NETWORK') {
         Toast.fire({
           icon: 'error',
-          title: `Setting waktu gagal dihapus!`,
+          title: `Catalog gagal dihapus!`,
         })
       } else {
         Toast.fire({
@@ -292,9 +292,7 @@ function page() {
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={(e) =>
-                    handleDeleteFacilityContent(row.getValue('id'))
-                  }
+                  onClick={(e) => handleDeleteCatalogData(row.getValue('id'))}
                 >
                   Continue
                 </AlertDialogAction>
@@ -320,7 +318,7 @@ function page() {
       },
       cell: ({ row }) => (
         <div className="w-full text-left">
-            Seat {row.getValue('no_seat')}
+          <span className="font-bold">Seat {row.getValue('no_seat')}</span>
           <p>{row.original.catalog_txt}</p>
         </div>
       ),
@@ -342,7 +340,14 @@ function page() {
       cell: ({ row }) => (
         <div className="w-fit text-center flex items-center">
           {' '}
-          <Image src={process.env.NEXT_PUBLIC_IMAGE_URL + row.getValue('catalog_img')} width={0} height={0} className='w-24' />
+          <Image
+            src={
+              process.env.NEXT_PUBLIC_IMAGE_URL + row.getValue('catalog_img')
+            }
+            width={0}
+            height={0}
+            className="w-24"
+          />
         </div>
       ),
     },
@@ -455,16 +460,12 @@ function page() {
     data.append('catalog_txt', catalogTxt)
 
     try {
-      const response = await axios.post(
-        `${baseUrl}/catalogs`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
+      const response = await axios.post(`${baseUrl}/catalogs`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
-      )
+      })
 
       Toast.fire({
         icon: 'success',
@@ -489,7 +490,6 @@ function page() {
       })
     }
   }
-
 
   const [
     openCreateReservationForm,
@@ -569,7 +569,7 @@ function page() {
               <div className="flex flex-col">
                 <h1 className="text-4xl font-semibold">Catalogs</h1>
                 <p className="text-base font-normal text-gray-400">
-                 Tambahkan catalog game pada setiap seat!
+                  Tambahkan catalog game pada setiap seat!
                 </p>
               </div>
             </Fade>
@@ -598,7 +598,8 @@ function page() {
                       variant="outline"
                       className="ml-auto"
                     >
-                      Tambahkan Catalog Game <IoMdAdd className="ml-2 h-4 w-4" />
+                      Tambahkan Catalog Game{' '}
+                      <IoMdAdd className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -651,7 +652,9 @@ function page() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Tambahkan Catalog</AlertDialogTitle>
                   <AlertDialogDescription>
-                    <p className="-mt-2">Upload Catalog Sebanyak - Banyaknya pada Seat Booking!</p>
+                    <p className="-mt-2">
+                      Upload Catalog Sebanyak - Banyaknya pada Seat Booking!
+                    </p>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <fieldset>
@@ -659,19 +662,18 @@ function page() {
                     <>
                       <div>
                         <label className="text-black" htmlFor="nama">
-                         No Seat
+                          No Seat
                         </label>
                         <input
-                              type="number"
-                              value={noSeat}
-                              onChange={(e) => setNoSeat(e.target.value)}
-                              name="no_seat"
-                              id="no_seat"
-                              placeholder="Masukkan No Seat"
-                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                            
-                              required
-                            />
+                          type="number"
+                          value={noSeat}
+                          onChange={(e) => setNoSeat(e.target.value)}
+                          name="no_seat"
+                          id="no_seat"
+                          placeholder="Masukkan No Seat"
+                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                          required
+                        />
                       </div>
 
                       <div>
@@ -679,30 +681,29 @@ function page() {
                           Catalog Text
                         </label>
                         <textarea
-                              type="text"
-                              value={catalogTxt}
-                              onChange={(e) => setCatalogTxt(e.target.value)}
-                              name="catalog_txt"
-                              id="catalog_txt"
-                              placeholder="Masukkan deskripsi catalog"
-                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                              
-                            ></textarea>
+                          type="text"
+                          value={catalogTxt}
+                          onChange={(e) => setCatalogTxt(e.target.value)}
+                          name="catalog_txt"
+                          id="catalog_txt"
+                          placeholder="Masukkan deskripsi catalog"
+                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                        ></textarea>
                       </div>
 
                       <div className="grid gap-4 py-0">
-                <div className="flex flex-col items-start gap-1">
-                <label className="text-black" htmlFor="nama">
-                          Catalog Image
-                        </label>
-                  <Input
-                    id="pict"
-                    onChange={handleFileChange}
-                    type="file"
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
+                        <div className="flex flex-col items-start gap-1">
+                          <label className="text-black" htmlFor="nama">
+                            Catalog Image
+                          </label>
+                          <Input
+                            id="pict"
+                            onChange={handleFileChange}
+                            type="file"
+                            className="col-span-3"
+                          />
+                        </div>
+                      </div>
                     </>
                   </form>
                 </fieldset>
