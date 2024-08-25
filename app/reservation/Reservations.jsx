@@ -1117,7 +1117,8 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0 ? (
+                                    {reserves.length > 0 &&
+                                    drawerContent === 'default' ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">
@@ -1440,7 +1441,8 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0 ? (
+                                    {reserves.length > 0 &&
+                                    drawerContent === 'default' ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">
@@ -1762,7 +1764,8 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0 ? (
+                                    {reserves.length > 0 &&
+                                    drawerContent === 'default' ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">

@@ -95,11 +95,20 @@ import {
   IoDocument,
   IoGameControllerSharp,
   IoLogOut,
+  IoMoveOutline,
   IoTime,
 } from 'react-icons/io5'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import Link from 'next/link'
-import { convertToDate, formatDate, formatDateOnTheUI } from '@/utils/date'
+import {
+  convertToDate,
+  formatDate,
+  formatDateOnTheUI,
+  generateTimeArray,
+  generateTimeArrayWithStep,
+  getCurrentDate,
+  getMaxDate,
+} from '@/utils/date'
 
 import {
   IoGameController,
@@ -119,6 +128,33 @@ function page() {
     )
 
     setData(filteredData)
+  }
+
+  const [reservesPosition, setReservesPosition] = React.useState([])
+
+  const getAllReservationsPositon = async (date) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/reservations?reserve_date=${date}`,
+      )
+      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        setReservesPosition(jsonData)
+        console.log(response.data)
+
+        setIsLoading(false)
+      } else {
+        setIsLoading(false)
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+
+      setIsLoading(false)
+    }
   }
 
   const [total, setTotal] = React.useState({
@@ -179,10 +215,129 @@ function page() {
     }
   }
 
+  const [openFormMoveCustomer, setOpenFormMoveCustomer] = React.useState(false)
+  const [idSelectedMove, setIdSelectedMove] = React.useState('')
+  const [selectedReservationMove, setSelectedReservationMove] = React.useState(
+    [],
+  )
+  const [maxDateMove, setMaxDateMove] = React.useState(getMaxDate)
+  const [dateMove, setDateMove] = React.useState(null)
+  const [selectedDateMove, setSelectedDateMove] = React.useState('')
+  const [currentDateMove, setCurrentDateMove] = React.useState(getCurrentDate)
+
+  const [startTimeReservasi, setStartTimeReservasi] = React.useState('')
+  const [endTimeReservasi, setEndTimeReservasi] = React.useState('')
+  const [customTimeSelected, setCustomTimeSelected] = React.useState([])
+
+  const getTimeSelected = async (date) => {
+    try {
+      const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
+      console.log(`${baseUrl}/times?selected_date=${date}`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        if (jsonData.data.length > 0) {
+          setCustomTimeSelected(jsonData.data)
+        } else {
+          setCustomTimeSelected([])
+        }
+
+        console.log({ customTimeSelected })
+      } else {
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+      setIsLoading(false)
+    }
+  }
+
+  const [bookedSlots, setBookedSlots] = React.useState([])
+
+  const timeArray = generateTimeArrayWithStep(startTimeReservasi, bookedSlots)
+
+  const fetchingAvailableReservation = async (date, position) => {
+    console.log('fetching')
+    getAllReservation(date, position)
+    console.log('fetching', reserves)
+  }
+
+  const handleGetReservationById = async (id) => {
+    try {
+      const response = await axios.get(
+        process.env.NEXT_PUBLIC_BASE_URL + '/reservations?reserve_id=' + id,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        setSelectedReservationMove(jsonData)
+        setSelectedDateMove(jsonData[0].reserve_date)
+        setStartTimeReservasi(jsonData[0].reserve_start_time)
+        setEndTimeReservasi(jsonData[0].reserve_end_time)
+        setDateMove(jsonData[0].reserve_date)
+        const nextDay = addDays(jsonData[0].reserve_date, 1)
+        getAllReservationsPositon(nextDay.toISOString().split('T')[0])
+        getTimeSelected(nextDay.toISOString().split('T')[0])
+        fetchingAvailableReservation(
+          jsonData[0].reserve_date,
+          jsonData[0].position,
+        )
+        console.log({ jsonData })
+        setIsLoading(false)
+        setOpenFormMoveCustomer(!openFormMoveCustomer)
+        console.log({ startTimeReservasi })
+      } else {
+        setIsLoading(false)
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      setIsLoading(false)
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
+  console.log({ customTimeSelected })
+  console.log({ bookedSlots })
+  console.log({ startTimeReservasi })
+
   const handleOpenUpdate = (id) => {
     setIdSelected(id)
     setOpenUpdate(true)
   }
+
+  const [dateClose, setDateClose] = React.useState([])
+
+  const getDateClosed = async (date) => {
+    try {
+      const response = await axios.get(`${baseUrl}/dates`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        setDateClose(jsonData.data)
+
+        console.log({ customTimeSelected })
+      } else {
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+      setIsLoading(false)
+    }
+  }
+
   const handleUpdateFacilityContent = async (id) => {
     const payload = {
       status_payment: statusPlaying,
@@ -231,7 +386,7 @@ function page() {
   }
   const columns = [
     {
-      accessorKey: 'reserve_id',
+      accessorKey: 'id',
       header: ({ column }) => {
         return (
           <Button
@@ -269,6 +424,15 @@ function page() {
             className="border-black border-opacity-5 bg-black bg-opacity-10 text-xs text-black"
           >
             <IoIosInformationCircle className="h-4 w-4" /> Info
+          </Button>
+          <Button
+            variant="outline"
+            onClick={(e) => {
+              handleGetReservationById(row.original.reserve_id)
+            }}
+            className="border-blue-500 border-opacity-5 bg-blue-500 bg-opacity-10 text-xs text-blue-500"
+          >
+            <IoMoveOutline className="h-4 w-4" /> Move
           </Button>
           <Button
             onClick={(e) => handleOpenUpdate(row.getValue('reserve_id'))}
@@ -311,7 +475,7 @@ function page() {
       ),
     },
     {
-      accessorKey: 'reserve_id',
+      accessorKey: 'id',
       header: ({ column }) => {
         return (
           <Button
@@ -326,7 +490,7 @@ function page() {
       },
       cell: ({ row }) => (
         <div className={`text-center capitalize`}>
-          {row.getValue('reserve_id')}
+          {row.original.reserve_id}
         </div>
       ),
     },
@@ -660,6 +824,7 @@ function page() {
   const router = useRouter()
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
+  const [reserves, setReserves] = React.useState([])
 
   const handleLogout = async () => {
     try {
@@ -772,6 +937,36 @@ function page() {
     }
   }
 
+  const getAllReservation = async (date, position) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
+      )
+      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        setReserves(jsonData)
+        const slots = jsonData.map((reserve) => ({
+          startTime: reserve.reserve_start_time,
+          endTime: reserve.reserve_end_time,
+        }))
+        setBookedSlots(slots)
+        console.log(response.data)
+
+        setIsLoading(false)
+      } else {
+        setIsLoading(false)
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+
+      setIsLoading(false)
+    }
+  }
+
   const [
     openCreateReservationForm,
     setOpenCreateReservationForm,
@@ -781,9 +976,24 @@ function page() {
   const [dateStart, setDateStart] = React.useState(null)
   const [dateEnd, setDateEnd] = React.useState(null)
 
+  const disableTimes =
+    reserves.length > 0
+      ? reserves
+          .map((reserve) => {
+            if (reserve.reserve_end_time) {
+              const [hour, minute, second] = reserve.reserve_end_time.split(':')
+              const formattedTime = `${hour}:${minute}`
+              return formattedTime
+            }
+            return null
+          })
+          .filter((time) => time !== null)
+      : []
+
   React.useEffect(() => {
     getAllDataReservations()
     getAllDataStatistics()
+    getDateClosed()
   }, [])
 
   return (
@@ -1080,6 +1290,236 @@ function page() {
                   </div>
                 </div>
               </Card>
+
+              <AlertDialog className="bg-black/20" open={openFormMoveCustomer}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Move Reservation Seat/Schedule
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Pastikan tempat dan waktu pindah belum terisi oleh
+                      customer lain!
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <fieldset>
+                    <form>
+                      <div className="flex flex-col gap-2 mb-2">
+                        <label className="text-black" htmlFor="nama">
+                          Tanggal Reservasi
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <input
+                              type="text"
+                              value={selectedDateMove}
+                              onChange={(e) =>
+                                setSelectedDateMove(e.target.value)
+                              }
+                              name="tanggal_reservasi"
+                              id="tanggal_reservasi"
+                              placeholder="Pilih tanggal reservasi"
+                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                              min={currentDateMove}
+                              max={maxDateMove}
+                              required
+                            />
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={selectedDateMove}
+                              onSelect={(date) => {
+                                setDateMove(date)
+                                const nextDay = addDays(date, 1)
+                                setSelectedDateMove(
+                                  nextDay.toISOString().split('T')[0],
+                                )
+                                getAllReservationsPositon(
+                                  nextDay.toISOString().split('T')[0],
+                                )
+                                getTimeSelected(
+                                  nextDay.toISOString().split('T')[0],
+                                )
+                              }}
+                              disabled={(date) =>
+                                dateClose.length !== 0
+                                  ? date > addDays(new Date(), 15) ||
+                                    date < subDays(new Date(), 1) ||
+                                    (date.getDate() >=
+                                      convertToDate(dateClose[0]?.start_date) &&
+                                      date.getDate() <=
+                                        convertToDate(dateClose[0]?.end_date))
+                                  : date > addDays(new Date(), 15) ||
+                                    date < subDays(new Date(), 1)
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <label className="text-black" htmlFor="nama">
+                        Fasilitas
+                      </label>
+                      <Select
+                        value={statusPlaying}
+                        onValueChange={(value) => setStatusPlaying(value)}
+                        required
+                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 mt-3 "
+                      >
+                        <SelectTrigger className="py-5 px-3 text-base text-black">
+                          <SelectValue
+                            className="text-base text-black placeholder:text-black"
+                            placeholder="Pilih Fasilitas"
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup className="">
+                            <SelectLabel className="text-base">
+                              Fasilitas
+                            </SelectLabel>
+                            <SelectItem
+                              className="text-base"
+                              value="PS5 Reguler"
+                            >
+                              PS5 Reguler
+                            </SelectItem>
+                            <SelectItem
+                              className="text-base"
+                              value="PS5 Reguler+"
+                            >
+                              PS5 Reguler+
+                            </SelectItem>
+                            <SelectItem className="text-base" value="Simulator">
+                              Simulator
+                            </SelectItem>
+                            <SelectItem
+                              className="text-base"
+                              value="Playstation 2"
+                            >
+                              Playstation 2
+                            </SelectItem>
+                            <SelectItem className="text-base" value="VIP Room">
+                              VIP Room
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {selectedDateMove != '' && (
+                        <div className="flex gap-1 w-full mt-2 mb-3">
+                          <div className="flex flex-col gap-2 w-full flex-1">
+                            <label htmlFor="nama" className="text-sm">
+                              Start Time
+                            </label>
+                            <Select
+                              value={startTimeReservasi}
+                              onValueChange={(value) =>
+                                setStartTimeReservasi(value)
+                              }
+                              required
+                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                            >
+                              <SelectTrigger className="py-5 px-3 text-sm">
+                                <SelectValue
+                                  className="text-base"
+                                  placeholder="00.00"
+                                />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel className="text-sm">
+                                    Pilih Waktu Mulai
+                                  </SelectLabel>
+                                  {generateTimeArray(
+                                    customTimeSelected,
+                                    selectedDateMove,
+                                    bookedSlots,
+                                  ).map((time, index) => (
+                                    <SelectItem key={index} value={time}>
+                                      {time}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex flex-col gap-2 w-full flex-1">
+                            <label htmlFor="nama" className="text-sm">
+                              End Time
+                            </label>
+                            <Select
+                              value={endTimeReservasi}
+                              onValueChange={(value) =>
+                                setEndTimeReservasi(value)
+                              }
+                              required
+                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                            >
+                              <SelectTrigger className="py-5 px-3 text-sm">
+                                <SelectValue
+                                  className="text-base"
+                                  placeholder="00.00"
+                                />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel className="text-sm">
+                                    Pilih Waktu Berakhir
+                                  </SelectLabel>
+                                  {startTimeReservasi != '' &&
+                                  timeArray.length != 0 ? (
+                                    generateTimeArrayWithStep(
+                                      startTimeReservasi,
+                                      bookedSlots,
+                                    ).map((time, index) => {
+                                      const isDisabled = disableTimes.includes(
+                                        time,
+                                      )
+
+                                      return (
+                                        <SelectItem
+                                          key={index}
+                                          value={time}
+                                          className={'text-sm'}
+                                          disabled={isDisabled}
+                                        >
+                                          {time}
+                                        </SelectItem>
+                                      )
+                                    })
+                                  ) : (
+                                    <SelectItem value={'00.00'}>
+                                      <p className="text-gray-500">
+                                        Waktu yang kamu pilih <br />
+                                        sudah terisi. Silakan <br />
+                                        pilih waktu bermain <br />
+                                        di jam yang lain
+                                      </p>
+                                    </SelectItem>
+                                  )}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      )}
+                    </form>
+                  </fieldset>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel
+                      onClick={(e) => setOpenFormMoveCustomer(false)}
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={(e) => handleUpdateFacilityContent(idSelected)}
+                    >
+                      Update
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
 
               <AlertDialog className="bg-black/20" open={openUpdate}>
                 <AlertDialogContent>

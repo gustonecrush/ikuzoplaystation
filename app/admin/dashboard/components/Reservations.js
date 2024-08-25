@@ -86,9 +86,10 @@ export default function Reservation() {
   const [selectedPay, setSelectedPay] = React.useState('')
   const [pricePerReserve, setPricePerReserve] = React.useState(0)
 
+  const [reservesPosition, setReservesPosition] = useState([])
   const [reserves, setReserves] = useState([])
   const [bookedSlots, setBookedSlots] = useState([])
-  const [reservesPosition, setReservesPosition] = useState([])
+
   const timeArray = generateTimeArrayWithStep(startTimeReservasi, bookedSlots)
 
   const [open, setOpen] = React.useState(false)
