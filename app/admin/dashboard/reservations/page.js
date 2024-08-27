@@ -264,6 +264,7 @@ function page() {
   }
 
   const handleGetReservationById = async (id) => {
+    setIdSelected(id)
     try {
       const response = await axios.get(
         process.env.NEXT_PUBLIC_BASE_URL + '/reservations?reserve_id=' + id,
@@ -335,6 +336,55 @@ function page() {
     } catch (error) {
       console.log(error)
       setIsLoading(false)
+    }
+  }
+
+  const handleChangeSeatCustomer = async (id) => {
+    const data = new FormData()
+    data.append('location', typeSeatPlaying)
+    data.append('position', selectedSeat)
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/reservations/seat/${idSelected}`,
+        data,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+        console.log({ jsonData })
+      } else {
+        console.error({ error })
+        throw new Error('Failed to fetch data')
+      }
+
+      Toast.fire({
+        icon: 'success',
+        title: `Data reservasi berhasil diupdate!`,
+      })
+
+      getAllDataReservations()
+      getAllDataStatistics()
+
+      setStatusPlaying('')
+      setOpenUpdate(false)
+      setIdSelected('')
+      setOpenFormMoveCustomer(!openFormMoveCustomer)
+    } catch (error) {
+      console.error({ error })
+      setStatusPlaying('')
+
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data reservasi gagal diupdate!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+      setOpenUpdate(false)
     }
   }
 
@@ -545,13 +595,12 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
-              row.getValue('status_reserve') == 'settlement'
-                ? 'border-green-500 bg-green-500 text-green-600'
-                : row.getValue('status_reserve') == 'pending'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_reserve') == 'settlement'
+              ? 'border-green-500 bg-green-500 text-green-600'
+              : row.getValue('status_reserve') == 'pending'
                 ? 'border-yellow-500 bg-yellow-500 text-yellow-500'
                 : 'border-red-500 bg-red-500 text-red-500'
-            }`}
+              }`}
           >
             {' '}
             {row.getValue('status_reserve') == 'settlement' && <MdPaid />}
@@ -585,13 +634,12 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
-              row.getValue('status_payment') == 'done'
-                ? 'border-blue-500 bg-blue-500 text-blue-600'
-                : row.getValue('status_payment') == 'not playing'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_payment') == 'done'
+              ? 'border-blue-500 bg-blue-500 text-blue-600'
+              : row.getValue('status_payment') == 'not playing'
                 ? 'border-purple-400 bg-purple-500 text-purple-600'
                 : 'border-gray-500 bg-gray-500 text-gray-700'
-            }`}
+              }`}
           >
             {' '}
             {row.getValue('status_payment') == 'playing' && (
@@ -976,18 +1024,21 @@ function page() {
   const [dateStart, setDateStart] = React.useState(null)
   const [dateEnd, setDateEnd] = React.useState(null)
 
+  const [typeSeatPlaying, setTypeSeatPlaying] = React.useState('')
+  const [selectedSeat, setSelectedSeat] = React.useState('')
+
   const disableTimes =
     reserves.length > 0
       ? reserves
-          .map((reserve) => {
-            if (reserve.reserve_end_time) {
-              const [hour, minute, second] = reserve.reserve_end_time.split(':')
-              const formattedTime = `${hour}:${minute}`
-              return formattedTime
-            }
-            return null
-          })
-          .filter((time) => time !== null)
+        .map((reserve) => {
+          if (reserve.reserve_end_time) {
+            const [hour, minute, second] = reserve.reserve_end_time.split(':')
+            const formattedTime = `${hour}:${minute}`
+            return formattedTime
+          }
+          return null
+        })
+        .filter((time) => time !== null)
       : []
 
   React.useEffect(() => {
@@ -1304,7 +1355,7 @@ function page() {
                   </AlertDialogHeader>
                   <fieldset>
                     <form>
-                      <div className="flex flex-col gap-2 mb-2">
+                      {/* <div className="flex flex-col gap-2 mb-2">
                         <label className="text-black" htmlFor="nama">
                           Tanggal Reservasi
                         </label>
@@ -1357,13 +1408,13 @@ function page() {
                             />
                           </PopoverContent>
                         </Popover>
-                      </div>
+                      </div> */}
                       <label className="text-black" htmlFor="nama">
                         Fasilitas
                       </label>
                       <Select
-                        value={statusPlaying}
-                        onValueChange={(value) => setStatusPlaying(value)}
+                        value={typeSeatPlaying}
+                        onValueChange={(value) => setTypeSeatPlaying(value)}
                         required
                         className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 mt-3 "
                       >
@@ -1405,7 +1456,102 @@ function page() {
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      {selectedDateMove != '' && (
+                      <label className="text-black mt-3" htmlFor="nama">
+                        Seat Number
+                      </label>
+                      <Select
+                        value={selectedSeat}
+                        onValueChange={(value) => setSelectedSeat(value)}
+                        required
+                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 mt-3 "
+                      >
+                        <SelectTrigger className="py-5 px-3 text-base text-black">
+                          <SelectValue
+                            className="text-base text-black placeholder:text-black"
+                            placeholder="Pilih Fasilitas"
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup className="">
+                            <SelectLabel className="text-base">
+                              Seat Number
+                            </SelectLabel>
+                            {
+                              typeSeatPlaying == 'PS5 Reguler' && <>
+                                <SelectItem
+                                  className="text-base"
+                                  value="1"
+                                >
+                                  1
+                                </SelectItem>
+                                <SelectItem
+                                  className="text-base"
+                                  value="2"
+                                >
+                                  2
+                                </SelectItem>
+                                <SelectItem
+                                  className="text-base"
+                                  value="3"
+                                >
+                                  3
+                                </SelectItem>
+                                <SelectItem
+                                  className="text-base"
+                                  value="4"
+                                >
+                                  4
+                                </SelectItem>
+                                <SelectItem
+                                  className="text-base"
+                                  value="5"
+                                >
+                                  5
+                                </SelectItem>
+                                <SelectItem
+                                  className="text-base"
+                                  value="8"
+                                >
+                                  8
+                                </SelectItem>
+                              </>
+                            }
+                            {
+                              typeSeatPlaying == 'Simulator' && <>
+                                <SelectItem className="text-base" value="6">
+                                  6
+                                </SelectItem>  <SelectItem className="text-base" value="7">
+                                  7
+                                </SelectItem></>
+                            }
+                            {
+                              typeSeatPlaying == 'PS5 Reguler+' && <>
+                                <SelectItem className="text-base" value="6">
+                                  10
+                                </SelectItem>  <SelectItem className="text-base" value="7">
+                                  11
+                                </SelectItem></>
+                            }
+                            {
+                              typeSeatPlaying == 'Playstation 2' && <SelectItem
+                                className="text-base"
+                                value="9"
+                              >
+                                9
+                              </SelectItem>
+                            }
+                            {
+                              typeSeatPlaying == 'VIP Room' && <SelectItem
+                                className="text-base"
+                                value="12"
+                              >
+                                12
+                              </SelectItem>
+                            }
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {/* {selectedDateMove != '' && (
                         <div className="flex gap-1 w-full mt-2 mb-3">
                           <div className="flex flex-col gap-2 w-full flex-1">
                             <label htmlFor="nama" className="text-sm">
@@ -1502,7 +1648,7 @@ function page() {
                             </Select>
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </form>
                   </fieldset>
 
@@ -1513,7 +1659,7 @@ function page() {
                       Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={(e) => handleUpdateFacilityContent(idSelected)}
+                      onClick={(e) => handleChangeSeatCustomer(idSelected)}
                     >
                       Update
                     </AlertDialogAction>

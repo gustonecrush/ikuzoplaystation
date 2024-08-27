@@ -1062,43 +1062,31 @@ export default function Reservation() {
                                         </div>
                                       </div>
                                     ) : catalogs.length > 0 ? (
-                                      <Swiper
-                                        effect={'coverflow'}
-                                        grabCursor={true}
-                                        centeredSlides={true}
-                                        slidesPerView={'auto'}
-                                        initialSlide={2}
-                                        coverflowEffect={{
-                                          rotate: 50,
-                                          stretch: 0,
-                                          depth: 100,
-                                          modifier: 1,
-                                          slideShadows: true,
-                                        }}
-                                        pagination={true}
-                                        modules={[EffectCoverflow, Pagination]}
-                                        className="mySwiper -mt-12"
+                                      <div
+                                        className={`grid grid-cols-3 gap-4  ${
+                                          catalogs.length > 9
+                                            ? 'h-[350px]'
+                                            : 'h-fit'
+                                        } overflow-y-scroll py-4 px-7`}
                                       >
                                         {catalogs.map((catalog, index) => (
-                                          <SwiperSlide
+                                          <div
                                             key={index}
-                                            className="w-fit small"
+                                            className="flex flex-col gap-2 items-center justify-center"
                                           >
-                                            <div className="flex flex-col gap-2 items-center justify-center">
-                                              <Image
-                                                alt={catalog.catalog_img}
-                                                width={0}
-                                                height={0}
-                                                className="rounded-lg md:!w-[300px] md:!h-[300px]"
-                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                              />
-                                              <p className="text-gray-500 text-sm text-center">
-                                                {catalog.catalog_txt}
-                                              </p>
-                                            </div>
-                                          </SwiperSlide>
+                                            <Image
+                                              alt={catalog.catalog_img}
+                                              width={0}
+                                              height={0}
+                                              className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                            />
+                                            <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                              {catalog.catalog_txt}
+                                            </p>
+                                          </div>
                                         ))}
-                                      </Swiper>
+                                      </div>
                                     ) : (
                                       <div className="w-full mt-10 mb-8  flex items-center justify-center">
                                         <div className="flex flex-col gap-1 items-center justify-center">
@@ -1386,43 +1374,31 @@ export default function Reservation() {
                                         </div>
                                       </div>
                                     ) : catalogs.length > 0 ? (
-                                      <Swiper
-                                        effect={'coverflow'}
-                                        grabCursor={true}
-                                        centeredSlides={true}
-                                        slidesPerView={'auto'}
-                                        initialSlide={2}
-                                        coverflowEffect={{
-                                          rotate: 50,
-                                          stretch: 0,
-                                          depth: 100,
-                                          modifier: 1,
-                                          slideShadows: true,
-                                        }}
-                                        pagination={true}
-                                        modules={[EffectCoverflow, Pagination]}
-                                        className="mySwiper -mt-12"
+                                      <div
+                                        className={`grid grid-cols-3 gap-4  ${
+                                          catalogs.length > 9
+                                            ? 'h-[350px]'
+                                            : 'h-fit'
+                                        } overflow-y-scroll py-4 px-7`}
                                       >
                                         {catalogs.map((catalog, index) => (
-                                          <SwiperSlide
+                                          <div
                                             key={index}
-                                            className="w-fit small"
+                                            className="flex flex-col gap-2 items-center justify-center"
                                           >
-                                            <div className="flex flex-col gap-2 items-center justify-center">
-                                              <Image
-                                                alt={catalog.catalog_img}
-                                                width={0}
-                                                height={0}
-                                                className="rounded-lg md:!w-[300px] md:!h-[300px]"
-                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                              />
-                                              <p className="text-gray-500 text-sm text-center">
-                                                {catalog.catalog_txt}
-                                              </p>
-                                            </div>
-                                          </SwiperSlide>
+                                            <Image
+                                              alt={catalog.catalog_img}
+                                              width={0}
+                                              height={0}
+                                              className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                            />
+                                            <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                              {catalog.catalog_txt}
+                                            </p>
+                                          </div>
                                         ))}
-                                      </Swiper>
+                                      </div>
                                     ) : (
                                       <div className="w-full mt-10 mb-8  flex items-center justify-center">
                                         <div className="flex flex-col gap-1 items-center justify-center">
@@ -1709,43 +1685,31 @@ export default function Reservation() {
                                         </div>
                                       </div>
                                     ) : catalogs.length > 0 ? (
-                                      <Swiper
-                                        effect={'coverflow'}
-                                        grabCursor={true}
-                                        centeredSlides={true}
-                                        slidesPerView={'auto'}
-                                        initialSlide={2}
-                                        coverflowEffect={{
-                                          rotate: 50,
-                                          stretch: 0,
-                                          depth: 100,
-                                          modifier: 1,
-                                          slideShadows: true,
-                                        }}
-                                        pagination={true}
-                                        modules={[EffectCoverflow, Pagination]}
-                                        className="mySwiper -mt-12"
-                                      >
-                                        {catalogs.map((catalog, index) => (
-                                          <SwiperSlide
-                                            key={index}
-                                            className="w-fit small"
-                                          >
-                                            <div className="flex flex-col gap-2 items-center justify-center">
-                                              <Image
-                                                alt={catalog.catalog_img}
-                                                width={0}
-                                                height={0}
-                                                className="rounded-lg md:!w-[300px] md:!h-[300px]"
-                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                              />
-                                              <p className="text-gray-500 text-sm text-center">
-                                                {catalog.catalog_txt}
-                                              </p>
-                                            </div>
-                                          </SwiperSlide>
-                                        ))}
-                                      </Swiper>
+                                      <div
+                                      className={`grid grid-cols-3 gap-4  ${
+                                        catalogs.length > 9
+                                          ? 'h-[350px]'
+                                          : 'h-fit'
+                                      } overflow-y-scroll py-4 px-7`}
+                                    >
+                                      {catalogs.map((catalog, index) => (
+                                        <div
+                                          key={index}
+                                          className="flex flex-col gap-2 items-center justify-center"
+                                        >
+                                          <Image
+                                            alt={catalog.catalog_img}
+                                            width={0}
+                                            height={0}
+                                            className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                          />
+                                          <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                            {catalog.catalog_txt}
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </div>
                                     ) : (
                                       <div className="w-full mt-10 mb-8  flex items-center justify-center">
                                         <div className="flex flex-col gap-1 items-center justify-center">
@@ -2040,43 +2004,31 @@ export default function Reservation() {
                                         </div>
                                       </div>
                                     ) : catalogs.length > 0 ? (
-                                      <Swiper
-                                        effect={'coverflow'}
-                                        grabCursor={true}
-                                        centeredSlides={true}
-                                        slidesPerView={'auto'}
-                                        initialSlide={2}
-                                        coverflowEffect={{
-                                          rotate: 50,
-                                          stretch: 0,
-                                          depth: 100,
-                                          modifier: 1,
-                                          slideShadows: true,
-                                        }}
-                                        pagination={true}
-                                        modules={[EffectCoverflow, Pagination]}
-                                        className="mySwiper -mt-12"
-                                      >
-                                        {catalogs.map((catalog, index) => (
-                                          <SwiperSlide
-                                            key={index}
-                                            className="w-fit small"
-                                          >
-                                            <div className="flex flex-col gap-2 items-center justify-center">
-                                              <Image
-                                                alt={catalog.catalog_img}
-                                                width={0}
-                                                height={0}
-                                                className="rounded-lg md:!w-[300px] md:!h-[300px]"
-                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                              />
-                                              <p className="text-gray-500 text-sm text-center">
-                                                {catalog.catalog_txt}
-                                              </p>
-                                            </div>
-                                          </SwiperSlide>
-                                        ))}
-                                      </Swiper>
+                                      <div
+                                      className={`grid grid-cols-3 gap-4  ${
+                                        catalogs.length > 9
+                                          ? 'h-[350px]'
+                                          : 'h-fit'
+                                      } overflow-y-scroll py-4 px-7`}
+                                    >
+                                      {catalogs.map((catalog, index) => (
+                                        <div
+                                          key={index}
+                                          className="flex flex-col gap-2 items-center justify-center"
+                                        >
+                                          <Image
+                                            alt={catalog.catalog_img}
+                                            width={0}
+                                            height={0}
+                                            className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                          />
+                                          <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                            {catalog.catalog_txt}
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </div>
                                     ) : (
                                       <div className="w-full mt-10 mb-8  flex items-center justify-center">
                                         <div className="flex flex-col gap-1 items-center justify-center">
@@ -2376,43 +2328,31 @@ export default function Reservation() {
                                         {/* Reserved Times, Start Time, End Time code here */}
                                       </div>
                                     ) : catalogs.length > 0 ? (
-                                      <Swiper
-                                        effect={'coverflow'}
-                                        grabCursor={true}
-                                        centeredSlides={true}
-                                        slidesPerView={'auto'}
-                                        initialSlide={2}
-                                        coverflowEffect={{
-                                          rotate: 50,
-                                          stretch: 0,
-                                          depth: 100,
-                                          modifier: 1,
-                                          slideShadows: true,
-                                        }}
-                                        pagination={true}
-                                        modules={[EffectCoverflow, Pagination]}
-                                        className="mySwiper -mt-12"
-                                      >
-                                        {catalogs.map((catalog, index) => (
-                                          <SwiperSlide
-                                            key={index}
-                                            className="w-fit small"
-                                          >
-                                            <div className="flex flex-col gap-2 items-center justify-center">
-                                              <Image
-                                                alt={catalog.catalog_img}
-                                                width={0}
-                                                height={0}
-                                                className="rounded-lg md:!w-[300px] md:!h-[300px]"
-                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                              />
-                                              <p className="text-gray-500 text-sm text-center">
-                                                {catalog.catalog_txt}
-                                              </p>
-                                            </div>
-                                          </SwiperSlide>
-                                        ))}
-                                      </Swiper>
+                                      <div
+                                      className={`grid grid-cols-3 gap-4  ${
+                                        catalogs.length > 9
+                                          ? 'h-[350px]'
+                                          : 'h-fit'
+                                      } overflow-y-scroll py-4 px-7`}
+                                    >
+                                      {catalogs.map((catalog, index) => (
+                                        <div
+                                          key={index}
+                                          className="flex flex-col gap-2 items-center justify-center"
+                                        >
+                                          <Image
+                                            alt={catalog.catalog_img}
+                                            width={0}
+                                            height={0}
+                                            className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                          />
+                                          <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                            {catalog.catalog_txt}
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </div>
                                     ) : (
                                       <div className="w-full mt-10 mb-8  flex items-center justify-center">
                                         <div className="flex flex-col gap-1 items-center justify-center">
