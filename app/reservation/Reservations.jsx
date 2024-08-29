@@ -790,8 +790,7 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0 &&
-                                    drawerContent === 'default' ? (
+                                    {reserves.length > 0  ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">
@@ -1105,8 +1104,7 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0 &&
-                                    drawerContent === 'default' ? (
+                                    {reserves.length > 0  ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">
@@ -1417,8 +1415,7 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0 &&
-                                    drawerContent === 'default' ? (
+                                    {reserves.length > 0  ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">
@@ -1728,8 +1725,7 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0 &&
-                                    drawerContent === 'default' ? (
+                                    {reserves.length > 0  ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">
@@ -2370,6 +2366,121 @@ export default function Reservation() {
                                         </div>
                                       </div>
                                     )}
+
+{drawerContent === 'default' && (
+                                      <Fade className="px-5 ">
+                                        <div className="flex gap-1 w-full mt-2 mb-3">
+                                          <div className="flex flex-col gap-2 w-full flex-1">
+                                            <label
+                                              htmlFor="nama"
+                                              className="text-sm"
+                                            >
+                                              Start Time
+                                            </label>
+                                            <Select
+                                              value={startTimeReservasi}
+                                              onValueChange={(value) =>
+                                                setStartTimeReservasi(value)
+                                              }
+                                              required
+                                              className="border border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg !px-3 !py-4"
+                                            >
+                                              <SelectTrigger className="py-5 px-3 text-sm">
+                                                <SelectValue
+                                                  className="text-base"
+                                                  placeholder="00.00"
+                                                />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectGroup>
+                                                  <SelectLabel className="text-sm">
+                                                    Pilih Waktu Mulai
+                                                  </SelectLabel>
+                                                  {generateTimeArray(
+                                                    customTimeSelected,
+                                                    selectedDate,
+                                                    bookedSlots,
+                                                  ).map((time, index) => (
+                                                    <SelectItem
+                                                      key={index}
+                                                      value={time}
+                                                    >
+                                                      {time}
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectGroup>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                          <div className="flex flex-col gap-2 w-full flex-1">
+                                            <label
+                                              htmlFor="nama"
+                                              className="text-sm"
+                                            >
+                                              End Time
+                                            </label>
+                                            <Select
+                                              value={endTimeReservasi}
+                                              onValueChange={(value) =>
+                                                setEndTimeReservasi(value)
+                                              }
+                                              required
+                                              className="border border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg !px-3 !py-4"
+                                            >
+                                              <SelectTrigger className="py-5 px-3 text-sm">
+                                                <SelectValue
+                                                  className="text-base"
+                                                  placeholder="00.00"
+                                                />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                <SelectGroup>
+                                                  <SelectLabel className="text-sm">
+                                                    Pilih Waktu Berakhir
+                                                  </SelectLabel>
+                                                  {startTimeReservasi != '' &&
+                                                  timeArray.length != 0 ? (
+                                                    generateTimeArrayWithStep(
+                                                      startTimeReservasi,
+                                                      bookedSlots,
+                                                      customTimeSelected,
+                                                    ).map((time, index) => {
+                                                      const isDisabled = disableTimes.includes(
+                                                        time,
+                                                      )
+
+                                                      return (
+                                                        <SelectItem
+                                                          key={index}
+                                                          value={time}
+                                                          className={'text-sm'}
+                                                          disabled={isDisabled}
+                                                        >
+                                                          {time}
+                                                        </SelectItem>
+                                                      )
+                                                    })
+                                                  ) : (
+                                                    <SelectItem value={'00.00'}>
+                                                      <p className="text-gray-500">
+                                                        Waktu yang kamu pilih
+                                                        <br />
+                                                        sudah terisi. Silakan
+                                                        <br />
+                                                        pilih waktu bermain{' '}
+                                                        <br />
+                                                        di jam yang lain
+                                                      </p>
+                                                    </SelectItem>
+                                                  )}
+                                                </SelectGroup>
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
+                                        </div>
+                                      </Fade>
+                                    )}
+
 
                                     <DrawerFooter className="pt-2">
                                       {drawerContent === 'default' ? (
