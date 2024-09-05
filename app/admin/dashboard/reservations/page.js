@@ -949,7 +949,7 @@ function page() {
     }
   }
 
-  const exportToExcel = () => {
+  const exportToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data)
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Reservations')
@@ -1014,6 +1014,41 @@ function page() {
       setIsLoading(false)
     }
   }
+
+  const [dateStartExport, setDateStartExport] = React.useState(null)
+  const [dateEndExport, setDateEndExport] = React.useState(null)
+  const [reservationExport, setReservationExport] = React.useState([])
+
+  const handleExportData = async () => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/reservations?date_start=${dateStartExport}&date_end=${dateEndExport}`,
+      )
+      if (response.status == 200) {
+        const jsonData = await response.data
+
+        setReservationExport(jsonData)
+        console.log(response.data)
+
+        setIsLoading(false)
+        exportToExcel(jsonData)
+      } else {
+        setIsLoading(false)
+        console.log({ response })
+        throw new Error('Failed to fetch data')
+      }
+    } catch (error) {
+      console.log(error)
+      Toast.fire({
+        icon: 'error',
+        title: `Internal server sedang error, coba lagi nanti!`,
+      })
+      setIsLoading(false)
+    }
+  }
+
+  console.log({ dateStartExport })
+  console.log({ dateEndExport })
 
   const [
     openCreateReservationForm,
@@ -1219,16 +1254,14 @@ function page() {
                                 selected={dateStart}
                                 onSelect={(date) => {
                                   setDateStart(date)
-                                  Cookies.set(
-                                    'dateStart',
-                                    date.toISOString().split('T')[0],
+                                  const nextDay = addDays(date, 1)
+                                  setDateStartExport(
+                                    nextDay.toISOString().split('T')[0],
                                   )
-                                  if (dateEnd) {
-                                    getAllDataReservations(
-                                      date.toISOString().split('T')[0],
-                                      dateEnd.toISOString().split('T')[0],
-                                    )
-                                  }
+                                  Cookies.set(
+                                    'dateStartExport',
+                                    nextDay.toISOString().split('T')[0],
+                                  )
                                 }}
                                 initialFocus
                               />
@@ -1242,23 +1275,24 @@ function page() {
                                 selected={dateEnd}
                                 onSelect={(date) => {
                                   const nextDay = addDays(date, 1)
-                                  setDateEnd(nextDay)
-                                  Cookies.set(
-                                    'dateEnd',
+                                  setDateEnd(date)
+                                  setDateEndExport(
                                     nextDay.toISOString().split('T')[0],
                                   )
-                                  if (dateStart) {
-                                    getAllDataReservations(
-                                      dateStart.toISOString().split('T')[0],
-                                      nextDay.toISOString().split('T')[0],
-                                    )
-                                  }
+                                  Cookies.set(
+                                    'dateEndExport',
+                                    nextDay.toISOString().split('T')[0],
+                                  )
                                 }}
                                 initialFocus
                               />
                             </div>
                           </div>
-                          <Button variant="outline" className="ml-auto">
+                          <Button
+                            onClick={() => handleExportData()}
+                            variant="outline"
+                            className="ml-auto"
+                          >
                             Export Data{' '}
                             <PiMicrosoftExcelLogoFill className="ml-2 h-4 w-4" />
                           </Button>
