@@ -595,12 +595,13 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_reserve') == 'settlement'
-              ? 'border-green-500 bg-green-500 text-green-600'
-              : row.getValue('status_reserve') == 'pending'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+              row.getValue('status_reserve') == 'settlement'
+                ? 'border-green-500 bg-green-500 text-green-600'
+                : row.getValue('status_reserve') == 'pending'
                 ? 'border-yellow-500 bg-yellow-500 text-yellow-500'
                 : 'border-red-500 bg-red-500 text-red-500'
-              }`}
+            }`}
           >
             {' '}
             {row.getValue('status_reserve') == 'settlement' && <MdPaid />}
@@ -634,12 +635,13 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_payment') == 'done'
-              ? 'border-blue-500 bg-blue-500 text-blue-600'
-              : row.getValue('status_payment') == 'not playing'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+              row.getValue('status_payment') == 'done'
+                ? 'border-blue-500 bg-blue-500 text-blue-600'
+                : row.getValue('status_payment') == 'not playing'
                 ? 'border-purple-400 bg-purple-500 text-purple-600'
                 : 'border-gray-500 bg-gray-500 text-gray-700'
-              }`}
+            }`}
           >
             {' '}
             {row.getValue('status_payment') == 'playing' && (
@@ -1022,7 +1024,7 @@ function page() {
   const handleExportData = async () => {
     try {
       const response = await axios.get(
-        `${baseUrl}/reservations?date_start=${dateStartExport}&date_end=${dateEndExport}`,
+        `${baseUrl}/export?date_start=${dateStartExport}&date_end=${dateEndExport}`,
       )
       if (response.status == 200) {
         const jsonData = await response.data
@@ -1065,15 +1067,15 @@ function page() {
   const disableTimes =
     reserves.length > 0
       ? reserves
-        .map((reserve) => {
-          if (reserve.reserve_end_time) {
-            const [hour, minute, second] = reserve.reserve_end_time.split(':')
-            const formattedTime = `${hour}:${minute}`
-            return formattedTime
-          }
-          return null
-        })
-        .filter((time) => time !== null)
+          .map((reserve) => {
+            if (reserve.reserve_end_time) {
+              const [hour, minute, second] = reserve.reserve_end_time.split(':')
+              const formattedTime = `${hour}:${minute}`
+              return formattedTime
+            }
+            return null
+          })
+          .filter((time) => time !== null)
       : []
 
   React.useEffect(() => {
@@ -1510,78 +1512,58 @@ function page() {
                             <SelectLabel className="text-base">
                               Seat Number
                             </SelectLabel>
-                            {
-                              typeSeatPlaying == 'PS5 Reguler' && <>
-                                <SelectItem
-                                  className="text-base"
-                                  value="1"
-                                >
+                            {typeSeatPlaying == 'PS5 Reguler' && (
+                              <>
+                                <SelectItem className="text-base" value="1">
                                   1
                                 </SelectItem>
-                                <SelectItem
-                                  className="text-base"
-                                  value="2"
-                                >
+                                <SelectItem className="text-base" value="2">
                                   2
                                 </SelectItem>
-                                <SelectItem
-                                  className="text-base"
-                                  value="3"
-                                >
+                                <SelectItem className="text-base" value="3">
                                   3
                                 </SelectItem>
-                                <SelectItem
-                                  className="text-base"
-                                  value="4"
-                                >
+                                <SelectItem className="text-base" value="4">
                                   4
                                 </SelectItem>
-                                <SelectItem
-                                  className="text-base"
-                                  value="5"
-                                >
+                                <SelectItem className="text-base" value="5">
                                   5
                                 </SelectItem>
-                                <SelectItem
-                                  className="text-base"
-                                  value="8"
-                                >
+                                <SelectItem className="text-base" value="8">
                                   8
                                 </SelectItem>
                               </>
-                            }
-                            {
-                              typeSeatPlaying == 'Simulator' && <>
+                            )}
+                            {typeSeatPlaying == 'Simulator' && (
+                              <>
                                 <SelectItem className="text-base" value="6">
                                   6
-                                </SelectItem>  <SelectItem className="text-base" value="7">
+                                </SelectItem>{' '}
+                                <SelectItem className="text-base" value="7">
                                   7
-                                </SelectItem></>
-                            }
-                            {
-                              typeSeatPlaying == 'PS5 Reguler+' && <>
+                                </SelectItem>
+                              </>
+                            )}
+                            {typeSeatPlaying == 'PS5 Reguler+' && (
+                              <>
                                 <SelectItem className="text-base" value="6">
                                   10
-                                </SelectItem>  <SelectItem className="text-base" value="7">
+                                </SelectItem>{' '}
+                                <SelectItem className="text-base" value="7">
                                   11
-                                </SelectItem></>
-                            }
-                            {
-                              typeSeatPlaying == 'Playstation 2' && <SelectItem
-                                className="text-base"
-                                value="9"
-                              >
+                                </SelectItem>
+                              </>
+                            )}
+                            {typeSeatPlaying == 'Playstation 2' && (
+                              <SelectItem className="text-base" value="9">
                                 9
                               </SelectItem>
-                            }
-                            {
-                              typeSeatPlaying == 'VIP Room' && <SelectItem
-                                className="text-base"
-                                value="12"
-                              >
+                            )}
+                            {typeSeatPlaying == 'VIP Room' && (
+                              <SelectItem className="text-base" value="12">
                                 12
                               </SelectItem>
-                            }
+                            )}
                           </SelectGroup>
                         </SelectContent>
                       </Select>
