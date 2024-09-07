@@ -163,6 +163,7 @@ export const generateTimeArray = (
   date = new Date().toISOString().split('T')[0],
   bookedSlots,
 ) => {
+  console.log('BOOKED', bookedSlots)
   const times = []
   const today = new Date()
   const currentHour = today.getHours()
@@ -214,6 +215,7 @@ export const generateTimeArray = (
     }
   })
 
+  console.log({ times })
   return times
 }
 
