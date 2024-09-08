@@ -476,15 +476,15 @@ export default function Reservation() {
   const disableTimes =
     reserves.length > 0
       ? reserves
-        .map((reserve) => {
-          if (reserve.reserve_end_time) {
-            const [hour, minute, second] = reserve.reserve_end_time.split(':')
-            const formattedTime = `${hour}:${minute}`
-            return formattedTime
-          }
-          return null
-        })
-        .filter((time) => time !== null)
+          .map((reserve) => {
+            if (reserve.reserve_end_time) {
+              const [hour, minute, second] = reserve.reserve_end_time.split(':')
+              const formattedTime = `${hour}:${minute}`
+              return formattedTime
+            }
+            return null
+          })
+          .filter((time) => time !== null)
       : []
 
   return (
@@ -591,13 +591,13 @@ export default function Reservation() {
                         disabled={(date) =>
                           dateClose.length !== 0
                             ? date > addDays(new Date(), 15) ||
-                            date < subDays(new Date(), 1) ||
-                            (date.getDate() >=
-                              convertToDate(dateClose[0]?.start_date) &&
-                              date.getDate() <=
-                              convertToDate(dateClose[0]?.end_date))
+                              date < subDays(new Date(), 1) ||
+                              (date.getDate() >=
+                                convertToDate(dateClose[0]?.start_date) &&
+                                date.getDate() <=
+                                  convertToDate(dateClose[0]?.end_date))
                             : date > addDays(new Date(), 15) ||
-                            date < subDays(new Date(), 1)
+                              date < subDays(new Date(), 1)
                         }
                         initialFocus
                       />
@@ -684,10 +684,11 @@ export default function Reservation() {
                     </div>
 
                     <img
-                      src={`/${floorSelected == 'first-floor'
+                      src={`/${
+                        floorSelected == 'first-floor'
                           ? 'first-floor.jpg'
                           : 'second-floor.jpg'
-                        }`}
+                      }`}
                       alt=""
                       style={{
                         width: '100%',
@@ -701,8 +702,9 @@ export default function Reservation() {
                       {floorSelected == 'first-floor' && selectedDate != '' && (
                         <div className={`flex flex-col  mb-6   w-full`}>
                           <div
-                            className={`flex flex-row justify-around w-full top-16 absolute z-50 gap-[${7 + scale * 10
-                              }] `}
+                            className={`flex flex-row justify-around w-full top-16 absolute z-50 gap-[${
+                              7 + scale * 10
+                            }] `}
                             ref={imageRef}
                             style={{
                               width: '100%',
@@ -784,26 +786,27 @@ export default function Reservation() {
                                             <div className="flex flex-row flex-wrap gap-1">
                                               {reserves.length > 0
                                                 ? reserves.map(
-                                                  (reserve, index) => (
-                                                    <div
-                                                      key={index}
-                                                      className={`text-xs px-2 py-1 border ${reserve.status_reserve ===
+                                                    (reserve, index) => (
+                                                      <div
+                                                        key={index}
+                                                        className={`text-xs px-2 py-1 border ${
+                                                          reserve.status_reserve ===
                                                           'pending'
-                                                          ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                          : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                            ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                            : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
                                                         } rounded-md w-fit`}
-                                                    >
-                                                      {
-                                                        reserve.reserve_start_time
-                                                      }{' '}
-                                                      -{' '}
-                                                      {
-                                                        reserve.reserve_end_time
-                                                      }{' '}
-                                                      WIB
-                                                    </div>
-                                                  ),
-                                                )
+                                                      >
+                                                        {
+                                                          reserve.reserve_start_time
+                                                        }{' '}
+                                                        -{' '}
+                                                        {
+                                                          reserve.reserve_end_time
+                                                        }{' '}
+                                                        WIB
+                                                      </div>
+                                                    ),
+                                                  )
                                                 : null}
                                             </div>
                                           </div>
@@ -882,7 +885,7 @@ export default function Reservation() {
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
-                                                  timeArray.length != 0 ? (
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -937,8 +940,9 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row justify-around w-64 bottom-12 absolute z-50 left-24 gap-[${10 + scale * 10
-                              }] `}
+                            className={`flex flex-row justify-around w-64 bottom-12 absolute z-50 left-24 gap-[${
+                              10 + scale * 10
+                            }] `}
                             ref={imageRef}
                             style={{
                               height: 'auto',
@@ -1018,25 +1022,26 @@ export default function Reservation() {
                                             <div className="flex flex-row flex-wrap gap-1">
                                               {reserves.length > 0
                                                 ? reserves.map(
-                                                  (reserve, index) => (
-                                                    <div
-                                                      className={`text-xs px-2 py-1 border ${reserve.status_reserve ===
+                                                    (reserve, index) => (
+                                                      <div
+                                                        className={`text-xs px-2 py-1 border ${
+                                                          reserve.status_reserve ===
                                                           'pending'
-                                                          ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                          : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                            ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                            : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
                                                         } rounded-md w-fit`}
-                                                    >
-                                                      {
-                                                        reserve.reserve_start_time
-                                                      }{' '}
-                                                      -{' '}
-                                                      {
-                                                        reserve.reserve_end_time
-                                                      }{' '}
-                                                      WIB
-                                                    </div>
-                                                  ),
-                                                )
+                                                      >
+                                                        {
+                                                          reserve.reserve_start_time
+                                                        }{' '}
+                                                        -{' '}
+                                                        {
+                                                          reserve.reserve_end_time
+                                                        }{' '}
+                                                        WIB
+                                                      </div>
+                                                    ),
+                                                  )
                                                 : null}
                                             </div>
                                           </div>
@@ -1115,7 +1120,7 @@ export default function Reservation() {
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
-                                                  timeArray.length != 0 ? (
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1170,8 +1175,9 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row justify-around w-fit bottom-12 absolute z-50 left-[53%] -ml-2 gap-${8 + scale * 10
-                              } `}
+                            className={`flex flex-row justify-around w-fit bottom-12 absolute z-50 left-[53%] -ml-2 gap-${
+                              8 + scale * 10
+                            } `}
                             ref={imageRef}
                             style={{
                               height: 'auto',
@@ -1251,25 +1257,26 @@ export default function Reservation() {
                                             <div className="flex flex-row flex-wrap gap-1">
                                               {reserves.length > 0
                                                 ? reserves.map(
-                                                  (reserve, index) => (
-                                                    <div
-                                                      className={`text-xs px-2 py-1 border ${reserve.status_reserve ===
+                                                    (reserve, index) => (
+                                                      <div
+                                                        className={`text-xs px-2 py-1 border ${
+                                                          reserve.status_reserve ===
                                                           'pending'
-                                                          ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                          : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                            ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                            : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
                                                         } rounded-md w-fit`}
-                                                    >
-                                                      {
-                                                        reserve.reserve_start_time
-                                                      }{' '}
-                                                      -{' '}
-                                                      {
-                                                        reserve.reserve_end_time
-                                                      }{' '}
-                                                      WIB
-                                                    </div>
-                                                  ),
-                                                )
+                                                      >
+                                                        {
+                                                          reserve.reserve_start_time
+                                                        }{' '}
+                                                        -{' '}
+                                                        {
+                                                          reserve.reserve_end_time
+                                                        }{' '}
+                                                        WIB
+                                                      </div>
+                                                    ),
+                                                  )
                                                 : null}
                                             </div>
                                           </div>
@@ -1348,7 +1355,7 @@ export default function Reservation() {
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
-                                                  timeArray.length != 0 ? (
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1403,8 +1410,9 @@ export default function Reservation() {
                       {floorSelected == 'second-floor' && selectedDate != '' && (
                         <div className="flex flex-col mb-6">
                           <div
-                            className={`flex flex-row w-auto top-48 absolute left-[36%] z-50 gap-[${5 + scale * 10
-                              }]`}
+                            className={`flex flex-row w-auto top-48 absolute left-[36%] z-50 gap-[${
+                              5 + scale * 10
+                            }]`}
                             ref={imageRef}
                             style={{
                               height: 'auto',
@@ -1438,8 +1446,8 @@ export default function Reservation() {
                                         {number == '9'
                                           ? 'VIP'
                                           : number == 12
-                                            ? 'PS 2'
-                                            : 'Reg+'}
+                                          ? 'PS 2'
+                                          : 'Reg+'}
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
@@ -1488,25 +1496,26 @@ export default function Reservation() {
                                             <div className="flex flex-row flex-wrap gap-1">
                                               {reserves.length > 0
                                                 ? reserves.map(
-                                                  (reserve, index) => (
-                                                    <div
-                                                      className={`text-xs px-2 py-1 border ${reserve.status_reserve ===
+                                                    (reserve, index) => (
+                                                      <div
+                                                        className={`text-xs px-2 py-1 border ${
+                                                          reserve.status_reserve ===
                                                           'pending'
-                                                          ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                          : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                            ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                            : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
                                                         } rounded-md w-fit`}
-                                                    >
-                                                      {
-                                                        reserve.reserve_start_time
-                                                      }{' '}
-                                                      -{' '}
-                                                      {
-                                                        reserve.reserve_end_time
-                                                      }{' '}
-                                                      WIB
-                                                    </div>
-                                                  ),
-                                                )
+                                                      >
+                                                        {
+                                                          reserve.reserve_start_time
+                                                        }{' '}
+                                                        -{' '}
+                                                        {
+                                                          reserve.reserve_end_time
+                                                        }{' '}
+                                                        WIB
+                                                      </div>
+                                                    ),
+                                                  )
                                                 : null}
                                             </div>
                                           </div>
@@ -1585,7 +1594,7 @@ export default function Reservation() {
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
-                                                  timeArray.length != 0 ? (
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1640,8 +1649,9 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row w-full justify-end top-64 absolute right-40 z-50 gap-[${5 + scale * 10
-                              }]`}
+                            className={`flex flex-row w-full justify-end top-64 absolute right-40 z-50 gap-[${
+                              5 + scale * 10
+                            }]`}
                             ref={imageRef}
                             style={{
                               height: 'auto',
@@ -1655,8 +1665,9 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer w-28 h-28 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${number == 10 && 'mr-16'
-                                        }`}
+                                      className={`cursor-pointer w-28 h-28 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${
+                                        number == 10 && 'mr-16'
+                                      }`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
@@ -1676,8 +1687,8 @@ export default function Reservation() {
                                         {number == '9'
                                           ? 'VIP'
                                           : number == 12
-                                            ? 'PS 2'
-                                            : 'Reg+'}
+                                          ? 'PS 2'
+                                          : 'Reg+'}
                                       </p>{' '}
                                     </div>
                                   </DrawerTrigger>
@@ -1726,25 +1737,26 @@ export default function Reservation() {
                                             <div className="flex flex-row flex-wrap gap-1">
                                               {reserves.length > 0
                                                 ? reserves.map(
-                                                  (reserve, index) => (
-                                                    <div
-                                                      className={`text-xs px-2 py-1 border ${reserve.status_reserve ===
+                                                    (reserve, index) => (
+                                                      <div
+                                                        className={`text-xs px-2 py-1 border ${
+                                                          reserve.status_reserve ===
                                                           'pending'
-                                                          ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                          : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                            ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                            : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
                                                         } rounded-md w-fit`}
-                                                    >
-                                                      {
-                                                        reserve.reserve_start_time
-                                                      }{' '}
-                                                      -{' '}
-                                                      {
-                                                        reserve.reserve_end_time
-                                                      }{' '}
-                                                      WIB
-                                                    </div>
-                                                  ),
-                                                )
+                                                      >
+                                                        {
+                                                          reserve.reserve_start_time
+                                                        }{' '}
+                                                        -{' '}
+                                                        {
+                                                          reserve.reserve_end_time
+                                                        }{' '}
+                                                        WIB
+                                                      </div>
+                                                    ),
+                                                  )
                                                 : null}
                                             </div>
                                           </div>
@@ -1823,7 +1835,7 @@ export default function Reservation() {
                                                   Pilih Waktu Berakhir
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
-                                                  timeArray.length != 0 ? (
+                                                timeArray.length != 0 ? (
                                                   generateTimeArrayWithStep(
                                                     startTimeReservasi,
                                                     bookedSlots,
@@ -1878,8 +1890,9 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row justify-around bottom-20 absolute left-10 z-50 gap-${5 + scale * 10
-                              }`}
+                            className={`flex flex-row justify-around bottom-20 absolute left-10 z-50 gap-${
+                              5 + scale * 10
+                            }`}
                             ref={imageRef}
                             style={{
                               height: 'auto',
@@ -1962,26 +1975,26 @@ export default function Reservation() {
                                     </div>
 
                                     {reserves.length > 0 ? (
-                                      <>
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full my-2">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Reserved Times
-                                              </label>
-                                              <div className="flex flex-row flex-wrap gap-1">
-                                                {reserves.length > 0
-                                                  ? reserves.map(
+                                      <Fade className="px-5 ">
+                                        <div className="flex gap-1 w-full my-2">
+                                          <div className="flex flex-col gap-2 w-full flex-1">
+                                            <label
+                                              htmlFor="nama"
+                                              className="text-sm"
+                                            >
+                                              Reserved Times
+                                            </label>
+                                            <div className="flex flex-row flex-wrap gap-1">
+                                              {reserves.length > 0
+                                                ? reserves.map(
                                                     (reserve, index) => (
                                                       <div
-                                                        className={`text-xs px-2 py-1 border ${reserve.status_reserve ===
-                                                            'pending'
+                                                        className={`text-xs px-2 py-1 border ${
+                                                          reserve.status_reserve ===
+                                                          'pending'
                                                             ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
                                                             : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                          } rounded-md w-fit`}
+                                                        } rounded-md w-fit`}
                                                       >
                                                         {
                                                           reserve.reserve_start_time
@@ -1994,122 +2007,122 @@ export default function Reservation() {
                                                       </div>
                                                     ),
                                                   )
-                                                  : null}
-                                              </div>
+                                                : null}
                                             </div>
                                           </div>
-                                        </Fade>
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generateTimeArray(
-                                                      customTimeSelected,
-                                                      selectedDate,
-                                                      bookedSlots,
-                                                    ).map((time, index) => (
+                                        </div>
+                                      </Fade>
+                                    ) : null}
+
+                                    <Fade className="px-5 ">
+                                      <div className="flex gap-1 w-full mt-2 mb-3">
+                                        <div className="flex flex-col gap-2 w-full flex-1">
+                                          <label
+                                            htmlFor="nama"
+                                            className="text-sm"
+                                          >
+                                            Start Time
+                                          </label>
+                                          <Select
+                                            value={startTimeReservasi}
+                                            onValueChange={(value) =>
+                                              setStartTimeReservasi(value)
+                                            }
+                                            required
+                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                          >
+                                            <SelectTrigger className="py-5 px-3 text-sm">
+                                              <SelectValue
+                                                className="text-base"
+                                                placeholder="00.00"
+                                              />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectGroup>
+                                                <SelectLabel className="text-sm">
+                                                  Pilih Waktu Mulai
+                                                </SelectLabel>
+                                                {generateTimeArray(
+                                                  customTimeSelected,
+                                                  selectedDate,
+                                                  bookedSlots,
+                                                ).map((time, index) => (
+                                                  <SelectItem
+                                                    key={index}
+                                                    value={time}
+                                                  >
+                                                    {time}
+                                                  </SelectItem>
+                                                ))}
+                                              </SelectGroup>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                        <div className="flex flex-col gap-2 w-full flex-1">
+                                          <label
+                                            htmlFor="nama"
+                                            className="text-sm"
+                                          >
+                                            End Time
+                                          </label>
+                                          <Select
+                                            value={endTimeReservasi}
+                                            onValueChange={(value) =>
+                                              setEndTimeReservasi(value)
+                                            }
+                                            required
+                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                          >
+                                            <SelectTrigger className="py-5 px-3 text-sm">
+                                              <SelectValue
+                                                className="text-base"
+                                                placeholder="00.00"
+                                              />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectGroup>
+                                                <SelectLabel className="text-sm">
+                                                  Pilih Waktu Berakhir
+                                                </SelectLabel>
+                                                {startTimeReservasi != '' &&
+                                                timeArray.length != 0 ? (
+                                                  generateTimeArrayWithStep(
+                                                    startTimeReservasi,
+                                                    bookedSlots,
+                                                  ).map((time, index) => {
+                                                    const isDisabled = disableTimes.includes(
+                                                      time,
+                                                    )
+
+                                                    return (
                                                       <SelectItem
                                                         key={index}
                                                         value={time}
+                                                        className={'text-sm'}
+                                                        disabled={isDisabled}
                                                       >
                                                         {time}
                                                       </SelectItem>
-                                                    ))}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                      timeArray.length != 0 ? (
-                                                      generateTimeArrayWithStep(
-                                                        startTimeReservasi,
-                                                        bookedSlots,
-                                                      ).map((time, index) => {
-                                                        const isDisabled = disableTimes.includes(
-                                                          time,
-                                                        )
-
-                                                        return (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                            className={'text-sm'}
-                                                            disabled={isDisabled}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        )
-                                                      })
-                                                    ) : (
-                                                      <SelectItem value={'00.00'}>
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                          </div>
-                                        </Fade>
-                                      </>
-                                    ) : null}
+                                                    )
+                                                  })
+                                                ) : (
+                                                  <SelectItem value={'00.00'}>
+                                                    <p className="text-gray-500">
+                                                      Waktu yang kamu pilih{' '}
+                                                      <br />
+                                                      sudah terisi. Silakan{' '}
+                                                      <br />
+                                                      pilih waktu bermain <br />
+                                                      di jam yang lain
+                                                    </p>
+                                                  </SelectItem>
+                                                )}
+                                              </SelectGroup>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                      </div>
+                                    </Fade>
                                     <DrawerFooter className="pt-2">
                                       <DrawerClose asChild>
                                         <Button
@@ -2157,10 +2170,11 @@ export default function Reservation() {
         ) : (
           <>
             <div
-              className={`${isSelectPay
+              className={`${
+                isSelectPay
                   ? ''
                   : 'flex flex-col gap-3 px-5 bg-white shadow-md rounded-lg mt-5 py-7'
-                }`}
+              }`}
             >
               <div className={`${isSelectPay ? 'mt-5' : 'p-4'}`}>
                 {isLoading ? (
@@ -2172,8 +2186,9 @@ export default function Reservation() {
                   <div className="flex gap-2 -mb-2">
                     <div
                       onClick={(e) => setSelectedPay('cash')}
-                      className={`${selectedPay == 'cash' ? 'bg-gray-100' : 'bg-white'
-                        } shadow-md px-5 py-9 cursor-pointer rounded-lg w-full flex flex-col gap-2 items-center justify-center hover:scale-95 duration-700`}
+                      className={`${
+                        selectedPay == 'cash' ? 'bg-gray-100' : 'bg-white'
+                      } shadow-md px-5 py-9 cursor-pointer rounded-lg w-full flex flex-col gap-2 items-center justify-center hover:scale-95 duration-700`}
                     >
                       <Image
                         width={0}
@@ -2191,8 +2206,9 @@ export default function Reservation() {
                     </div>
                     <div
                       onClick={(e) => setSelectedPay('non-cash')}
-                      className={`${selectedPay == 'non-cash' ? 'bg-gray-100' : 'bg-white'
-                        } shadow-md px-5 py-9 cursor-pointer rounded-lg w-full flex flex-col gap-2 items-center justify-center hover:scale-95 duration-700`}
+                      className={`${
+                        selectedPay == 'non-cash' ? 'bg-gray-100' : 'bg-white'
+                      } shadow-md px-5 py-9 cursor-pointer rounded-lg w-full flex flex-col gap-2 items-center justify-center hover:scale-95 duration-700`}
                     >
                       <Image
                         width={0}
@@ -2388,8 +2404,9 @@ export default function Reservation() {
             <div className="py-2 text-gray-600">
               Pastikan customer telah membayar kepada kasir dengan nominal
               sebesar{' '}
-              <span className="font-bold text-orange text-lg">{`IDR ${totalTime * pricePerReserve
-                }`}</span>{' '}
+              <span className="font-bold text-orange text-lg">{`IDR ${
+                totalTime * pricePerReserve
+              }`}</span>{' '}
               untuk waktu{' '}
               <span className=" font-semibold">
                 permainan {`${totalTime}`} jam di{' '}
