@@ -221,7 +221,8 @@ const Invoice = () => {
                             </div>
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
-                            {data.reserve_start_time} - {data.reserve_end_time}
+                            {data.reserve_start_time} - {data.reserve_end_time}{' '}
+                            on ({data.reserve_date})
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
                             IDR {data.price}
