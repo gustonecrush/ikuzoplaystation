@@ -41,27 +41,18 @@ const Invoice = () => {
     }
   }
 
-  function base64ToFile(base64String, fileName) {
-    // Split the base64 string to get the MIME type and the data
-    const base64Parts = base64String.split(';base64,')
-    const mimeType = base64Parts[0].split(':')[1]
-    const base64Data = base64Parts[1]
+  const base64ToFile = (dataurl, filename = 'invoice.png') => {
+    let arr = dataurl.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n)
 
-    // Convert the base64 string to a byte array
-    const byteCharacters = atob(base64Data)
-    const byteNumbers = new Array(byteCharacters.length)
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
     }
-    const byteArray = new Uint8Array(byteNumbers)
 
-    // Create a Blob from the byte array
-    const blob = new Blob([byteArray], { type: mimeType })
-
-    // Create a File from the Blob
-    const file = new File([blob], fileName, { type: mimeType })
-
-    return file
+    return new File([u8arr], filename, { type: mime })
   }
 
   const downloadInvoice = () => {
@@ -85,6 +76,8 @@ const Invoice = () => {
 
   const handleUpdateContent = async (file) => {
     const formData = new FormData()
+
+    console.log('File object:', file)
 
     formData.append('reserve_id', data.reserve_name)
     formData.append('reserve_name', data.reserve_name)
@@ -228,7 +221,8 @@ const Invoice = () => {
                             </div>
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
-                            {data.reserve_start_time} - {data.reserve_end_time}
+                            {data.reserve_start_time} - {data.reserve_end_time}{' '}
+                            on ({formatDateOnTheUI(data.reserve_date)})
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
                             IDR {data.price}
