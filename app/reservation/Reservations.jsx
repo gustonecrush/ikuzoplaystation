@@ -792,10 +792,52 @@ export default function Reservation() {
                                     )}
 
                                
-                       
-                                      <Fade className="px-5 ">
-                                        <div className="flex gap-1 w-full mt-2 mb-3">
-                                        <div className="flex flex-col gap-2 w-full flex-1">
+{reserves.length > 0  ? (
+                                      <>
+                                        <Fade className="px-5 ">
+                                          <div className="flex gap-1 w-full my-2">
+                                            <div className="flex flex-col gap-2 w-full flex-1">
+                                              <label
+                                                htmlFor="nama"
+                                                className="text-sm"
+                                              >
+                                                Reserved Times
+                                              </label>
+                                              <div className="flex flex-row flex-wrap gap-1">
+                                                {reserves.length > 0
+                                                  ? reserves.map(
+                                                      (reserve, index) => (
+                                                        <div
+                                                          className={`text-xs px-2 py-1 border ${
+                                                            reserve.status_reserve ===
+                                                            'pending'
+                                                              ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                              : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                          } rounded-md w-fit`}
+                                                        >
+                                                          {
+                                                            reserve.reserve_start_time
+                                                          }{' '}
+                                                          -{' '}
+                                                          {
+                                                            reserve.reserve_end_time
+                                                          }{' '}
+                                                          WIB
+                                                        </div>
+                                                      ),
+                                                    )
+                                                  : null}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </Fade>
+                                      
+                                      </>
+                                    ) : null}
+
+<Fade className="px-5 ">
+                                          <div className="flex gap-1 w-full mt-2 mb-3">
+                                          <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
                                             htmlFor="nama"
                                             className="text-sm"
@@ -900,8 +942,8 @@ export default function Reservation() {
                                             </SelectContent>
                                           </Select>
                                         </div>
-                                        </div>
-                                      </Fade>
+                                          </div>
+                                        </Fade>
 
                                     {drawerContent === 'default' ? (
                                       <div className="flex flex-col gap-2 px-5 mt-3">
@@ -1059,9 +1101,52 @@ export default function Reservation() {
 
                                
                        
-                                      <Fade className="px-5 ">
-                                        <div className="flex gap-1 w-full mt-2 mb-3">
-                                        <div className="flex flex-col gap-2 w-full flex-1">
+{reserves.length > 0  ? (
+                                      <>
+                                        <Fade className="px-5 ">
+                                          <div className="flex gap-1 w-full my-2">
+                                            <div className="flex flex-col gap-2 w-full flex-1">
+                                              <label
+                                                htmlFor="nama"
+                                                className="text-sm"
+                                              >
+                                                Reserved Times
+                                              </label>
+                                              <div className="flex flex-row flex-wrap gap-1">
+                                                {reserves.length > 0
+                                                  ? reserves.map(
+                                                      (reserve, index) => (
+                                                        <div
+                                                          className={`text-xs px-2 py-1 border ${
+                                                            reserve.status_reserve ===
+                                                            'pending'
+                                                              ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                              : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                          } rounded-md w-fit`}
+                                                        >
+                                                          {
+                                                            reserve.reserve_start_time
+                                                          }{' '}
+                                                          -{' '}
+                                                          {
+                                                            reserve.reserve_end_time
+                                                          }{' '}
+                                                          WIB
+                                                        </div>
+                                                      ),
+                                                    )
+                                                  : null}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </Fade>
+                                      
+                                      </>
+                                    ) : null}
+
+<Fade className="px-5 ">
+                                          <div className="flex gap-1 w-full mt-2 mb-3">
+                                          <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
                                             htmlFor="nama"
                                             className="text-sm"
@@ -1166,8 +1251,8 @@ export default function Reservation() {
                                             </SelectContent>
                                           </Select>
                                         </div>
-                                        </div>
-                                      </Fade>
+                                          </div>
+                                        </Fade>
 
                                     {drawerContent === 'default' ? (
                                       <div className="flex flex-col gap-2 px-5 mt-2">
@@ -1323,9 +1408,52 @@ export default function Reservation() {
 
                                
                        
-                                      <Fade className="px-5 ">
-                                        <div className="flex gap-1 w-full mt-2 mb-3">
-                                        <div className="flex flex-col gap-2 w-full flex-1">
+{reserves.length > 0  ? (
+                                      <>
+                                        <Fade className="px-5 ">
+                                          <div className="flex gap-1 w-full my-2">
+                                            <div className="flex flex-col gap-2 w-full flex-1">
+                                              <label
+                                                htmlFor="nama"
+                                                className="text-sm"
+                                              >
+                                                Reserved Times
+                                              </label>
+                                              <div className="flex flex-row flex-wrap gap-1">
+                                                {reserves.length > 0
+                                                  ? reserves.map(
+                                                      (reserve, index) => (
+                                                        <div
+                                                          className={`text-xs px-2 py-1 border ${
+                                                            reserve.status_reserve ===
+                                                            'pending'
+                                                              ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                              : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                          } rounded-md w-fit`}
+                                                        >
+                                                          {
+                                                            reserve.reserve_start_time
+                                                          }{' '}
+                                                          -{' '}
+                                                          {
+                                                            reserve.reserve_end_time
+                                                          }{' '}
+                                                          WIB
+                                                        </div>
+                                                      ),
+                                                    )
+                                                  : null}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </Fade>
+                                      
+                                      </>
+                                    ) : null}
+
+<Fade className="px-5 ">
+                                          <div className="flex gap-1 w-full mt-2 mb-3">
+                                          <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
                                             htmlFor="nama"
                                             className="text-sm"
@@ -1430,8 +1558,8 @@ export default function Reservation() {
                                             </SelectContent>
                                           </Select>
                                         </div>
-                                        </div>
-                                      </Fade>
+                                          </div>
+                                        </Fade>
 
                                     {drawerContent === 'default' ? (
                                       <div className="flex flex-col gap-2 px-5 mt-2">
@@ -1590,7 +1718,7 @@ export default function Reservation() {
                                       </div>
                                     )}
 
-                                    {reserves.length > 0  ? (
+{reserves.length > 0  ? (
                                       <>
                                         <Fade className="px-5 ">
                                           <div className="flex gap-1 w-full my-2">
@@ -1629,7 +1757,11 @@ export default function Reservation() {
                                             </div>
                                           </div>
                                         </Fade>
-                                        <Fade className="px-5 ">
+                                      
+                                      </>
+                                    ) : null}
+
+<Fade className="px-5 ">
                                           <div className="flex gap-1 w-full mt-2 mb-3">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -1738,8 +1870,6 @@ export default function Reservation() {
                                         </div>
                                           </div>
                                         </Fade>
-                                      </>
-                                    ) : null}
 
                                     {drawerContent === 'default' ? (
                                       <div className="flex flex-col gap-2 px-5 my-2">
@@ -1941,7 +2071,11 @@ export default function Reservation() {
                                             </div>
                                           </div>
                                         </Fade>
-                                        <Fade className="px-5 ">
+                                      
+                                      </>
+                                    ) : null}
+
+<Fade className="px-5 ">
                                           <div className="flex gap-1 w-full mt-2 mb-3">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -2050,8 +2184,6 @@ export default function Reservation() {
                                         </div>
                                           </div>
                                         </Fade>
-                                      </>
-                                    ) : null}
 
                                     <DrawerFooter className="pt-2">
                                       {drawerContent === 'default' ? (
@@ -2247,7 +2379,11 @@ export default function Reservation() {
                                             </div>
                                           </div>
                                         </Fade>
-                                        <Fade className="px-5 ">
+                                      
+                                      </>
+                                    ) : null}
+
+<Fade className="px-5 ">
                                           <div className="flex gap-1 w-full mt-2 mb-3">
                                           <div className="flex flex-col gap-2 w-full flex-1">
                                           <label
@@ -2356,8 +2492,6 @@ export default function Reservation() {
                                         </div>
                                           </div>
                                         </Fade>
-                                      </>
-                                    ) : null}
 
                                     {drawerContent === 'default' ? (
                                       <div className="flex flex-col gap-2 px-5 my-2">
