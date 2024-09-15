@@ -737,7 +737,7 @@ export default function Reservation() {
                                           }}
                                         >
                                           <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[0].pict}`}
                                             useMap="#image-map"
                                             alt=""
                                             style={{
@@ -768,7 +768,10 @@ export default function Reservation() {
                                               src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
                                             />
                                             <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                              {catalog.catalog_txt}
+                                              {catalog.catalog_txt.substring(
+                                                0,
+                                                10,
+                                              ) + '...'}
                                             </p>
                                           </div>
                                         ))}
@@ -1045,7 +1048,7 @@ export default function Reservation() {
                                           }}
                                         >
                                           <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[1].pict}`}
                                             useMap="#image-map"
                                             alt=""
                                             style={{
@@ -1076,7 +1079,10 @@ export default function Reservation() {
                                               src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
                                             />
                                             <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                              {catalog.catalog_txt}
+                                              {catalog.catalog_txt.substring(
+                                                0,
+                                                10,
+                                              ) + '...'}
                                             </p>
                                           </div>
                                         ))}
@@ -1267,7 +1273,9 @@ export default function Reservation() {
                                         <Button
                                           variant="outline"
                                           className={`bg-transparent text-orange border-orange py-5`}
-                                          onClick={handleCatalogClick}
+                                          onClick={(e) =>
+                                            handleCatalogClick(number)
+                                          }
                                         >
                                           <IoMdBook className="text-lg mr-2" />{' '}
                                           Lihat Catalog Game
@@ -1352,7 +1360,7 @@ export default function Reservation() {
                                           }}
                                         >
                                           <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[0].pict}`}
                                             useMap="#image-map"
                                             alt=""
                                             style={{
@@ -1383,7 +1391,10 @@ export default function Reservation() {
                                               src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
                                             />
                                             <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                              {catalog.catalog_txt}
+                                              {catalog.catalog_txt.substring(
+                                                0,
+                                                10,
+                                              ) + '...'}
                                             </p>
                                           </div>
                                         ))}
@@ -1574,7 +1585,9 @@ export default function Reservation() {
                                         <Button
                                           variant="outline"
                                           className={`bg-transparent text-orange border-orange py-5`}
-                                          onClick={handleCatalogClick}
+                                          onClick={(e) =>
+                                            handleCatalogClick(number)
+                                          }
                                         >
                                           <IoMdBook className="text-lg mr-2" />{' '}
                                           Lihat Catalog Game
@@ -1695,7 +1708,10 @@ export default function Reservation() {
                                               src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
                                             />
                                             <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                              {catalog.catalog_txt}
+                                              {catalog.catalog_txt.substring(
+                                                0,
+                                                10,
+                                              ) + '...'}
                                             </p>
                                           </div>
                                         ))}
@@ -1891,7 +1907,9 @@ export default function Reservation() {
                                         <Button
                                           variant="outline"
                                           className={`bg-transparent text-orange border-orange py-5`}
-                                          onClick={handleCatalogClick}
+                                          onClick={(e) =>
+                                            handleCatalogClick(number)
+                                          }
                                         >
                                           <IoMdBook className="text-lg mr-2" />{' '}
                                           Lihat Catalog Game
@@ -2014,7 +2032,10 @@ export default function Reservation() {
                                               src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
                                             />
                                             <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                              {catalog.catalog_txt}
+                                              {catalog.catalog_txt.substring(
+                                                0,
+                                                10,
+                                              ) + '...'}
                                             </p>
                                           </div>
                                         ))}
@@ -2211,7 +2232,9 @@ export default function Reservation() {
                                           <Button
                                             variant="outline"
                                             className={`bg-transparent text-orange border-orange py-5`}
-                                            onClick={handleCatalogClick}
+                                            onClick={(e) =>
+                                              handleCatalogClick(number)
+                                            }
                                           >
                                             <IoMdBook className="text-lg mr-2" />{' '}
                                             Lihat Catalog Game
@@ -2329,7 +2352,10 @@ export default function Reservation() {
                                               src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
                                             />
                                             <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                              {catalog.catalog_txt}
+                                              {catalog.catalog_txt.substring(
+                                                0,
+                                                10,
+                                              ) + '...'}
                                             </p>
                                           </div>
                                         ))}
@@ -2515,7 +2541,9 @@ export default function Reservation() {
                                         <Button
                                           variant="outline"
                                           className={`bg-transparent text-orange border-orange py-5`}
-                                          onClick={handleCatalogClick}
+                                          onClick={(e) =>
+                                            handleCatalogClick(number)
+                                          }
                                         >
                                           <IoMdBook className="text-lg mr-2" />{' '}
                                           Lihat Catalog Game
