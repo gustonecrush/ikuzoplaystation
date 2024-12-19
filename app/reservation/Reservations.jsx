@@ -2580,7 +2580,7 @@ export default function Reservation() {
                               cursor: 'move',
                             }}
                           >
-                            {[1, 2, 3, 4].map((number) => {
+                            {[13, 14, 15, 16].map((number) => {
                               return (
                                 <Drawer
                                   onClose={(e) => setDrawerContent('default')}
@@ -2901,7 +2901,7 @@ export default function Reservation() {
                               cursor: 'move',
                             }}
                           >
-                            {[5].map((number) => {
+                            {[17].map((number) => {
                               return (
                                 <Drawer key={number}>
                                   <DrawerTrigger asChild>
@@ -3221,7 +3221,7 @@ export default function Reservation() {
                               cursor: 'move',
                             }}
                           >
-                            {[1, 2].map((number) => {
+                            {[18, 19].map((number) => {
                               return (
                                 <Drawer key={number}>
                                   <DrawerTrigger asChild>
@@ -3535,7 +3535,7 @@ export default function Reservation() {
                               cursor: 'move',
                             }}
                           >
-                            {[3, 4, 5].map((number) => {
+                            {[20, 21, 22].map((number) => {
                               return (
                                 <Drawer
                                   onClose={(e) => setDrawerContent('default')}
