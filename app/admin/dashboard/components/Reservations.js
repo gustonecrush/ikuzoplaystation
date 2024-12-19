@@ -70,6 +70,7 @@ import { RESERVATION_PLACE } from '@/constans/reservations'
 import { IoMdBook } from 'react-icons/io'
 
 export default function Reservation() {
+  const [drawerContent, setDrawerContent] = useState('default')
   // RESERVATION STATE DATA
   const [continueTapped, setContinueTapped] = React.useState(false)
   const [idReservasi, setIdReservasi] = React.useState(generateRandomString)
@@ -81,8 +82,6 @@ export default function Reservation() {
   const [totalTime, setTotalTime] = React.useState(null)
   const [currentDate, setCurrentDate] = React.useState(getCurrentDate)
   const [maxDate, setMaxDate] = React.useState(getMaxDate)
-  const [currentTime, setCurrentTime] = React.useState(getCurrentTime)
-  const [maxTime, setMaxTime] = React.useState(getMaxTime)
   const [isLoading, setIsLoading] = React.useState(false)
   const [isSelectPay, setIsSelectPay] = React.useState(false)
   const [selectedPay, setSelectedPay] = React.useState('')
@@ -148,6 +147,7 @@ export default function Reservation() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
+      getAllPositions()
       console.log(`${baseUrl}/reservations?reserve_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
@@ -158,7 +158,7 @@ export default function Reservation() {
           endTime: reserve.reserve_end_time,
         }))
         setBookedSlots(slots)
-        setPositions(jsonData.data)
+
         console.log(response.data)
 
         setIsLoading(false)
@@ -180,10 +180,8 @@ export default function Reservation() {
     try {
       const response = await axios.get(`${baseUrl}/content-facilities`)
       if (response.status == 200) {
-        const jsonData = await response.data
-
-        setPositions(jsonData.data.data)
-        console.log("ALL POSITION : ", response.data)
+        setPositions(response.data.data)
+        console.log("ALL POSITION : ", response.data.data)
 
         setIsLoading(false)
       } else {
@@ -1992,16 +1990,7 @@ export default function Reservation() {
                                             Continue
                                           </Button>
                                         </DrawerClose>
-                                        <Button
-                                          variant="outline"
-                                          className={`bg-transparent text-orange border-orange py-5`}
-                                          onClick={(e) =>
-                                            handleCatalogClick(number)
-                                          }
-                                        >
-                                          <IoMdBook className="text-lg mr-2" />{' '}
-                                          Lihat Catalog Game
-                                        </Button>
+
                                       </div>
 
                                     </DrawerFooter>
@@ -3258,16 +3247,7 @@ export default function Reservation() {
                                             Continue
                                           </Button>
                                         </DrawerClose>
-                                        <Button
-                                          variant="outline"
-                                          className={`bg-transparent text-orange border-orange py-5`}
-                                          onClick={(e) =>
-                                            handleCatalogClick(number)
-                                          }
-                                        >
-                                          <IoMdBook className="text-lg mr-2" />{' '}
-                                          Lihat Catalog Game
-                                        </Button>
+
                                       </div>
 
                                     </DrawerFooter>
