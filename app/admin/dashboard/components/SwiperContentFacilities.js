@@ -465,7 +465,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
             </DialogClose>
           </DialogContent>
         </Dialog>
-        <Dialog open={openUpdateSection}>
+        <Dialog  open={openUpdateSection}>
           <DialogTrigger
             asChild
             onClick={() => setOpenUpdateSection(!openUpdateSection)}
@@ -474,7 +474,7 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
               Update Facility Section
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="!max-w-6xl w-full">
             <form onSubmit={handleUpdateFacilitySection}>
               <DialogHeader>
                 <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
