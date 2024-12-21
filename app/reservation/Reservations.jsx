@@ -696,11 +696,20 @@ export default function Reservation() {
                                       className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
-                                        setNamaPosisiReservasi(
-                                          positions[0].name,
-                                        )
+                                        if (number < 4) {
+                                          setNamaPosisiReservasi(
+                                            positions[8].name,
+                                          )
+                                          setPricePerReserve(positions[8].price)
+                                        } else {
+                                          setNamaPosisiReservasi(
+                                            positions[0].name,
+                                          )
+                                          setPricePerReserve(positions[0].price)
+                                        }
+                                        
 
-                                        setPricePerReserve(positions[0].price)
+                                       
                                         fetchingAvailableReservation(
                                           selectedDate,
                                           number,
@@ -718,11 +727,13 @@ export default function Reservation() {
                                   <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto pb-5">
                                     <DrawerHeader className="text-left">
                                       <DrawerTitle>
-                                        {positions[0].name}
+                                      
+                                        {number < 4 ? positions[8].name : positions[0].name}
                                       </DrawerTitle>
                                       <DrawerDescription>
-                                        IDR {positions[0].price}/hour and can
-                                        only accomodate {positions[0].capacity}{' '}
+
+                                        IDR {number < 4 ? positions[8].price : positions[0].price}/hour and can
+                                        only accomodate {number < 4 ? positions[8].capacity : positions[0].capacity}{' '}
                                         person (position {number}).
                                       </DrawerDescription>
                                     </DrawerHeader>
@@ -737,7 +748,7 @@ export default function Reservation() {
                                           }}
                                         >
                                           <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[0].pict}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${number < 4 ? positions[8].pict : positions[0].pict}`}
                                             useMap="#image-map"
                                             alt=""
                                             style={{
