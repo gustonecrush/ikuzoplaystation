@@ -257,7 +257,7 @@ export default function Reservation() {
     if (
       namaReservasi &&
       nomorWhatsappReservasi &&
-      floorSelected &&
+      selectedReservationPlace &&
       selectedDate &&
       startTimeReservasi &&
       endTimeReservasi &&
