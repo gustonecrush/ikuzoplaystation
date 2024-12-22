@@ -595,13 +595,12 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
-              row.getValue('status_reserve') == 'settlement'
-                ? 'border-green-500 bg-green-500 text-green-600'
-                : row.getValue('status_reserve') == 'pending'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_reserve') == 'settlement'
+              ? 'border-green-500 bg-green-500 text-green-600'
+              : row.getValue('status_reserve') == 'pending'
                 ? 'border-yellow-500 bg-yellow-500 text-yellow-500'
                 : 'border-red-500 bg-red-500 text-red-500'
-            }`}
+              }`}
           >
             {' '}
             {row.getValue('status_reserve') == 'settlement' && <MdPaid />}
@@ -635,13 +634,12 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
-              row.getValue('status_payment') == 'done'
-                ? 'border-blue-500 bg-blue-500 text-blue-600'
-                : row.getValue('status_payment') == 'not playing'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_payment') == 'done'
+              ? 'border-blue-500 bg-blue-500 text-blue-600'
+              : row.getValue('status_payment') == 'not playing'
                 ? 'border-purple-400 bg-purple-500 text-purple-600'
                 : 'border-gray-500 bg-gray-500 text-gray-700'
-            }`}
+              }`}
           >
             {' '}
             {row.getValue('status_payment') == 'playing' && (
@@ -1067,15 +1065,15 @@ function page() {
   const disableTimes =
     reserves.length > 0
       ? reserves
-          .map((reserve) => {
-            if (reserve.reserve_end_time) {
-              const [hour, minute, second] = reserve.reserve_end_time.split(':')
-              const formattedTime = `${hour}:${minute}`
-              return formattedTime
-            }
-            return null
-          })
-          .filter((time) => time !== null)
+        .map((reserve) => {
+          if (reserve.reserve_end_time) {
+            const [hour, minute, second] = reserve.reserve_end_time.split(':')
+            const formattedTime = `${hour}:${minute}`
+            return formattedTime
+          }
+          return null
+        })
+        .filter((time) => time !== null)
       : []
 
   React.useEffect(() => {
@@ -1391,60 +1389,6 @@ function page() {
                   </AlertDialogHeader>
                   <fieldset>
                     <form>
-                      {/* <div className="flex flex-col gap-2 mb-2">
-                        <label className="text-black" htmlFor="nama">
-                          Tanggal Reservasi
-                        </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <input
-                              type="text"
-                              value={selectedDateMove}
-                              onChange={(e) =>
-                                setSelectedDateMove(e.target.value)
-                              }
-                              name="tanggal_reservasi"
-                              id="tanggal_reservasi"
-                              placeholder="Pilih tanggal reservasi"
-                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                              min={currentDateMove}
-                              max={maxDateMove}
-                              required
-                            />
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={selectedDateMove}
-                              onSelect={(date) => {
-                                setDateMove(date)
-                                const nextDay = addDays(date, 1)
-                                setSelectedDateMove(
-                                  nextDay.toISOString().split('T')[0],
-                                )
-                                getAllReservationsPositon(
-                                  nextDay.toISOString().split('T')[0],
-                                )
-                                getTimeSelected(
-                                  nextDay.toISOString().split('T')[0],
-                                )
-                              }}
-                              disabled={(date) =>
-                                dateClose.length !== 0
-                                  ? date > addDays(new Date(), 15) ||
-                                    date < subDays(new Date(), 1) ||
-                                    (date.getDate() >=
-                                      convertToDate(dateClose[0]?.start_date) &&
-                                      date.getDate() <=
-                                        convertToDate(dateClose[0]?.end_date))
-                                  : date > addDays(new Date(), 15) ||
-                                    date < subDays(new Date(), 1)
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div> */}
                       <label className="text-black" htmlFor="nama">
                         Fasilitas
                       </label>
@@ -1452,7 +1396,7 @@ function page() {
                         value={typeSeatPlaying}
                         onValueChange={(value) => setTypeSeatPlaying(value)}
                         required
-                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 mt-3 "
+                        className="border border-border duration-500 mb-2 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 mt-3 "
                       >
                         <SelectTrigger className="py-5 px-3 text-base text-black">
                           <SelectValue
@@ -1473,21 +1417,24 @@ function page() {
                             </SelectItem>
                             <SelectItem
                               className="text-base"
-                              value="PS5 Reguler+"
+                              value="PS4 Reguler"
                             >
-                              PS5 Reguler+
+                              PS4 Reguler
                             </SelectItem>
                             <SelectItem className="text-base" value="Simulator">
                               Simulator
                             </SelectItem>
-                            <SelectItem
-                              className="text-base"
-                              value="Playstation 2"
-                            >
-                              Playstation 2
+                            <SelectItem className="text-base" value="Family Open Space">
+                              Family Open Space
                             </SelectItem>
-                            <SelectItem className="text-base" value="VIP Room">
-                              VIP Room
+                            <SelectItem className="text-base" value="Squad Open Space">
+                              Squad Open Space
+                            </SelectItem>
+                            <SelectItem className="text-base" value="Family VIP Room">
+                              Family VIP Room
+                            </SelectItem>
+                            <SelectItem className="text-base" value="LoveBirds VIP Room">
+                              LoveBirds VIP Room
                             </SelectItem>
                           </SelectGroup>
                         </SelectContent>
@@ -1514,15 +1461,6 @@ function page() {
                             </SelectLabel>
                             {typeSeatPlaying == 'PS5 Reguler' && (
                               <>
-                                <SelectItem className="text-base" value="1">
-                                  1
-                                </SelectItem>
-                                <SelectItem className="text-base" value="2">
-                                  2
-                                </SelectItem>
-                                <SelectItem className="text-base" value="3">
-                                  3
-                                </SelectItem>
                                 <SelectItem className="text-base" value="4">
                                   4
                                 </SelectItem>
@@ -1532,6 +1470,20 @@ function page() {
                                 <SelectItem className="text-base" value="8">
                                   8
                                 </SelectItem>
+                              </>
+                            )}
+                            {typeSeatPlaying == 'PS4 Reguler' && (
+                              <>
+                                <SelectItem className="text-base" value="1">
+                                  1
+                                </SelectItem>
+                                <SelectItem className="text-base" value="2">
+                                  2
+                                </SelectItem>
+                                <SelectItem className="text-base" value="3">
+                                  3
+                                </SelectItem>
+
                               </>
                             )}
                             {typeSeatPlaying == 'Simulator' && (
@@ -1544,127 +1496,55 @@ function page() {
                                 </SelectItem>
                               </>
                             )}
-                            {typeSeatPlaying == 'PS5 Reguler+' && (
+                            {typeSeatPlaying == 'Family Open Space' && (
                               <>
-                                <SelectItem className="text-base" value="6">
-                                  10
-                                </SelectItem>{' '}
-                                <SelectItem className="text-base" value="7">
-                                  11
+                                <SelectItem className="text-base" value="17">
+                                  17
                                 </SelectItem>
                               </>
                             )}
-                            {typeSeatPlaying == 'Playstation 2' && (
-                              <SelectItem className="text-base" value="9">
-                                9
-                              </SelectItem>
+                            {typeSeatPlaying == 'Squad Open Space' && (
+                              <>
+                                <SelectItem className="text-base" value="13">
+                                  13
+                                </SelectItem>{' '}
+                                <SelectItem className="text-base" value="14">
+                                  14
+                                </SelectItem>
+                                <SelectItem className="text-base" value="15">
+                                  15
+                                </SelectItem>
+                                <SelectItem className="text-base" value="16">
+                                  16
+                                </SelectItem>
+                              </>
                             )}
-                            {typeSeatPlaying == 'VIP Room' && (
-                              <SelectItem className="text-base" value="12">
-                                12
-                              </SelectItem>
+                            {typeSeatPlaying == 'Family VIP Room' && (
+                              <>
+                                <SelectItem className="text-base" value="18">
+                                  18
+                                </SelectItem>{' '}
+                                <SelectItem className="text-base" value="19">
+                                  19
+                                </SelectItem>
+                              </>
+                            )}
+                            {typeSeatPlaying == 'LoveBirds VIP Room' && (
+                              <>
+                                <SelectItem className="text-base" value="20">
+                                  20
+                                </SelectItem>{' '}
+                                <SelectItem className="text-base" value="21">
+                                  21
+                                </SelectItem>
+                                <SelectItem className="text-base" value="22">
+                                  22
+                                </SelectItem>
+                              </>
                             )}
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      {/* {selectedDateMove != '' && (
-                        <div className="flex gap-1 w-full mt-2 mb-3">
-                          <div className="flex flex-col gap-2 w-full flex-1">
-                            <label htmlFor="nama" className="text-sm">
-                              Start Time
-                            </label>
-                            <Select
-                              value={startTimeReservasi}
-                              onValueChange={(value) =>
-                                setStartTimeReservasi(value)
-                              }
-                              required
-                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                            >
-                              <SelectTrigger className="py-5 px-3 text-sm">
-                                <SelectValue
-                                  className="text-base"
-                                  placeholder="00.00"
-                                />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectLabel className="text-sm">
-                                    Pilih Waktu Mulai
-                                  </SelectLabel>
-                                  {generateTimeArray(
-                                    customTimeSelected,
-                                    selectedDateMove,
-                                    bookedSlots,
-                                  ).map((time, index) => (
-                                    <SelectItem key={index} value={time}>
-                                      {time}
-                                    </SelectItem>
-                                  ))}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="flex flex-col gap-2 w-full flex-1">
-                            <label htmlFor="nama" className="text-sm">
-                              End Time
-                            </label>
-                            <Select
-                              value={endTimeReservasi}
-                              onValueChange={(value) =>
-                                setEndTimeReservasi(value)
-                              }
-                              required
-                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                            >
-                              <SelectTrigger className="py-5 px-3 text-sm">
-                                <SelectValue
-                                  className="text-base"
-                                  placeholder="00.00"
-                                />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectLabel className="text-sm">
-                                    Pilih Waktu Berakhir
-                                  </SelectLabel>
-                                  {startTimeReservasi != '' &&
-                                  timeArray.length != 0 ? (
-                                    generateTimeArrayWithStep(
-                                      startTimeReservasi,
-                                      bookedSlots,
-                                    ).map((time, index) => {
-                                      const isDisabled = disableTimes.includes(
-                                        time,
-                                      )
-
-                                      return (
-                                        <SelectItem
-                                          key={index}
-                                          value={time}
-                                          className={'text-sm'}
-                                          disabled={isDisabled}
-                                        >
-                                          {time}
-                                        </SelectItem>
-                                      )
-                                    })
-                                  ) : (
-                                    <SelectItem value={'00.00'}>
-                                      <p className="text-gray-500">
-                                        Waktu yang kamu pilih <br />
-                                        sudah terisi. Silakan <br />
-                                        pilih waktu bermain <br />
-                                        di jam yang lain
-                                      </p>
-                                    </SelectItem>
-                                  )}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      )} */}
                     </form>
                   </fieldset>
 

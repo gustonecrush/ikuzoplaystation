@@ -2254,7 +2254,7 @@ export default function Reservation() {
                       {selectedReservationPlace == 'premium-space' && selectedDate != '' && (
                         <div className="flex flex-col mb-6">
                           <div
-                            className={`flex flex-row w-full gap-36 absolute left-7 md:top-20  md:left-32 z-50 gap-[${8 + scale * 10
+                            className={`flex flex-row w-[80%] gap-32 absolute left-7 md:top-20  ml-20 z-50 gap-[${8 + scale * 10
                               }]`}
                             ref={imageRef}
                             style={{
@@ -2272,7 +2272,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer md:w-28 md:h-28 w-10 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${number == 10 && 'mr-16'
+                                      className={`cursor-pointer md:w-32 md:h-32 w-10 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${number == 10 && 'mr-16'
                                         }`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
@@ -2523,7 +2523,7 @@ export default function Reservation() {
                                   <DrawerTrigger asChild>
                                     <div
                                       key={number}
-                                      className={`cursor-pointer md:w-28 md:h-28 w-16 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
+                                      className={`cursor-pointer md:w-32 md:h-32 w-16 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
                                       onClick={() => {
                                         setPosisiReservasi(number)
                                         setNamaPosisiReservasi(
