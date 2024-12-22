@@ -309,10 +309,6 @@ function page() {
     }
   }
 
-  console.log({ customTimeSelected })
-  console.log({ bookedSlots })
-  console.log({ startTimeReservasi })
-
   const handleOpenUpdate = (id) => {
     setIdSelected(id)
     setOpenUpdate(true)
@@ -434,6 +430,9 @@ function page() {
       setOpenUpdate(false)
     }
   }
+
+  const [selectedTypeSeat, setSelectedTypeSeat] = React.useState('')
+
   const columns = [
     {
       accessorKey: 'id',
@@ -719,6 +718,7 @@ function page() {
     },
     {
       accessorKey: 'location',
+
       header: ({ column }) => {
         return (
           <Button
@@ -850,6 +850,15 @@ function page() {
       ),
     },
   ]
+
+  React.useEffect(() => {
+    if (selectedTypeSeat) {
+      setColumnFilters([{ id: 'location', value: selectedTypeSeat }]);
+    } else {
+      setColumnFilters([]);
+    }
+  }, [selectedTypeSeat]);
+
   const table = useReactTable({
     data,
     columns,
@@ -1076,6 +1085,8 @@ function page() {
         .filter((time) => time !== null)
       : []
 
+
+
   React.useEffect(() => {
     getAllDataReservations()
     getAllDataStatistics()
@@ -1164,176 +1175,209 @@ function page() {
             <section className="gap-3 px-5 ml-8 bg-white shadow-md rounded-lg mt-5 ">
               <Card extra="mt-6 p-5 text-base">
                 <div className="w-full">
-                  <div className="flex items-center justify-between py-4">
-                    <Input
-                      placeholder="Cari ID Reservasi..."
-                      value={
-                        table.getColumn('reserve_id')?.getFilterValue() ?? ''
-                      }
-                      onChange={(event) =>
-                        table
-                          .getColumn('reserve_id')
-                          ?.setFilterValue(event.target.value)
-                      }
-                      className="max-w-sm"
-                    />
-                    <div className="flex gap-1">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="ml-auto">
-                            Tools <PiGearBold className="ml-2 h-4 w-4" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                          <div className="p-4 flex flex-col space-y-2">
-                            <Button
-                              variant="primary"
-                              onClick={(e) => {
-                                setIsHide(!isHide)
-                                if (!isHide) {
-                                  hideSuccessPayment()
-                                } else {
-                                  const nextDay = addDays(
-                                    Cookies.get('selectedDate'),
-                                    1,
-                                  )
-                                  setDate(Cookies.get('selectedDate'))
-                                  getAllDataReservations(
-                                    nextDay.toISOString().split('T')[0],
-                                  )
-                                }
-                              }}
-                            >
-                              {isHide ? 'Unhide' : 'Hide'} Success Payment{' '}
-                              {!isHide ? (
-                                <BiHide className="ml-2 h-4 w-4" />
-                              ) : (
-                                <FiEye className="ml-2 h-4 w-4" />
-                              )}
-                            </Button>
-
-                            <Button
-                              variant="primary"
-                              onClick={() => console.log('Button 3 clicked')}
-                            >
-                              Button 3
-                            </Button>
-                            <Button
-                              variant="primary"
-                              onClick={() => console.log('Button 4 clicked')}
-                            >
-                              Button 4
-                            </Button>
-                            <Button
-                              variant="primary"
-                              onClick={() => console.log('Button 5 clicked')}
-                            >
-                              Button 5
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline">
-                            Export{' '}
-                            <PiMicrosoftExcelLogoFill className="ml-2 h-4 w-4" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-full p-0 flex flex-col gap-2"
-                          align="start"
-                        >
-                          <div class="flex flex-row gap-2">
-                            <div>
-                              <label className="px-3 py-4 font-semibold text-sm">
-                                Select Start Date:
-                              </label>
-                              <Calendar
-                                mode="single"
-                                selected={dateStart}
-                                onSelect={(date) => {
-                                  setDateStart(date)
-                                  const nextDay = addDays(date, 1)
-                                  setDateStartExport(
-                                    nextDay.toISOString().split('T')[0],
-                                  )
-                                  Cookies.set(
-                                    'dateStartExport',
-                                    nextDay.toISOString().split('T')[0],
-                                  )
-                                }}
-                                initialFocus
-                              />
-                            </div>
-                            <div>
-                              <label className="px-3 py-4 font-semibold text-sm">
-                                Select End Date:
-                              </label>
-                              <Calendar
-                                mode="single"
-                                selected={dateEnd}
-                                onSelect={(date) => {
-                                  const nextDay = addDays(date, 1)
-                                  setDateEnd(date)
-                                  setDateEndExport(
-                                    nextDay.toISOString().split('T')[0],
-                                  )
-                                  Cookies.set(
-                                    'dateEndExport',
-                                    nextDay.toISOString().split('T')[0],
-                                  )
-                                }}
-                                initialFocus
-                              />
-                            </div>
-                          </div>
-                          <Button
-                            onClick={() => handleExportData()}
-                            variant="outline"
-                            className="ml-auto"
-                          >
-                            Export Data{' '}
-                            <PiMicrosoftExcelLogoFill className="ml-2 h-4 w-4" />
-                          </Button>
-                        </PopoverContent>
-                      </Popover>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="ml-auto">
-                            Tanggal {formatDate(date)}{' '}
-                            <IoMdCalendar className="ml-2 h-4 w-4" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={(date) => {
-                              const nextDay = addDays(date, 1)
-                              setDate(date)
-                              Cookies.set('selectedDate', date)
-                              getAllDataReservations(
-                                nextDay.toISOString().split('T')[0],
-                              )
-                            }}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-
-                      <Button
-                        onClick={(e) =>
-                          setOpenCreateReservationForm(
-                            !openCreateReservationForm,
-                          )
+                  <div className="flex flex-col">
+                    <div className="flex items-center justify-between py-4">
+                      <Input
+                        placeholder="Cari ID Reservasi..."
+                        value={
+                          table.getColumn('reserve_id')?.getFilterValue() ?? ''
                         }
-                        variant="outline"
-                        className="ml-auto"
-                      >
-                        Tambah Reservasi <IoMdAdd className="ml-2 h-4 w-4" />
-                      </Button>
+                        onChange={(event) =>
+                          table
+                            .getColumn('reserve_id')
+                            ?.setFilterValue(event.target.value)
+                        }
+                        className="max-w-sm"
+                      />
+                      <div className="flex gap-1">
+
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="ml-auto">
+                              Tools <PiGearBold className="ml-2 h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent>
+                            <div className="px-4 py-2 flex flex-col space-y-2">
+                              <Button
+                                variant="primary"
+                                onClick={(e) => {
+                                  setIsHide(!isHide)
+                                  if (!isHide) {
+                                    hideSuccessPayment()
+                                  } else {
+                                    const nextDay = addDays(
+                                      Cookies.get('selectedDate'),
+                                      1,
+                                    )
+                                    setDate(Cookies.get('selectedDate'))
+                                    getAllDataReservations(
+                                      nextDay.toISOString().split('T')[0],
+                                    )
+                                  }
+                                }}
+                              >
+                                {isHide ? 'Unhide' : 'Hide'} Success Payment{' '}
+                                {!isHide ? (
+                                  <BiHide className="ml-2 h-4 w-4" />
+                                ) : (
+                                  <FiEye className="ml-2 h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline">
+                              Export{' '}
+                              <PiMicrosoftExcelLogoFill className="ml-2 h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-full p-0 flex flex-col gap-2"
+                            align="start"
+                          >
+                            <div class="flex flex-row gap-2">
+                              <div>
+                                <label className="px-3 py-4 font-semibold text-sm">
+                                  Select Start Date:
+                                </label>
+                                <Calendar
+                                  mode="single"
+                                  selected={dateStart}
+                                  onSelect={(date) => {
+                                    setDateStart(date)
+                                    const nextDay = addDays(date, 1)
+                                    setDateStartExport(
+                                      nextDay.toISOString().split('T')[0],
+                                    )
+                                    Cookies.set(
+                                      'dateStartExport',
+                                      nextDay.toISOString().split('T')[0],
+                                    )
+                                  }}
+                                  initialFocus
+                                />
+                              </div>
+                              <div>
+                                <label className="px-3 py-4 font-semibold text-sm">
+                                  Select End Date:
+                                </label>
+                                <Calendar
+                                  mode="single"
+                                  selected={dateEnd}
+                                  onSelect={(date) => {
+                                    const nextDay = addDays(date, 1)
+                                    setDateEnd(date)
+                                    setDateEndExport(
+                                      nextDay.toISOString().split('T')[0],
+                                    )
+                                    Cookies.set(
+                                      'dateEndExport',
+                                      nextDay.toISOString().split('T')[0],
+                                    )
+                                  }}
+                                  initialFocus
+                                />
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => handleExportData()}
+                              variant="outline"
+                              className="ml-auto"
+                            >
+                              Export Data{' '}
+                              <PiMicrosoftExcelLogoFill className="ml-2 h-4 w-4" />
+                            </Button>
+                          </PopoverContent>
+                        </Popover>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="ml-auto">
+                              Tanggal {formatDate(date)}{' '}
+                              <IoMdCalendar className="ml-2 h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={date}
+                              onSelect={(date) => {
+                                const nextDay = addDays(date, 1)
+                                setDate(date)
+                                Cookies.set('selectedDate', date)
+                                getAllDataReservations(
+                                  nextDay.toISOString().split('T')[0],
+                                )
+                              }}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+
+                        <Button
+                          onClick={(e) =>
+                            setOpenCreateReservationForm(
+                              !openCreateReservationForm,
+                            )
+                          }
+                          variant="outline"
+                          className="ml-auto"
+                        >
+                          Tambah Reservasi <IoMdAdd className="ml-2 h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
+
+                    <Select
+                      value={selectedTypeSeat}
+                      onValueChange={(value) => setSelectedTypeSeat(value)}
+                      required
+                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4"
+                    >
+                      <SelectTrigger className="py-5 px-3 text-base mb-2 -mt-2 text-black">
+                        <SelectValue
+                          className="text-sm text-black placeholder:text-black"
+                          placeholder="Filter by Fasilitas"
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup className="">
+                          <SelectLabel className="text-sm">
+                            Fasilitas
+                          </SelectLabel>
+
+                          <SelectItem
+                            className="text-sm"
+                            value="PS5 Reguler"
+                          >
+                            PS5 Reguler
+                          </SelectItem>
+                          <SelectItem
+                            className="text-sm"
+                            value="PS4 Reguler"
+                          >
+                            PS4 Reguler
+                          </SelectItem>
+                          <SelectItem className="text-sm" value="Simulator">
+                            Simulator
+                          </SelectItem>
+                          <SelectItem className="text-sm" value="Family Open Space">
+                            Family Open Space
+                          </SelectItem>
+                          <SelectItem className="text-sm" value="Squad Open Space">
+                            Squad Open Space
+                          </SelectItem>
+                          <SelectItem className="text-sm" value="Family VIP Room">
+                            Family VIP Room
+                          </SelectItem>
+                          <SelectItem className="text-sm" value="LoveBirds VIP Room">
+                            LoveBirds VIP Room
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {isLoading ? (
@@ -1406,34 +1450,34 @@ function page() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup className="">
-                            <SelectLabel className="text-base">
+                            <SelectLabel className="text-sm">
                               Fasilitas
                             </SelectLabel>
                             <SelectItem
-                              className="text-base"
+                              className="text-sm"
                               value="PS5 Reguler"
                             >
                               PS5 Reguler
                             </SelectItem>
                             <SelectItem
-                              className="text-base"
+                              className="text-sm"
                               value="PS4 Reguler"
                             >
                               PS4 Reguler
                             </SelectItem>
-                            <SelectItem className="text-base" value="Simulator">
+                            <SelectItem className="text-sm" value="Simulator">
                               Simulator
                             </SelectItem>
-                            <SelectItem className="text-base" value="Family Open Space">
+                            <SelectItem className="text-sm" value="Family Open Space">
                               Family Open Space
                             </SelectItem>
-                            <SelectItem className="text-base" value="Squad Open Space">
+                            <SelectItem className="text-sm" value="Squad Open Space">
                               Squad Open Space
                             </SelectItem>
-                            <SelectItem className="text-base" value="Family VIP Room">
+                            <SelectItem className="text-sm" value="Family VIP Room">
                               Family VIP Room
                             </SelectItem>
-                            <SelectItem className="text-base" value="LoveBirds VIP Room">
+                            <SelectItem className="text-sm" value="LoveBirds VIP Room">
                               LoveBirds VIP Room
                             </SelectItem>
                           </SelectGroup>
@@ -1456,31 +1500,31 @@ function page() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup className="">
-                            <SelectLabel className="text-base">
+                            <SelectLabel className="text-sm">
                               Seat Number
                             </SelectLabel>
                             {typeSeatPlaying == 'PS5 Reguler' && (
                               <>
-                                <SelectItem className="text-base" value="4">
+                                <SelectItem className="text-sm" value="4">
                                   4
                                 </SelectItem>
-                                <SelectItem className="text-base" value="5">
+                                <SelectItem className="text-sm" value="5">
                                   5
                                 </SelectItem>
-                                <SelectItem className="text-base" value="8">
+                                <SelectItem className="text-sm" value="8">
                                   8
                                 </SelectItem>
                               </>
                             )}
                             {typeSeatPlaying == 'PS4 Reguler' && (
                               <>
-                                <SelectItem className="text-base" value="1">
+                                <SelectItem className="text-sm" value="1">
                                   1
                                 </SelectItem>
-                                <SelectItem className="text-base" value="2">
+                                <SelectItem className="text-sm" value="2">
                                   2
                                 </SelectItem>
-                                <SelectItem className="text-base" value="3">
+                                <SelectItem className="text-sm" value="3">
                                   3
                                 </SelectItem>
 
@@ -1488,56 +1532,56 @@ function page() {
                             )}
                             {typeSeatPlaying == 'Simulator' && (
                               <>
-                                <SelectItem className="text-base" value="6">
+                                <SelectItem className="text-sm" value="6">
                                   6
                                 </SelectItem>{' '}
-                                <SelectItem className="text-base" value="7">
+                                <SelectItem className="text-sm" value="7">
                                   7
                                 </SelectItem>
                               </>
                             )}
                             {typeSeatPlaying == 'Family Open Space' && (
                               <>
-                                <SelectItem className="text-base" value="17">
+                                <SelectItem className="text-sm" value="17">
                                   17
                                 </SelectItem>
                               </>
                             )}
                             {typeSeatPlaying == 'Squad Open Space' && (
                               <>
-                                <SelectItem className="text-base" value="13">
+                                <SelectItem className="text-sm" value="13">
                                   13
                                 </SelectItem>{' '}
-                                <SelectItem className="text-base" value="14">
+                                <SelectItem className="text-sm" value="14">
                                   14
                                 </SelectItem>
-                                <SelectItem className="text-base" value="15">
+                                <SelectItem className="text-sm" value="15">
                                   15
                                 </SelectItem>
-                                <SelectItem className="text-base" value="16">
+                                <SelectItem className="text-sm" value="16">
                                   16
                                 </SelectItem>
                               </>
                             )}
                             {typeSeatPlaying == 'Family VIP Room' && (
                               <>
-                                <SelectItem className="text-base" value="18">
+                                <SelectItem className="text-sm" value="18">
                                   18
                                 </SelectItem>{' '}
-                                <SelectItem className="text-base" value="19">
+                                <SelectItem className="text-sm" value="19">
                                   19
                                 </SelectItem>
                               </>
                             )}
                             {typeSeatPlaying == 'LoveBirds VIP Room' && (
                               <>
-                                <SelectItem className="text-base" value="20">
+                                <SelectItem className="text-sm" value="20">
                                   20
                                 </SelectItem>{' '}
-                                <SelectItem className="text-base" value="21">
+                                <SelectItem className="text-sm" value="21">
                                   21
                                 </SelectItem>
-                                <SelectItem className="text-base" value="22">
+                                <SelectItem className="text-sm" value="22">
                                   22
                                 </SelectItem>
                               </>
@@ -1590,19 +1634,19 @@ function page() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup className="">
-                            <SelectLabel className="text-base">
+                            <SelectLabel className="text-sm">
                               Status Playing
                             </SelectLabel>
-                            <SelectItem className="text-base" value="playing">
+                            <SelectItem className="text-sm" value="playing">
                               Playing
                             </SelectItem>
                             <SelectItem
-                              className="text-base"
+                              className="text-sm"
                               value="not playing"
                             >
                               Not Playing
                             </SelectItem>
-                            <SelectItem className="text-base" value="done">
+                            <SelectItem className="text-sm" value="done">
                               Done
                             </SelectItem>
                           </SelectGroup>
