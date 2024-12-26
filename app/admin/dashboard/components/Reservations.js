@@ -2254,7 +2254,7 @@ export default function Reservation() {
                       {selectedReservationPlace == 'premium-space' && selectedDate != '' && (
                         <div className="flex flex-col mb-6">
                           <div
-                            className={`flex flex-row w-[80%] gap-32 absolute left-7 md:top-20  ml-20 z-50 gap-[${8 + scale * 10
+                            className={`flex flex-row w-[80%] gap-32 md:gap-44 absolute left-7 md:top-20  ml-20 md:ml-40 z-50 gap-[${8 + scale * 10
                               }]`}
                             ref={imageRef}
                             style={{
@@ -2508,7 +2508,7 @@ export default function Reservation() {
                             })}
                           </div>
                           <div
-                            className={`flex flex-row w-auto bottom-28 gap-16 absolute left-[46%]   z-50 gap-[${8 + scale * 10
+                            className={`flex flex-row w-auto bottom-32 gap-16 absolute left-[46%]   z-50 gap-[${8 + scale * 10
                               }]`}
                             ref={imageRef}
                             style={{
@@ -3010,7 +3010,7 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row w-full bottom-40 gap-60 absolute left-6  md:left-36 z-50 gap-[${10 + scale * 10
+                            className={`flex flex-row w-full bottom-52 gap-60  md:gap-80 absolute left-6  md:left-48 z-50 gap-[${10 + scale * 10
                               }]`}
                             ref={imageRef}
                             style={{

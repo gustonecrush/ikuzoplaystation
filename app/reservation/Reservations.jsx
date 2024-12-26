@@ -2581,7 +2581,7 @@ export default function Reservation() {
 {selectedReservationPlace == 'premium-space' && selectedDate != '' && (
                         <div className="flex flex-col mb-6">
                              <div
-                            className={`flex flex-row w-full top-5 gap-8 absolute left-7 md:top-64  md:left-36 z-50 gap-[${
+                            className={`flex flex-row w-full top-5 gap-8 md:gap-16 absolute left-7 md:top-10  md:left-20 z-50 gap-[${
                               8 + scale * 10
                             }]`}
                             ref={imageRef}
@@ -2902,7 +2902,7 @@ export default function Reservation() {
                             })}
                           </div> 
                           <div
-                            className={`flex flex-row w-auto bottom-12 gap-16 absolute left-[46%] md:top-36  z-50 gap-[${
+                            className={`flex flex-row w-auto bottom-12 gap-16 absolute left-[46%] md:bottom-20  z-50 gap-[${
                               8 + scale * 10
                             }]`}
                             ref={imageRef}
@@ -3222,7 +3222,7 @@ export default function Reservation() {
 {selectedReservationPlace == 'private-space' && selectedDate != '' && (
                         <div className="flex flex-col mb-6">
                           <div
-                            className={`flex flex-row w-auto top-7 gap-16 absolute left-[16%] md:top-36  z-50 gap-[${
+                            className={`flex flex-row w-auto top-7 gap-16 md:gap-64 absolute left-[16%] md:top-16  z-50 gap-[${
                               10 + scale * 10
                             }]`}
                             ref={imageRef}
@@ -3536,7 +3536,7 @@ export default function Reservation() {
                           </div>
 
                           <div
-                            className={`flex flex-row w-full top-[11rem] gap-3 absolute left-6 md:top-64  md:left-36 z-50 gap-[${
+                            className={`flex flex-row w-full top-[11rem] md:top-[26rem] gap-3 md:gap-24 absolute left-6  md:left-32 z-50 gap-[${
                               10 + scale * 10
                             }]`}
                             ref={imageRef}
