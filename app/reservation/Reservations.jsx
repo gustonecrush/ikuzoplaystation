@@ -985,8 +985,9 @@ export default function Reservation() {
                                               : 'h-fit'
                                           } overflow-y-scroll py-4 px-7`}
                                         >
-                                          {filteredCatalogs.length == 0
-                                            ? catalogs.map((catalog, index) => (
+                                          {filteredCatalogs.length == 0 ? (
+                                            filterKeyword == '' ? (
+                                              catalogs.map((catalog, index) => (
                                                 <div
                                                   key={index}
                                                   className="flex flex-col gap-2 items-center justify-center"
@@ -1006,28 +1007,47 @@ export default function Reservation() {
                                                   </p>
                                                 </div>
                                               ))
-                                            : filteredCatalogs.map(
-                                                (catalog, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="flex flex-col gap-2 items-center justify-center"
-                                                  >
-                                                    <Image
-                                                      alt={catalog.catalog_img}
-                                                      width={0}
-                                                      height={0}
-                                                      className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
-                                                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                                    />
-                                                    <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                                      {catalog.catalog_txt.substring(
-                                                        0,
-                                                        10,
-                                                      ) + '...'}
-                                                    </p>
-                                                  </div>
-                                                ),
-                                              )}
+                                            ) : (
+                                              <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                                <div className="flex flex-col gap-1 items-center justify-center">
+                                                  <Image
+                                                    src={'/error.png'}
+                                                    width={0}
+                                                    height={0}
+                                                    className="w-[150px]"
+                                                    alt={'No content available'}
+                                                  />
+                                                  <p className="text-base font-normal text-gray-400">
+                                                    There is no any contents
+                                                    right now ikuzo!
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            )
+                                          ) : (
+                                            filteredCatalogs.map(
+                                              (catalog, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="flex flex-col gap-2 items-center justify-center"
+                                                >
+                                                  <Image
+                                                    alt={catalog.catalog_img}
+                                                    width={0}
+                                                    height={0}
+                                                    className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                                  />
+                                                  <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                                    {catalog.catalog_txt.substring(
+                                                      0,
+                                                      10,
+                                                    ) + '...'}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -1343,8 +1363,9 @@ export default function Reservation() {
                                               : 'h-fit'
                                           } overflow-y-scroll py-4 px-7`}
                                         >
-                                          {filteredCatalogs.length == 0
-                                            ? catalogs.map((catalog, index) => (
+                                          {filteredCatalogs.length == 0 ? (
+                                            filterKeyword == '' ? (
+                                              catalogs.map((catalog, index) => (
                                                 <div
                                                   key={index}
                                                   className="flex flex-col gap-2 items-center justify-center"
@@ -1364,28 +1385,47 @@ export default function Reservation() {
                                                   </p>
                                                 </div>
                                               ))
-                                            : filteredCatalogs.map(
-                                                (catalog, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="flex flex-col gap-2 items-center justify-center"
-                                                  >
-                                                    <Image
-                                                      alt={catalog.catalog_img}
-                                                      width={0}
-                                                      height={0}
-                                                      className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
-                                                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                                    />
-                                                    <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                                      {catalog.catalog_txt.substring(
-                                                        0,
-                                                        10,
-                                                      ) + '...'}
-                                                    </p>
-                                                  </div>
-                                                ),
-                                              )}
+                                            ) : (
+                                              <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                                <div className="flex flex-col gap-1 items-center justify-center">
+                                                  <Image
+                                                    src={'/error.png'}
+                                                    width={0}
+                                                    height={0}
+                                                    className="w-[150px]"
+                                                    alt={'No content available'}
+                                                  />
+                                                  <p className="text-base font-normal text-gray-400">
+                                                    There is no any contents
+                                                    right now ikuzo!
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            )
+                                          ) : (
+                                            filteredCatalogs.map(
+                                              (catalog, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="flex flex-col gap-2 items-center justify-center"
+                                                >
+                                                  <Image
+                                                    alt={catalog.catalog_img}
+                                                    width={0}
+                                                    height={0}
+                                                    className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                                  />
+                                                  <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                                    {catalog.catalog_txt.substring(
+                                                      0,
+                                                      10,
+                                                    ) + '...'}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -1701,8 +1741,9 @@ export default function Reservation() {
                                               : 'h-fit'
                                           } overflow-y-scroll py-4 px-7`}
                                         >
-                                          {filteredCatalogs.length == 0
-                                            ? catalogs.map((catalog, index) => (
+                                          {filteredCatalogs.length == 0 ? (
+                                            filterKeyword == '' ? (
+                                              catalogs.map((catalog, index) => (
                                                 <div
                                                   key={index}
                                                   className="flex flex-col gap-2 items-center justify-center"
@@ -1722,28 +1763,47 @@ export default function Reservation() {
                                                   </p>
                                                 </div>
                                               ))
-                                            : filteredCatalogs.map(
-                                                (catalog, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="flex flex-col gap-2 items-center justify-center"
-                                                  >
-                                                    <Image
-                                                      alt={catalog.catalog_img}
-                                                      width={0}
-                                                      height={0}
-                                                      className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
-                                                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                                    />
-                                                    <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                                      {catalog.catalog_txt.substring(
-                                                        0,
-                                                        10,
-                                                      ) + '...'}
-                                                    </p>
-                                                  </div>
-                                                ),
-                                              )}
+                                            ) : (
+                                              <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                                <div className="flex flex-col gap-1 items-center justify-center">
+                                                  <Image
+                                                    src={'/error.png'}
+                                                    width={0}
+                                                    height={0}
+                                                    className="w-[150px]"
+                                                    alt={'No content available'}
+                                                  />
+                                                  <p className="text-base font-normal text-gray-400">
+                                                    There is no any contents
+                                                    right now ikuzo!
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            )
+                                          ) : (
+                                            filteredCatalogs.map(
+                                              (catalog, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="flex flex-col gap-2 items-center justify-center"
+                                                >
+                                                  <Image
+                                                    alt={catalog.catalog_img}
+                                                    width={0}
+                                                    height={0}
+                                                    className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                                  />
+                                                  <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                                    {catalog.catalog_txt.substring(
+                                                      0,
+                                                      10,
+                                                    ) + '...'}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -3013,8 +3073,9 @@ export default function Reservation() {
                                               : 'h-fit'
                                           } overflow-y-scroll py-4 px-7`}
                                         >
-                                          {filteredCatalogs.length == 0
-                                            ? catalogs.map((catalog, index) => (
+                                          {filteredCatalogs.length == 0 ? (
+                                            filterKeyword == '' ? (
+                                              catalogs.map((catalog, index) => (
                                                 <div
                                                   key={index}
                                                   className="flex flex-col gap-2 items-center justify-center"
@@ -3034,28 +3095,47 @@ export default function Reservation() {
                                                   </p>
                                                 </div>
                                               ))
-                                            : filteredCatalogs.map(
-                                                (catalog, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="flex flex-col gap-2 items-center justify-center"
-                                                  >
-                                                    <Image
-                                                      alt={catalog.catalog_img}
-                                                      width={0}
-                                                      height={0}
-                                                      className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
-                                                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                                    />
-                                                    <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                                      {catalog.catalog_txt.substring(
-                                                        0,
-                                                        10,
-                                                      ) + '...'}
-                                                    </p>
-                                                  </div>
-                                                ),
-                                              )}
+                                            ) : (
+                                              <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                                <div className="flex flex-col gap-1 items-center justify-center">
+                                                  <Image
+                                                    src={'/error.png'}
+                                                    width={0}
+                                                    height={0}
+                                                    className="w-[150px]"
+                                                    alt={'No content available'}
+                                                  />
+                                                  <p className="text-base font-normal text-gray-400">
+                                                    There is no any contents
+                                                    right now ikuzo!
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            )
+                                          ) : (
+                                            filteredCatalogs.map(
+                                              (catalog, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="flex flex-col gap-2 items-center justify-center"
+                                                >
+                                                  <Image
+                                                    alt={catalog.catalog_img}
+                                                    width={0}
+                                                    height={0}
+                                                    className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                                  />
+                                                  <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                                    {catalog.catalog_txt.substring(
+                                                      0,
+                                                      10,
+                                                    ) + '...'}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -3371,8 +3451,9 @@ export default function Reservation() {
                                               : 'h-fit'
                                           } overflow-y-scroll py-4 px-7`}
                                         >
-                                          {filteredCatalogs.length == 0
-                                            ? catalogs.map((catalog, index) => (
+                                          {filteredCatalogs.length == 0 ? (
+                                            filterKeyword == '' ? (
+                                              catalogs.map((catalog, index) => (
                                                 <div
                                                   key={index}
                                                   className="flex flex-col gap-2 items-center justify-center"
@@ -3392,28 +3473,47 @@ export default function Reservation() {
                                                   </p>
                                                 </div>
                                               ))
-                                            : filteredCatalogs.map(
-                                                (catalog, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="flex flex-col gap-2 items-center justify-center"
-                                                  >
-                                                    <Image
-                                                      alt={catalog.catalog_img}
-                                                      width={0}
-                                                      height={0}
-                                                      className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
-                                                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                                    />
-                                                    <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                                      {catalog.catalog_txt.substring(
-                                                        0,
-                                                        10,
-                                                      ) + '...'}
-                                                    </p>
-                                                  </div>
-                                                ),
-                                              )}
+                                            ) : (
+                                              <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                                <div className="flex flex-col gap-1 items-center justify-center">
+                                                  <Image
+                                                    src={'/error.png'}
+                                                    width={0}
+                                                    height={0}
+                                                    className="w-[150px]"
+                                                    alt={'No content available'}
+                                                  />
+                                                  <p className="text-base font-normal text-gray-400">
+                                                    There is no any contents
+                                                    right now ikuzo!
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            )
+                                          ) : (
+                                            filteredCatalogs.map(
+                                              (catalog, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="flex flex-col gap-2 items-center justify-center"
+                                                >
+                                                  <Image
+                                                    alt={catalog.catalog_img}
+                                                    width={0}
+                                                    height={0}
+                                                    className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                                  />
+                                                  <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                                    {catalog.catalog_txt.substring(
+                                                      0,
+                                                      10,
+                                                    ) + '...'}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -3732,8 +3832,9 @@ export default function Reservation() {
                                               : 'h-fit'
                                           } overflow-y-scroll py-4 px-7`}
                                         >
-                                          {filteredCatalogs.length == 0
-                                            ? catalogs.map((catalog, index) => (
+                                          {filteredCatalogs.length == 0 ? (
+                                            filterKeyword == '' ? (
+                                              catalogs.map((catalog, index) => (
                                                 <div
                                                   key={index}
                                                   className="flex flex-col gap-2 items-center justify-center"
@@ -3753,28 +3854,47 @@ export default function Reservation() {
                                                   </p>
                                                 </div>
                                               ))
-                                            : filteredCatalogs.map(
-                                                (catalog, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="flex flex-col gap-2 items-center justify-center"
-                                                  >
-                                                    <Image
-                                                      alt={catalog.catalog_img}
-                                                      width={0}
-                                                      height={0}
-                                                      className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
-                                                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                                    />
-                                                    <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                                      {catalog.catalog_txt.substring(
-                                                        0,
-                                                        10,
-                                                      ) + '...'}
-                                                    </p>
-                                                  </div>
-                                                ),
-                                              )}
+                                            ) : (
+                                              <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                                <div className="flex flex-col gap-1 items-center justify-center">
+                                                  <Image
+                                                    src={'/error.png'}
+                                                    width={0}
+                                                    height={0}
+                                                    className="w-[150px]"
+                                                    alt={'No content available'}
+                                                  />
+                                                  <p className="text-base font-normal text-gray-400">
+                                                    There is no any contents
+                                                    right now ikuzo!
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            )
+                                          ) : (
+                                            filteredCatalogs.map(
+                                              (catalog, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="flex flex-col gap-2 items-center justify-center"
+                                                >
+                                                  <Image
+                                                    alt={catalog.catalog_img}
+                                                    width={0}
+                                                    height={0}
+                                                    className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                                  />
+                                                  <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                                    {catalog.catalog_txt.substring(
+                                                      0,
+                                                      10,
+                                                    ) + '...'}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -4091,8 +4211,9 @@ export default function Reservation() {
                                               : 'h-fit'
                                           } overflow-y-scroll py-4 px-7`}
                                         >
-                                          {filteredCatalogs.length == 0
-                                            ? catalogs.map((catalog, index) => (
+                                          {filteredCatalogs.length == 0 ? (
+                                            filterKeyword == '' ? (
+                                              catalogs.map((catalog, index) => (
                                                 <div
                                                   key={index}
                                                   className="flex flex-col gap-2 items-center justify-center"
@@ -4112,28 +4233,47 @@ export default function Reservation() {
                                                   </p>
                                                 </div>
                                               ))
-                                            : filteredCatalogs.map(
-                                                (catalog, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="flex flex-col gap-2 items-center justify-center"
-                                                  >
-                                                    <Image
-                                                      alt={catalog.catalog_img}
-                                                      width={0}
-                                                      height={0}
-                                                      className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
-                                                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
-                                                    />
-                                                    <p className="text-gray-500 text-sm text-center leading-[100%]">
-                                                      {catalog.catalog_txt.substring(
-                                                        0,
-                                                        10,
-                                                      ) + '...'}
-                                                    </p>
-                                                  </div>
-                                                ),
-                                              )}
+                                            ) : (
+                                              <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                                <div className="flex flex-col gap-1 items-center justify-center">
+                                                  <Image
+                                                    src={'/error.png'}
+                                                    width={0}
+                                                    height={0}
+                                                    className="w-[150px]"
+                                                    alt={'No content available'}
+                                                  />
+                                                  <p className="text-base font-normal text-gray-400">
+                                                    There is no any contents
+                                                    right now ikuzo!
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            )
+                                          ) : (
+                                            filteredCatalogs.map(
+                                              (catalog, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="flex flex-col gap-2 items-center justify-center"
+                                                >
+                                                  <Image
+                                                    alt={catalog.catalog_img}
+                                                    width={0}
+                                                    height={0}
+                                                    className="rounded-lg w-full h-[110px] !md:[300px] object-cover"
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${catalog.catalog_img}`}
+                                                  />
+                                                  <p className="text-gray-500 text-sm text-center leading-[100%]">
+                                                    {catalog.catalog_txt.substring(
+                                                      0,
+                                                      10,
+                                                    ) + '...'}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="w-full mt-10 mb-8  flex items-center justify-center">
