@@ -979,7 +979,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -1357,7 +1362,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -1735,7 +1745,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -1942,7 +1957,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -2260,7 +2280,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -2574,7 +2599,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -3067,7 +3097,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -3445,7 +3480,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -3826,7 +3866,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
@@ -4205,7 +4250,12 @@ export default function Reservation() {
                                         </div>
                                       ) : catalogs.length > 0 ? (
                                         <div
-                                          className={`grid grid-cols-3 gap-4  ${
+                                          className={`grid ${
+                                            filteredCatalogs.length == 0 &&
+                                            filterKeyword != ''
+                                              ? 'grid-cols-1'
+                                              : 'grid-cols-3'
+                                          } gap-4  ${
                                             catalogs.length > 9
                                               ? 'h-[350px]'
                                               : 'h-fit'
