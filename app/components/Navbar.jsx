@@ -24,6 +24,7 @@ const Navbar = () => {
   const [searchResults, setSearchResults] = useState(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [isEmpty, setIsEmpty] = useState(false)
 
   const handleSearch = async () => {
     if (catalogTxt) {
@@ -34,6 +35,7 @@ const Navbar = () => {
         setSearchResults(response.data)
       } catch (error) {
         console.error('Error fetching data:', error)
+        setIsEmpty(true)
       }
     }
   }
@@ -238,7 +240,9 @@ const Navbar = () => {
 
                   {/* Display Results */}
                   <div className="h-[450px] overflow-y-scroll">
-                    {searchResults && Object.keys(searchResults).length > 0 ? (
+                    {searchResults &&
+                    Object.keys(searchResults).length > 0 &&
+                    !isEmpty ? (
                       <div className="mt-4">
                         {Object.keys(searchResults).map(
                           (catalog_txt, index) => (
