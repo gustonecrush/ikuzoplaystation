@@ -18,6 +18,7 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
+import { HashLoader } from 'react-spinners'
 
 const Navbar = () => {
   const [catalogTxt, setCatalogTxt] = useState('')
@@ -25,17 +26,23 @@ const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [isEmpty, setIsEmpty] = useState(false)
+  const [isLoadingSearch, setIsLoadingSearch] = useState(false)
 
   const handleSearch = async () => {
     if (catalogTxt) {
+      setIsLoadingSearch(true)
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/search?catalog_txt=${catalogTxt}`,
         )
         setSearchResults(response.data)
+        setIsLoadingSearch(false)
+        setIsEmpty(false)
       } catch (error) {
         console.error('Error fetching data:', error)
         setIsEmpty(true)
+        setSearchResults(null)
+        setIsLoadingSearch(false)
       }
     }
   }
@@ -214,7 +221,16 @@ const Navbar = () => {
             </div>
 
             {/* Drawer for Search */}
-            <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+            <Drawer
+              open={drawerOpen}
+              onClose={() => {
+                setDrawerOpen(false)
+                setIsEmpty(true)
+                setSearchResults(null)
+                setIsLoadingSearch(false)
+                setCatalogTxt('')
+              }}
+            >
               <DrawerContent className="w-full md:max-w-3xl z-[9999999]">
                 <DrawerHeader>
                   <DrawerTitle>Search Catalog</DrawerTitle>
@@ -231,18 +247,24 @@ const Navbar = () => {
                     onChange={handleChange}
                     className="w-full p-2 mb-4 border rounded text-gray-500"
                   />
-                  <Button
-                    onClick={handleSearch}
-                    className="w-full bg-orange text-white"
-                  >
-                    Search
-                  </Button>
+                  {!isLoadingSearch && (
+                    <Button
+                      onClick={handleSearch}
+                      className="w-full bg-orange text-white"
+                    >
+                      Search
+                    </Button>
+                  )}
 
                   {/* Display Results */}
                   <div className="h-[450px] overflow-y-scroll">
-                    {searchResults &&
-                    Object.keys(searchResults).length > 0 &&
-                    !isEmpty ? (
+                    {isLoadingSearch ? (
+                      <div className="flex items-center justify-center p-10 pt-20">
+                        <HashLoader color="#FF6200" />
+                      </div>
+                    ) : searchResults != null &&
+                      Object.keys(searchResults).length > 0 &&
+                      !isEmpty ? (
                       <div className="mt-4">
                         {Object.keys(searchResults).map(
                           (catalog_txt, index) => (
@@ -312,6 +334,13 @@ const Navbar = () => {
                 <DrawerFooter>
                   <DrawerClose asChild>
                     <Button
+                      onClick={() => {
+                        setDrawerOpen(false)
+                        setIsEmpty(true)
+                        setSearchResults(null)
+                        setIsLoadingSearch(false)
+                        setCatalogTxt('')
+                      }}
                       variant="outline"
                       className="w-full bg-transparent text-orange border-orange"
                     >
