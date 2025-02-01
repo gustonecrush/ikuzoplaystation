@@ -58,10 +58,21 @@ import { formatDateOnTheUI, getCurrentDate, getMaxDate } from '@/utils/date'
 import { IoGameController, IoLaptopSharp } from 'react-icons/io5'
 import { MdOutlineChair } from 'react-icons/md'
 
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select'
+
 function page() {
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [statusPlaying, setStatusPlaying] = React.useState('')
+
+  const [seatFilter, setSeatFilter] = React.useState('')
+  const [catalogTxtFilter, setCatalogTxtFilter] = React.useState('')
 
   const [date, setDate] = React.useState(null)
   const [selectedDate, setSelectedDate] = React.useState('')
@@ -125,62 +136,6 @@ function page() {
     setData('')
   }
 
-  const handleUploadCustomTime = async (e) => {
-    e.preventDefault()
-
-    const data = {
-      start_date: selectedDate,
-      end_date: selectedDate2 == '' ? selectedDate : selectedDate2,
-    }
-
-    try {
-      const response = await axios.post(`${baseUrl}/dates`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (response.status == 200) {
-        const jsonData = await response.data
-        console.log({ jsonData })
-      } else {
-        console.error({ error })
-        throw new Error('Failed to fetch data')
-      }
-
-      Toast.fire({
-        icon: 'success',
-        title: `Setting waktu berhasil ditambahkan!`,
-      })
-
-      getAllDataCatalogs()
-      setOpenCreateReservationForm(false)
-      clearFormCustomTime()
-    } catch (error) {
-      console.error({ error })
-
-      if (error.code == 'ERR_NETWORK') {
-        Toast.fire({
-          icon: 'error',
-          title: `Setting waktu gagal ditambahkan!`,
-        })
-      } else {
-        Toast.fire({
-          icon: 'error',
-          title: `Internal server sedang error, coba lagi nanti!`,
-        })
-      }
-
-      clearFormCustomTime()
-      setOpenCreateReservationForm(false)
-    }
-  }
-
-  const handleOpenUpdate = (id) => {
-    setIdSelected(id)
-    setOpenUpdate(true)
-    setOpenCreateReservationForm(true)
-  }
   const handleUpdateFacilityContent = async (id) => {
     const data = {
       start_date: selectedDate,
@@ -232,7 +187,7 @@ function page() {
   }
   const columns = [
     {
-      accessorKey: 'id',
+      accessorKey: 'created_at',
       header: ({ column }) => {
         return (
           <Button
@@ -324,7 +279,7 @@ function page() {
       ),
     },
     {
-      accessorKey: 'catalog_img',
+      accessorKey: 'catalog_txt',
       header: ({ column }) => {
         return (
           <Button
@@ -341,11 +296,10 @@ function page() {
         <div className="w-fit text-center flex items-center">
           {' '}
           <Image
-            src={
-              process.env.NEXT_PUBLIC_IMAGE_URL + row.getValue('catalog_img')
-            }
+            src={process.env.NEXT_PUBLIC_IMAGE_URL + row.original.catalog_img}
             width={0}
             height={0}
+            alt={row.original.catalog_txt}
             className="w-24"
           />
         </div>
@@ -356,21 +310,23 @@ function page() {
     data,
     columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: setColumnFilters, // Pastikan ini ada
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    getFilteredRowModel: getFilteredRowModel(), // Pastikan ini ada
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    getFilteredRowModel: getFilteredRowModel(), // Tambahkan ini
     state: {
       sorting,
-      columnFilters,
+      columnFilters, // Pastikan state ini ada
       columnVisibility,
       rowSelection,
     },
   })
 
+  console.log('Column Filters:', columnFilters)
   const router = useRouter()
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
@@ -417,7 +373,10 @@ function page() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/catalogs`,
       )
       if (response.status == 200) {
-        const jsonData = await response.data
+        let jsonData = response.data.map((row) => ({
+          ...row,
+          no_seat: String(row.no_seat), // Convert all to string
+        }))
         setData(jsonData)
         console.log({ jsonData })
         setIsLoading(false)
@@ -578,19 +537,39 @@ function page() {
             <Card extra="mt-6 p-5 text-base">
               <div className="w-full">
                 <div className="flex items-center justify-between py-4">
-                  <Input
-                    placeholder="Cari Tanggal..."
-                    value={
-                      table.getColumn('start_date')?.getFilterValue() ?? ''
-                    }
-                    onChange={(event) =>
-                      table
-                        .getColumn('start_date')
-                        ?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                  />
                   <div className="flex gap-1">
+                    <Input
+                      placeholder="Cari berdasarkan nama game..."
+                      value={catalogTxtFilter}
+                      onChange={(event) => {
+                        setCatalogTxtFilter(event.target.value)
+                        table
+                          .getColumn('catalog_txt')
+                          ?.setFilterValue(event.target.value)
+                      }}
+                      className="max-w-sm"
+                    />
+                    <Select
+                      value={seatFilter}
+                      onValueChange={(value) => {
+                        setSeatFilter(value)
+                        console.log(value)
+                        table.getColumn('no_seat').setFilterValue(value)
+                      }}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by Seat" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 22 }, (_, i) => i + 1).map(
+                          (seat) => (
+                            <SelectItem key={seat} value={seat.toString()}>
+                              Seat {seat}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
                     <Button
                       onClick={(e) =>
                         setOpenCreateReservationForm(!openCreateReservationForm)
