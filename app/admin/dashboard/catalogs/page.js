@@ -364,6 +364,25 @@ function page() {
     }
   }
 
+  const facilityMapping = {
+    'PS4 Reguler': [1, 2, 3, 4, 5],
+    'Ikuzo Racing Simulator': [6, 7],
+    'PS5 Reguler+': [8],
+    'Squad Open Space': [13, 14, 15, 16],
+    'Family Open Space': [17],
+    'LoveBirds VIP Room': [18, 19],
+    'Family VIP Room': [20, 21, 22],
+  }
+
+  const getFacilityName = (seatNumber) => {
+    for (const [facility, seats] of Object.entries(facilityMapping)) {
+      if (seats.includes(seatNumber)) {
+        return facility
+      }
+    }
+    return 'Unknown Facility' // Jika nomor kursi tidak ditemukan
+  }
+
   console.log(data)
 
   const getAllDataCatalogs = async () => {
@@ -553,20 +572,25 @@ function page() {
                       value={seatFilter}
                       onValueChange={(value) => {
                         setSeatFilter(value)
-                        console.log(value)
                         table.getColumn('no_seat').setFilterValue(value)
                       }}
                     >
-                      <SelectTrigger className="w-[180px]">
+                      <SelectTrigger className="w-[280px]">
+                        {' '}
+                        {/* Lebarkan agar muat nama fasilitas */}
                         <SelectValue placeholder="Filter by Seat" />
                       </SelectTrigger>
                       <SelectContent>
                         {Array.from({ length: 22 }, (_, i) => i + 1).map(
-                          (seat) => (
-                            <SelectItem key={seat} value={seat.toString()}>
-                              Seat {seat}
-                            </SelectItem>
-                          ),
+                          (seat) => {
+                            const facilityName = getFacilityName(seat) // Dapatkan nama fasilitas
+                            return (
+                              <SelectItem key={seat} value={seat.toString()}>
+                                Seat {seat} - {facilityName}{' '}
+                                {/* Tampilkan nomor kursi dan nama fasilitas */}
+                              </SelectItem>
+                            )
+                          },
                         )}
                       </SelectContent>
                     </Select>
