@@ -214,10 +214,10 @@ const Navbar = () => {
             </Link>
 
             <div className="flex justify-between items-center px-3 relative w-full">
-              <FiSearch
+              <Link href={'/search/catalogs'}> <FiSearch
                 className="text-orange text-2xl cursor-pointer"
-                onClick={() => setDrawerOpen(true)}
-              />
+              /></Link>
+             
             </div>
 
             {/* Drawer for Search */}
