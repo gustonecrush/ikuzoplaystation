@@ -4,24 +4,13 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { FiSearch } from 'react-icons/fi'
 import Image from 'next/image'
-import Marquee from 'react-fast-marquee'
 import Link from 'next/link'
 
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { HashLoader } from 'react-spinners'
 import { IoArrowBack } from 'react-icons/io5'
 
-const page = () => {
+const Page = () => {
     const [catalogTxt, setCatalogTxt] = useState('')
     const [searchResults, setSearchResults] = useState(null)
     const [drawerOpen, setDrawerOpen] = useState(false)
@@ -292,4 +281,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page
