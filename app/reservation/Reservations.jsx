@@ -39,7 +39,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Calendar } from '@/components/ui/calendar'
-import { addDays, subDays } from 'date-fns'
+import { addDays, subDays, format, startOfDay } from 'date-fns'
 import axios from 'axios'
 import {
   Drawer,
@@ -158,7 +158,6 @@ export default function Reservation() {
     }
   }
 
-
   const [customTimeSelected, setCustomTimeSelected] = React.useState([])
   const [dateClose, setDateClose] = React.useState([])
 
@@ -204,7 +203,6 @@ export default function Reservation() {
       setIsLoading(false)
     }
   }
-
 
   /***********************************************************
    * functions & states for scaling image
@@ -403,7 +401,6 @@ export default function Reservation() {
           .filter((time) => time !== null)
       : []
 
-
   const [drawerContent, setDrawerContent] = useState('default')
   const [selectedSeat, setSelectedSeat] = React.useState(0)
   const [catalogs, setCatalogs] = React.useState([])
@@ -452,14 +449,14 @@ export default function Reservation() {
     setFilterKeyword('')
   }
 
-  React.useEffect(() => {
-    // Memastikan currentDate dan maxDate selalu update setiap hari
-    const interval = setInterval(() => {
-      setCurrentDate(format(new Date(), "yyyy-MM-dd"));
-      setMaxDate(format(addDays(new Date(), 14), "yyyy-MM-dd"));
-    }, 24 * 60 * 60 * 1000); // Perbarui setiap 24 jam
-    return () => clearInterval(interval);
-  }, []);
+  // React.useEffect(() => {
+  //   // Memastikan currentDate dan maxDate selalu update setiap hari
+  //   const interval = setInterval(() => {
+  //     setCurrentDate(getCurrentDate) // Set ke kemarin
+  //     setMaxDate(getMaxDate)
+  //   }, 24 * 60 * 60 * 1000) // Perbarui setiap 24 jam
+  //   return () => clearInterval(interval)
+  // }, [])
 
   return (
     <>
@@ -543,50 +540,50 @@ export default function Reservation() {
 
               {/* Tanggal Reservasi */}
               <Fade delay={600} duration={1200}>
-      <div className="flex flex-col gap-2">
-        <label className="text-white" htmlFor="nama">
-          Tanggal Reservasi
-        </label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <input
-              type="text"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              name="tanggal_reservasi"
-              id="tanggal_reservasi"
-              placeholder="Pilih tanggal reservasi"
-              className="border border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange w-full"
-              min={currentDate}
-              max={maxDate}
-              required
-              readOnly
-            />
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={(date) => {
-                setDate(date);
-                const nextDay = addDays(date, 1);
-                setSelectedDate(format(nextDay, "yyyy-MM-dd"));
-                getAllReservationsPosition(format(nextDay, "yyyy-MM-dd"));
-                getTimeSelected(format(nextDay, "yyyy-MM-dd"));
-              }}
-              disabled={(date) =>
-                dateClose.length !== 0
-                  ? date > addDays(new Date(), 14) || date < new Date() || 
-                    (date >= new Date(dateClose[0]?.start_date) && 
-                     date <= new Date(dateClose[0]?.end_date))
-                  : date > addDays(new Date(), 14) || date < new Date()
-              }
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-    </Fade>
+                <div className="flex flex-col gap-2">
+                  <label className="text-white" htmlFor="nama">
+                    Tanggal Reservasi
+                  </label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <input
+                        type="text"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        name="tanggal_reservasi"
+                        id="tanggal_reservasi"
+                        placeholder="Pilih tanggal reservasi"
+                        className="border border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange w-full"
+                        required
+                        readOnly
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(date) => {
+                          setDate(date)
+                          // const nextDay = addDays(date)
+                          setSelectedDate(format(date, 'yyyy-MM-dd'))
+                          getAllReservationsPosition(format(date, 'yyyy-MM-dd'))
+                          getTimeSelected(format(date, 'yyyy-MM-dd'))
+                        }}
+                        disabled={(date) => {
+                          const today = startOfDay(new Date()) // Removes time from today
+                          return dateClose.length !== 0
+                            ? date > addDays(today, 14) ||
+                                date < today ||
+                                (date >= new Date(dateClose[0]?.start_date) &&
+                                  date <= new Date(dateClose[0]?.end_date))
+                            : date > addDays(today, 14) || date < today
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </Fade>
 
               {/* Lantai Reservasi */}
               <Fade delay={7} duration={1300}>
