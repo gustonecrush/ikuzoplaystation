@@ -1,3 +1,4 @@
 import { Statistics } from './Statistics'
+import Card from './Card'
 
-export { Statistics }
+export { Statistics, Card }
