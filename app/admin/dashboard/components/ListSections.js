@@ -103,10 +103,19 @@ function ListSections({ isLoading, sections, fetchContentFacilities }) {
 
       console.error({ error })
       setOpen(false)
-      Toast.fire({
-        icon: 'error',
-        title: error.response.data.data,
-      })
+      if (error.response.data.data == 'The content failed to upload.') {
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopss!',
+          text: 'File size maximum upload is 2MB',
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopss!',
+          text: error.response.data.data,
+        })
+      }
     }
   }
 
@@ -191,10 +200,19 @@ function ListSections({ isLoading, sections, fetchContentFacilities }) {
       console.error({ error })
       setOpen(false)
 
-      Toast.fire({
-        icon: 'error',
-        title: error.response.data.data,
-      })
+      if (error.response.data.data == 'The content failed to upload.') {
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopss!',
+          text: 'File size maximum upload is 2MB',
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopss!',
+          text: error.response.data.data,
+        })
+      }
     }
   }
 
