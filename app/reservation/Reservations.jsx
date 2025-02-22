@@ -721,10 +721,10 @@ export default function Reservation() {
                                           setPosisiReservasi(number)
                                           if (number < 4) {
                                             setNamaPosisiReservasi(
-                                              positions[8].name,
+                                              positions[7].name,
                                             )
                                             setPricePerReserve(
-                                              positions[8].price,
+                                              positions[7].price,
                                             )
                                           } else {
                                             setNamaPosisiReservasi(
@@ -753,17 +753,17 @@ export default function Reservation() {
                                       <DrawerHeader className="text-left">
                                         <DrawerTitle>
                                           {number < 4
-                                            ? positions[8].name
+                                            ? positions[7].name
                                             : positions[0].name}
                                         </DrawerTitle>
                                         <DrawerDescription>
                                           IDR{' '}
                                           {number < 4
-                                            ? positions[8].price
+                                            ? positions[7].price
                                             : positions[0].price}
                                           /hour and can only accomodate{' '}
                                           {number < 4
-                                            ? positions[8].capacity
+                                            ? positions[7].capacity
                                             : positions[0].capacity}{' '}
                                           person (position {number}).
                                         </DrawerDescription>
@@ -796,7 +796,7 @@ export default function Reservation() {
                                                   .NEXT_PUBLIC_IMAGE_URL
                                               }${
                                                 number < 4
-                                                  ? positions[8].pict
+                                                  ? positions[7].pict
                                                   : positions[0].pict
                                               }`}
                                               useMap="#image-map"
