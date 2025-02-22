@@ -145,6 +145,7 @@ function page() {
         <div className="px-8">
           {selectedFeature == 'games' && (
             <SwiperContentGames
+              isLoading={isLoading}
               games={games}
               fetchContentGames={fetchContents}
             />
@@ -152,6 +153,7 @@ function page() {
 
           {selectedFeature == 'facilities' && (
             <SwiperContentFacilities
+              isLoading={isLoading}
               facilities={facilities}
               fetchContentFacilities={fetchContents}
             />
@@ -159,6 +161,7 @@ function page() {
 
           {selectedFeature == 'sections' && (
             <ListSections
+              isLoading={isLoading}
               sections={sections}
               fetchContentFacilities={fetchContents}
             />

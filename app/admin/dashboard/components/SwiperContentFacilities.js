@@ -53,7 +53,11 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { FiEdit3 } from 'react-icons/fi'
 import { HashLoader } from 'react-spinners'
 
-const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
+const SwiperContentFacilities = ({
+  isLoading,
+  facilities,
+  fetchContentFacilities,
+}) => {
   // base url & token
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
@@ -331,313 +335,323 @@ const SwiperContentFacilities = ({ facilities, fetchContentFacilities }) => {
 
   return (
     <section className={`w-full flex flex-col gap-5`}>
-      <div className="flex flex-row gap-2">
-        <Dialog open={open}>
-          <DialogTrigger asChild onClick={() => setOpen(!open)}>
-            <Button variant="outline" className="w-fit">
-              Upload New Facility Content
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <form
-              onSubmit={
-                isWillUpdate
-                  ? handleUpdateFacilityContent
-                  : handleUploadFacilityContent
-              }
-            >
-              <DialogHeader>
-                <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
-                  <GiSofa className="w-10 text-3xl" />
-                  <div className="flex flex-col gap-1">
-                    <DialogTitle>Ikuzo Facility Content</DialogTitle>
-                    <DialogDescription>
-                      {`Upload New Ikuzo Playstation Facility Content!`}
-                    </DialogDescription>
-                  </div>
-                </div>
-              </DialogHeader>
-              {isUploading ? (
-                <div className="flex items-center justify-center p-10">
-                  <HashLoader color="#FF6200" />
-                </div>
-              ) : (
-                <div className="grid gap-4 py-4">
-                  <div className="flex flex-col items-start gap-1">
-                    <Label htmlFor="name" className="text-right">
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Input Facility Name..."
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="flex gap-2 w-full">
-                    <div className="flex flex-col items-start gap-1 w-full">
-                      <Label htmlFor="price" className="text-right">
-                        Price
-                      </Label>
-                      <Input
-                        id="price"
-                        placeholder="Input Price..."
-                        type="number"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="flex flex-col items-start gap-1 w-full">
-                      <Label htmlFor="capacity" className="text-right">
-                        Capacity
-                      </Label>
-                      <Input
-                        id="capacity"
-                        type="number"
-                        placeholder="Input Capacity..."
-                        value={capacity}
-                        onChange={(e) => setCapacity(e.target.value)}
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <Label htmlFor="benefits" className="text-right">
-                      Benefits
-                    </Label>
-                    <Editor
-                      initialValue={initialValue}
-                      apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
-                      onInit={(evt, benefit) => (benefits.current = benefit)}
-                      init={{
-                        height: 200,
-                        width: '100%',
-
-                        menubar: false,
-                        plugins: ['lists', 'fullscreen', 'wordcount'],
-                        toolbar: 'bullist numlist',
-                        content_style:
-                          'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
-                      }}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex flex-col items-start gap-1">
-                    <Label htmlFor="pict" className="text-right">
-                      Picture
-                    </Label>
-                    {isWillUpdate && (
-                      <Image
-                        alt={pictFacilitySelected}
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${pictFacilitySelected}`}
-                        width={0}
-                        height={0}
-                        className="w-full object-cover h-[100px] rounded-lg"
-                      />
-                    )}
-                    <Input
-                      id="pict"
-                      onChange={handleFileChange}
-                      type="file"
-                      className="col-span-3"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <DialogFooter>
-                <Button type="submit" className="bg-orange hover:bg-orange">
-                  Upload
-                </Button>
-              </DialogFooter>
-            </form>
-
-            <DialogClose
-              onClick={() => setOpen(!open)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            >
-              <Cross2Icon className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
-          </DialogContent>
-        </Dialog>
-        <Dialog  open={openUpdateSection}>
-          <DialogTrigger
-            asChild
-            onClick={() => setOpenUpdateSection(!openUpdateSection)}
-          >
-            <Button variant="outline" className="w-fit">
-              Update Facility Section
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="!max-w-6xl w-full">
-            <form onSubmit={handleUpdateFacilitySection}>
-              <DialogHeader>
-                <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
-                  <GiSofa className="w-10 text-3xl" />
-                  <div className="flex flex-col gap-1">
-                    <DialogTitle>Ikuzo Facility Section</DialogTitle>
-                    <DialogDescription>
-                      {`Update Ikuzo Playstation Facility Section!`}
-                    </DialogDescription>
-                  </div>
-                </div>
-              </DialogHeader>
-              {isUploading ? (
-                <div className="flex items-center justify-center p-10">
-                  <HashLoader color="#FF6200" />
-                </div>
-              ) : (
-                <div className="grid gap-4 py-4">
-                  <div className="flex flex-col items-start gap-1">
-                    <Label htmlFor="name" className="text-right">
-                      Title
-                    </Label>
-                    <Input
-                      id="title"
-                      type="text"
-                      placeholder="Input Title..."
-                      value={titleUpdate}
-                      onChange={(e) => setTitleUpdate(e.target.value)}
-                      className="col-span-3"
-                    />
-                  </div>
-
-                  <div className="flex flex-col items-start gap-1 w-full">
-                    <Label htmlFor="benefits" className="text-right">
-                      Description
-                    </Label>
-                    <Editor
-                      initialValue={initialValue}
-                      apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
-                      onInit={(evt, desc) => (description.current = desc)}
-                      init={{
-                        height: 200,
-                        width: '100%',
-
-                        menubar: false,
-                        plugins: ['lists', 'fullscreen', 'wordcount'],
-                        toolbar: 'bullist numlist',
-                        content_style:
-                          'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
-                      }}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <DialogFooter>
-                <Button type="submit" className="bg-orange hover:bg-orange">
-                  Upload
-                </Button>
-              </DialogFooter>
-            </form>
-
-            <DialogClose
-              onClick={() => setOpenUpdateSection(!openUpdateSection)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            >
-              <Cross2Icon className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {facilities.length == 0 ? (
-        <div className="w-full mt-14 mb-16  flex items-center justify-center">
-          <div className="flex flex-col gap-1 items-center justify-center">
-            <Image
-              src={'/error.png'}
-              width={0}
-              height={0}
-              className="w-[200px]"
-              alt={'No content available'}
-            />
-            <p className="text-base font-normal text-gray-400">
-              There is no any contents right now ikuzo!
-            </p>
-          </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center p-10">
+          <HashLoader color="#FF6200" />
         </div>
       ) : (
-        <Swiper
-          effect={'coverflow'}
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={'auto'}
-          initialSlide={2}
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 100,
-            modifier: 1,
-            slideShadows: true,
-          }}
-          pagination={true}
-          modules={[EffectCoverflow, Pagination]}
-          className="mySwiper mx-10"
-        >
-          {facilities.map((facility, index) => (
-            <SwiperSlide key={index} className="wide">
-              <div className="relative">
-                <div className="flex flex-row gap-1 absolute top-4 right-4 w-fit p-1 bg-gray-700  bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 rounded-lg">
-                  <Button
-                    onClick={() => handleOpenFormForUpdating(facility)}
-                    variant="outline"
-                    className="ml-auto border border-yellow-500 bg-transparent hover:bg-yellow-600  hover:text-white text-base text-yellow-500"
-                  >
-                    <FiEdit3 className="h-7 w-5" />
-                  </Button>
-                  <form action="" method="post" className="">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="ml-auto border border-red-500 bg-transparent hover:bg-red-600   hover:text-white text-base text-red-500"
-                        >
-                          <AiOutlineDelete className="h-7 w-5" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Are you absolutely sure?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete your content and remove your data from our
-                            servers.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={(e) =>
-                              handleDeleteFacilityContent(facility.id)
-                            }
-                          >
-                            Continue
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </form>
-                </div>
+        <>
+          <div className="flex flex-row gap-2">
+            <Dialog open={open}>
+              <DialogTrigger asChild onClick={() => setOpen(!open)}>
+                <Button variant="outline" className="w-fit">
+                  Upload New Facility Content
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <form
+                  onSubmit={
+                    isWillUpdate
+                      ? handleUpdateFacilityContent
+                      : handleUploadFacilityContent
+                  }
+                >
+                  <DialogHeader>
+                    <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
+                      <GiSofa className="w-10 text-3xl" />
+                      <div className="flex flex-col gap-1">
+                        <DialogTitle>Ikuzo Facility Content</DialogTitle>
+                        <DialogDescription>
+                          {`Upload New Ikuzo Playstation Facility Content!`}
+                        </DialogDescription>
+                      </div>
+                    </div>
+                  </DialogHeader>
+                  {isUploading ? (
+                    <div className="flex items-center justify-center p-10">
+                      <HashLoader color="#FF6200" />
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 py-4">
+                      <div className="flex flex-col items-start gap-1">
+                        <Label htmlFor="name" className="text-right">
+                          Name
+                        </Label>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="Input Facility Name..."
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="flex gap-2 w-full">
+                        <div className="flex flex-col items-start gap-1 w-full">
+                          <Label htmlFor="price" className="text-right">
+                            Price
+                          </Label>
+                          <Input
+                            id="price"
+                            placeholder="Input Price..."
+                            type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="flex flex-col items-start gap-1 w-full">
+                          <Label htmlFor="capacity" className="text-right">
+                            Capacity
+                          </Label>
+                          <Input
+                            id="capacity"
+                            type="number"
+                            placeholder="Input Capacity..."
+                            value={capacity}
+                            onChange={(e) => setCapacity(e.target.value)}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
 
-                <img
-                  alt={facility.name}
-                  className="rounded-md"
-                  src={process.env.NEXT_PUBLIC_IMAGE_URL + facility.pict}
+                      <div className="flex flex-col items-start gap-1 w-full">
+                        <Label htmlFor="benefits" className="text-right">
+                          Benefits
+                        </Label>
+                        <Editor
+                          initialValue={initialValue}
+                          apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
+                          onInit={(evt, benefit) =>
+                            (benefits.current = benefit)
+                          }
+                          init={{
+                            height: 200,
+                            width: '100%',
+
+                            menubar: false,
+                            plugins: ['lists', 'fullscreen', 'wordcount'],
+                            toolbar: 'bullist numlist',
+                            content_style:
+                              'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
+                          }}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="flex flex-col items-start gap-1">
+                        <Label htmlFor="pict" className="text-right">
+                          Picture
+                        </Label>
+                        {isWillUpdate && (
+                          <Image
+                            alt={pictFacilitySelected}
+                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${pictFacilitySelected}`}
+                            width={0}
+                            height={0}
+                            className="w-full object-cover h-[100px] rounded-lg"
+                          />
+                        )}
+                        <Input
+                          id="pict"
+                          onChange={handleFileChange}
+                          type="file"
+                          className="col-span-3"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <DialogFooter>
+                    <Button type="submit" className="bg-orange hover:bg-orange">
+                      Upload
+                    </Button>
+                  </DialogFooter>
+                </form>
+
+                <DialogClose
+                  onClick={() => setOpen(!open)}
+                  className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                >
+                  <Cross2Icon className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={openUpdateSection}>
+              <DialogTrigger
+                asChild
+                onClick={() => setOpenUpdateSection(!openUpdateSection)}
+              >
+                <Button variant="outline" className="w-fit">
+                  Update Facility Section
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="!max-w-6xl w-full">
+                <form onSubmit={handleUpdateFacilitySection}>
+                  <DialogHeader>
+                    <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
+                      <GiSofa className="w-10 text-3xl" />
+                      <div className="flex flex-col gap-1">
+                        <DialogTitle>Ikuzo Facility Section</DialogTitle>
+                        <DialogDescription>
+                          {`Update Ikuzo Playstation Facility Section!`}
+                        </DialogDescription>
+                      </div>
+                    </div>
+                  </DialogHeader>
+                  {isUploading ? (
+                    <div className="flex items-center justify-center p-10">
+                      <HashLoader color="#FF6200" />
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 py-4">
+                      <div className="flex flex-col items-start gap-1">
+                        <Label htmlFor="name" className="text-right">
+                          Title
+                        </Label>
+                        <Input
+                          id="title"
+                          type="text"
+                          placeholder="Input Title..."
+                          value={titleUpdate}
+                          onChange={(e) => setTitleUpdate(e.target.value)}
+                          className="col-span-3"
+                        />
+                      </div>
+
+                      <div className="flex flex-col items-start gap-1 w-full">
+                        <Label htmlFor="benefits" className="text-right">
+                          Description
+                        </Label>
+                        <Editor
+                          initialValue={initialValue}
+                          apiKey={process.env.NEXT_PUBLIC_TINY_CLIENT}
+                          onInit={(evt, desc) => (description.current = desc)}
+                          init={{
+                            height: 200,
+                            width: '100%',
+
+                            menubar: false,
+                            plugins: ['lists', 'fullscreen', 'wordcount'],
+                            toolbar: 'bullist numlist',
+                            content_style:
+                              'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; width: 100%; overflow: hidden; }',
+                          }}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <DialogFooter>
+                    <Button type="submit" className="bg-orange hover:bg-orange">
+                      Upload
+                    </Button>
+                  </DialogFooter>
+                </form>
+
+                <DialogClose
+                  onClick={() => setOpenUpdateSection(!openUpdateSection)}
+                  className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                >
+                  <Cross2Icon className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {facilities.length == 0 ? (
+            <div className="w-full mt-14 mb-16  flex items-center justify-center">
+              <div className="flex flex-col gap-1 items-center justify-center">
+                <Image
+                  src={'/error.png'}
+                  width={0}
+                  height={0}
+                  className="w-[200px]"
+                  alt={'No content available'}
                 />
+                <p className="text-base font-normal text-gray-400">
+                  There is no any contents right now ikuzo!
+                </p>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+            </div>
+          ) : (
+            <Swiper
+              effect={'coverflow'}
+              grabCursor={true}
+              centeredSlides={true}
+              slidesPerView={'auto'}
+              initialSlide={2}
+              coverflowEffect={{
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true,
+              }}
+              pagination={true}
+              modules={[EffectCoverflow, Pagination]}
+              className="mySwiper mx-10"
+            >
+              {facilities.map((facility, index) => (
+                <SwiperSlide key={index} className="wide">
+                  <div className="relative">
+                    <div className="flex flex-row gap-1 absolute top-4 right-4 w-fit p-1 bg-gray-700  bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 rounded-lg">
+                      <Button
+                        onClick={() => handleOpenFormForUpdating(facility)}
+                        variant="outline"
+                        className="ml-auto border border-yellow-500 bg-transparent hover:bg-yellow-600  hover:text-white text-base text-yellow-500"
+                      >
+                        <FiEdit3 className="h-7 w-5" />
+                      </Button>
+                      <form action="" method="post" className="">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="ml-auto border border-red-500 bg-transparent hover:bg-red-600   hover:text-white text-base text-red-500"
+                            >
+                              <AiOutlineDelete className="h-7 w-5" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete your content and remove your
+                                data from our servers.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={(e) =>
+                                  handleDeleteFacilityContent(facility.id)
+                                }
+                              >
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </form>
+                    </div>
+
+                    <img
+                      alt={facility.name}
+                      className="rounded-md"
+                      src={process.env.NEXT_PUBLIC_IMAGE_URL + facility.pict}
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
+        </>
       )}
     </section>
   )
