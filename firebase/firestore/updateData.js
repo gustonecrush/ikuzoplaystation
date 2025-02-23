@@ -10,8 +10,10 @@ export default async function updateData(collection, id, data) {
   try {
     const docRef = doc(db, collection, id)
     result = await updateDoc(docRef, data)
+    console.log(result)
   } catch (e) {
     error = e
+    console.error(e)
   }
 
   return { result, error }

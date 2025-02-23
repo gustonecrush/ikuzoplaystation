@@ -9,8 +9,8 @@ import Toast from '@/app/components/Toast'
 import Layout from '../components/Layout'
 import SwiperContentGames from '@/app/components/SwiperContentGames'
 import SwiperContentFacilities from '@/app/admin/dashboard/components/SwiperContentFacilities'
-import ListSections from '../components/ListSections'
 import { useRouter } from 'next/navigation'
+import ContentWebsite from '../components/ContentWebsite'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -78,6 +78,12 @@ function page() {
       name: 'Sections',
       desc: 'Setup Content Sections',
       img: '/laptop.png',
+    },
+    {
+      id: 'contents',
+      name: 'Contents',
+      desc: 'Setup Content Website',
+      img: '/website.png',
     },
   ]
 
@@ -159,13 +165,7 @@ function page() {
             />
           )}
 
-          {selectedFeature == 'sections' && (
-            <ListSections
-              isLoading={isLoading}
-              sections={sections}
-              fetchContentFacilities={fetchContents}
-            />
-          )}
+          {selectedFeature == 'contents' && <ContentWebsite />}
         </div>
       </>
     </Layout>

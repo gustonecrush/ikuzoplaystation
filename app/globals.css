@@ -106,3 +106,14 @@ input[type='time']::-ms-clear {
 select {
   -webkit-appearance: none;
 }
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
