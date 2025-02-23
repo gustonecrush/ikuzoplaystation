@@ -155,7 +155,7 @@ export const convertToDate = (dateString) => {
 export const generateTimeArray = (
   customTimeSelectedArray = [
     {
-      open_time: 9,
+      open_time: 10,
       close_time: 23,
       date: new Date().toISOString().split('T')[0],
     },
@@ -166,7 +166,7 @@ export const generateTimeArray = (
   if (customTimeSelectedArray.length == 0) {
     customTimeSelectedArray = [
       {
-        open_time: 9,
+        open_time: 10,
         close_time: 23,
         date: new Date().toISOString().split('T')[0],
       },
