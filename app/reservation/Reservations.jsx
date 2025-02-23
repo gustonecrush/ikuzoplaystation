@@ -511,7 +511,7 @@ export default function Reservation() {
                 </h1>
                 <p className="text-sm font-normal text-white">
                   {!continueTapped
-                    ? reservationContent['reservation-desc']
+                    ? reservationContent['reservation-description']
                     : 'Lakukan pembayaran segera untuk reservasi'}
                 </p>
               </div>

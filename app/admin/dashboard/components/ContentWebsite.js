@@ -43,6 +43,21 @@ function ContentWebsite() {
     setFooterSocials(dataContentFooter.data['footer-socials'])
 
     setReservationContent(dataContentReservation.data)
+    setReservationTitle(dataContentReservation.data['reservation-title'])
+    setReservationDesc(dataContentReservation.data['reservation-description'])
+    setLabelName(dataContentReservation.data['label-name'])
+    setLabelWhatsapp(dataContentReservation.data['label-whatsapp'])
+    setLabelTanggalReservasi(
+      dataContentReservation.data['label-tanggal-reservasi'],
+    )
+    setLabelTempatReservasi(
+      dataContentReservation.data['label-tempat-reservasi'],
+    )
+    setPlaceholderName(dataContentReservation.data['placeholder-name'])
+    setPlaceholderWhatsapp(dataContentReservation.data['placeholder-whatsapp'])
+    setPlaceholderTanggalReservasi(
+      dataContentReservation.data['placeholder-tanggal-reservasi'],
+    )
   }
 
   // Form Search Content
@@ -445,8 +460,8 @@ function ContentWebsite() {
                   onChange={(e) => setReservationDesc(e.target.value)}
                 />
               </div>
-              <div className="flex gap-2">
-                <div>
+              <div className="flex gap-2 w-full">
+                <div className="w-full">
                   <label>Label Input Name</label>
                   <Input
                     placeholder={labelName}
@@ -455,7 +470,7 @@ function ContentWebsite() {
                   />
                 </div>
 
-                <div>
+                <div className="w-full">
                   <label>Placeholder Input Name</label>
                   <Input
                     placeholder={placeholderName}
@@ -464,8 +479,8 @@ function ContentWebsite() {
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <div>
+              <div className="flex gap-2 w-full">
+                <div className="w-full">
                   <label>Label Input Whatsapp</label>
                   <Input
                     placeholder={labelWhatsapp}
@@ -474,7 +489,7 @@ function ContentWebsite() {
                   />
                 </div>
 
-                <div>
+                <div className="w-full">
                   <label>Placeholder Input Whatsapp</label>
                   <Input
                     placeholder={placeholderWhatsapp}
@@ -483,8 +498,8 @@ function ContentWebsite() {
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <div>
+              <div className="flex gap-2 w-full">
+                <div className="w-full">
                   <label>Label Input Tanggal Reservasi</label>
                   <Input
                     placeholder={labelTanggalReservasi}
@@ -493,7 +508,7 @@ function ContentWebsite() {
                   />
                 </div>
 
-                <div>
+                <div className="w-full">
                   <label>Placeholder Input Tanggal Reservasi</label>
                   <Input
                     placeholder={placeholderTanggalReservasi}
@@ -514,7 +529,7 @@ function ContentWebsite() {
               </div>
               <Button
                 type="button"
-                onClick={() => handleUpdateDataSearchContents()}
+                onClick={() => handleUpdateDataReservationContents()}
               >
                 Update
               </Button>
