@@ -11,10 +11,21 @@ import { IoLogoGameControllerB } from 'react-icons/io'
 import Content from './Content'
 import Hero from './Hero'
 import axios from 'axios'
+import LoaderHome from './LoaderHome'
+import getDocument from '@/firebase/firestore/getData'
 
 export default function Home() {
   const [sectionsUpdate, setSectionsUpdate] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
+
+  const [searchContent, setSearchContent] = React.useState(null)
+
+  async function fetchDataContents() {
+    const dataContentSearch = await getDocument('search-id', 'search-id-doc')
+    setSearchContent(dataContentSearch.data)
+  }
+
+  console.log({ searchContent })
 
   const fetchSections = async () => {
     setIsLoading(true)
@@ -41,61 +52,66 @@ export default function Home() {
 
   React.useEffect(() => {
     fetchSections()
+    fetchDataContents()
   }, [])
 
   return (
     <>
-      <section className="flex flex-col h-full w-full scroll-smooth overflow-x-hidden">
-        <Navbar />
-        <Hero>
-          <Video />
-        </Hero>
-        <Content />
+      {searchContent == null ? (
+        <LoaderHome />
+      ) : (
+        <section className="flex flex-col h-full w-full scroll-smooth overflow-x-hidden">
+          <Navbar />
+          <Hero>
+            <Video />
+          </Hero>
+          <Content />
 
-        {/* Game Section */}
-        <div className="flex flex-col gap-2 mt-9 items-center justify-center py-10 bg-white w-full  h-fit z-20">
-          <BounceContainer>
-            <div className="flex flex-col gap-2 px-3">
-              <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
-                {isLoading ? '' : sectionsUpdate[0]?.title}
-              </h1>
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: sectionsUpdate && sectionsUpdate[0]?.description,
-                }}
-                className="text-gray-400 font-normal text-center prose-base"
-              ></p>
-            </div>
-          </BounceContainer>
-          <SwiperContainer />
-        </div>
+          {/* Game Section */}
+          <div className="flex flex-col gap-2 mt-9 items-center justify-center py-10 bg-white w-full  h-fit z-20">
+            <BounceContainer>
+              <div className="flex flex-col gap-2 px-3">
+                <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
+                  {isLoading ? '' : sectionsUpdate[0]?.title}
+                </h1>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: sectionsUpdate && sectionsUpdate[0]?.description,
+                  }}
+                  className="text-gray-400 font-normal text-center prose-base"
+                ></p>
+              </div>
+            </BounceContainer>
+            <SwiperContainer />
+          </div>
 
-        {/* Fasilitas Section */}
-        <div className="flex flex-col gap-2 items-center justify-center py-5 bg-white w-full h-fit z-20">
-          <BounceContainer>
-            <div className="flex flex-col gap-2 px-3">
-              <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
-                {isLoading ? '' : sectionsUpdate[1]?.title}
-              </h1>
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: sectionsUpdate && sectionsUpdate[1]?.description,
-                }}
-                className="text-gray-400 font-normal text-center prose-base"
-              ></p>
-            </div>
-          </BounceContainer>
-          <SwiperContainer2 />
-        </div>
+          {/* Fasilitas Section */}
+          <div className="flex flex-col gap-2 items-center justify-center py-5 bg-white w-full h-fit z-20">
+            <BounceContainer>
+              <div className="flex flex-col gap-2 px-3">
+                <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
+                  {isLoading ? '' : sectionsUpdate[1]?.title}
+                </h1>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: sectionsUpdate && sectionsUpdate[1]?.description,
+                  }}
+                  className="text-gray-400 font-normal text-center prose-base"
+                ></p>
+              </div>
+            </BounceContainer>
+            <SwiperContainer2 />
+          </div>
 
-        <section className="flex w-full items-center justify-center">
-          <ReserveButton type={'large'} />
+          <section className="flex w-full items-center justify-center">
+            <ReserveButton type={'large'} />
+          </section>
+
+          <Footer />
+
+          <CTAButton />
         </section>
-
-        <Footer />
-
-        <CTAButton />
-      </section>
+      )}
     </>
   )
 }
