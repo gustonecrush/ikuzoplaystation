@@ -2526,9 +2526,9 @@ export default function Reservation() {
                                         onClick={() => {
                                           setPosisiReservasi(number)
                                           setNamaPosisiReservasi(
-                                            positions[4].name,
+                                            positions[2].name,
                                           )
-                                          setPricePerReserve(positions[4].price)
+                                          setPricePerReserve(positions[2].price)
                                           fetchingAvailableReservation(
                                             selectedDate,
                                             number,
@@ -2546,12 +2546,12 @@ export default function Reservation() {
                                     <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                       <DrawerHeader className="text-left">
                                         <DrawerTitle>
-                                          {positions[4].name}
+                                          {positions[2].name}
                                         </DrawerTitle>
                                         <DrawerDescription>
-                                          IDR {positions[4].price}/hour and can
+                                          IDR {positions[2].price}/hour and can
                                           only accomodate{' '}
-                                          {positions[4].capacity} person
+                                          {positions[2].capacity} person
                                           (position {number}).
                                         </DrawerDescription>
                                       </DrawerHeader>
@@ -2566,7 +2566,7 @@ export default function Reservation() {
                                           }}
                                         >
                                           <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
                                             useMap="#image-map"
                                             alt=""
                                             style={{
