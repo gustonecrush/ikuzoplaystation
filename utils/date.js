@@ -163,7 +163,18 @@ export const generateTimeArray = (
   date = new Date().toISOString().split('T')[0],
   bookedSlots,
 ) => {
+  if (customTimeSelectedArray.length == 0) {
+    customTimeSelectedArray = [
+      {
+        open_time: 9,
+        close_time: 23,
+        date: new Date().toISOString().split('T')[0],
+      },
+    ]
+  }
   console.log('BOOKED', bookedSlots)
+  console.log(date)
+  console.log(customTimeSelectedArray)
   const times = []
   const today = new Date()
   const currentHour = today.getHours()

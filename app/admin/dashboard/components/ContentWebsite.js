@@ -77,6 +77,12 @@ function ContentWebsite() {
   const [searchInputPage, setSearchInputPage] = React.useState('')
   const [searchTitlePage, setSearchTitlePage] = React.useState('')
 
+  // Form Footer Content
+  const [footerAddress, setFooterAddress] = React.useState('')
+  const [footerDesc, setFooterDesc] = React.useState('')
+  const [footerLogo, setFooterLogo] = React.useState('')
+  const [footerSocials, setFooterSocials] = React.useState([])
+
   const [isLoading, setIsLoading] = React.useState(false)
 
   async function handleUpdateDataSearchContents() {
@@ -117,6 +123,43 @@ function ContentWebsite() {
     }
   }
 
+  async function handleUpdateDataFooterContents() {
+    setIsLoading(true)
+
+    const data = {
+      'footer-address': footerAddress,
+      'footer-desc': footerDesc,
+      'footer-logo': footerLogo,
+      'footer-socials': footerSocials,
+    }
+
+    try {
+      const dataContentFooter = await updateData(
+        'footer-id',
+        'footer-id-doc',
+        data,
+      )
+      console.log({ dataContentFooter })
+
+      await fetchDataContents() // Ensure fetch completes before stopping loading
+
+      Toast.fire({
+        icon: 'success',
+        title: 'Ikuzoooo!',
+        text: `Data content footer telah berhasil diupdate!`,
+      })
+    } catch (error) {
+      console.error('Error updating data:', error)
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Data content footer gagal diupdate, terdapat masalah!`,
+      })
+    } finally {
+      setIsLoading(false) // Stop loading
+    }
+  }
+
   console.log({ searchContent })
   console.log({ marqueeContent })
   console.log({ footerContent })
@@ -137,62 +180,124 @@ function ContentWebsite() {
       ) : (
         <>
           {/* Form Search Page */}
-          <div className="flex flex-col">
-            <h1 className="text-lg font-semibold">Search Content</h1>
-            <p className={`text-base font-normal text-gray-400`}>
-              Editable content related to search page from button, title,
-              description.
-            </p>
+          <div className="w-full border-b border-b-gray-400 pb-10 mb-10">
+            <div className="flex flex-col">
+              <h1 className="text-lg font-semibold">Search Content</h1>
+              <p className={`text-base font-normal text-gray-400`}>
+                Editable content related to search page from button, title,
+                description.
+              </p>
+            </div>
+            <form className="w-2/3 space-y-3">
+              <div>
+                <label>Search Title Page</label>
+                <Input
+                  placeholder={searchTitlePage}
+                  value={searchTitlePage}
+                  onChange={(e) => setSearchTitlePage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Description Page</label>
+                <Textarea
+                  rows={5}
+                  placeholder={searchDescPage}
+                  value={searchDescPage}
+                  onChange={(e) => setSearchDescPage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Input Text</label>
+                <Input
+                  placeholder={searchInputPage}
+                  value={searchInputPage}
+                  onChange={(e) => setSearchInputPage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Button Text</label>
+                <Input
+                  placeholder={searchBtnPage}
+                  value={searchBtnPage}
+                  onChange={(e) => setSearchBtnPage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Input Text on Homepage</label>
+                <Input
+                  placeholder={searchBtnTxt}
+                  value={searchBtnTxt}
+                  onChange={(e) => setSearchBtnTxt(e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={() => handleUpdateDataSearchContents()}
+              >
+                Update
+              </Button>
+            </form>
           </div>
-          <form className="w-2/3 space-y-3">
-            <div>
-              <label>Search Title Page</label>
-              <Input
-                placeholder={searchTitlePage}
-                value={searchTitlePage}
-                onChange={(e) => setSearchTitlePage(e.target.value)}
-              />
+
+          {/* Form Footer Content */}
+          <div className="w-full border-b border-b-gray-400 pb-10 mb-10">
+            <div className="flex flex-col">
+              <h1 className="text-lg font-semibold">Footer Content</h1>
+              <p className={`text-base font-normal text-gray-400`}>
+                Editable content related to footer on homepage from address,
+                description, and socials
+              </p>
             </div>
-            <div>
-              <label>Search Description Page</label>
-              <Textarea
-                rows={5}
-                placeholder={searchDescPage}
-                value={searchDescPage}
-                onChange={(e) => setSearchDescPage(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Search Input Text</label>
-              <Input
-                placeholder={searchInputPage}
-                value={searchInputPage}
-                onChange={(e) => setSearchInputPage(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Search Button Text</label>
-              <Input
-                placeholder={searchBtnPage}
-                value={searchBtnPage}
-                onChange={(e) => setSearchBtnPage(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Search Input Text on Homepage</label>
-              <Input
-                placeholder={searchBtnTxt}
-                value={searchBtnTxt}
-                onChange={(e) => setSearchBtnTxt(e.target.value)}
-              />
-            </div>
-            <Button
-              type="button"
-              onClick={() => handleUpdateDataSearchContents()}
-            >
-              Update
-            </Button>
-          </form>
+            <form className="w-2/3 space-y-3">
+              <div>
+                <label>Search Title Page</label>
+                <Input
+                  placeholder={searchTitlePage}
+                  value={searchTitlePage}
+                  onChange={(e) => setSearchTitlePage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Description Page</label>
+                <Textarea
+                  rows={5}
+                  placeholder={searchDescPage}
+                  value={searchDescPage}
+                  onChange={(e) => setSearchDescPage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Input Text</label>
+                <Input
+                  placeholder={searchInputPage}
+                  value={searchInputPage}
+                  onChange={(e) => setSearchInputPage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Button Text</label>
+                <Input
+                  placeholder={searchBtnPage}
+                  value={searchBtnPage}
+                  onChange={(e) => setSearchBtnPage(e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Search Input Text on Homepage</label>
+                <Input
+                  placeholder={searchBtnTxt}
+                  value={searchBtnTxt}
+                  onChange={(e) => setSearchBtnTxt(e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={() => handleUpdateDataFooterContents()}
+              >
+                Update
+              </Button>
+            </form>
+          </div>
         </>
       )}
     </section>
