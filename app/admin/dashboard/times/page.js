@@ -69,6 +69,7 @@ import { IoBook, IoCalendarClear, IoLogOut, IoTime } from 'react-icons/io5'
 import { formatDateOnTheUI, getCurrentDate, getMaxDate } from '@/utils/date'
 
 import { IoGameController, IoLaptopSharp } from 'react-icons/io5'
+import SpaceTimes from '../components/SpaceTimes'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -590,7 +591,7 @@ function page() {
                       : 'bg-white'
                   } rounded-lg shadow-md`}
                 >
-                  <div className="flex flex-row items-center gap-1 justify-center">
+                  <div className="flex flex-row items-center gap-3 justify-center">
                     <Image
                       src={feature.img}
                       alt={'Content Games'}
@@ -599,7 +600,7 @@ function page() {
                       className="w-[70px]"
                     />
 
-                    <div className="flex flex-col justify-start items-center">
+                    <div className="flex flex-col justify-start items-start">
                       <h1 className="text-lg font-semibold leading-none">
                         {feature.name}
                       </h1>
@@ -800,7 +801,7 @@ function page() {
             </section>
           )}
 
-          {selectedFeature == 'spaces' && <>IN DEVELOPMENT</>}
+          {selectedFeature == 'spaces' && <SpaceTimes />}
         </>
 
         {/* <Reservation /> */}
