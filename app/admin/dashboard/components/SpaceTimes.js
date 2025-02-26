@@ -15,6 +15,8 @@ import { TbEdit } from 'react-icons/tb'
 import { doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore'
 import firebaseApp from '@/firebase/config'
 import addData from '@/firebase/firestore/addData'
+import { AiOutlineDelete } from 'react-icons/ai'
+import { FiEdit3 } from 'react-icons/fi'
 
 function SpaceTimes() {
   const [privateSpaceData, setPrivateSpaceData] = React.useState(null)
@@ -406,20 +408,22 @@ function SpaceTimes() {
                             className="w-full p-2 border rounded-md"
                           />
                         </td>
-                        <td className="border px-4 py-2">
-                          <button
-                            onClick={() => handleUpdate(category, index)}
-                            className={`px-4 py-2 rounded-md ${
-                              isUpdating
-                                ? 'bg-gray-400'
-                                : 'bg-orange hover:bg-orange'
-                            } text-white flex items-center`}
+                        <td className="border px-4 py-2 gap-2 flex">
+                          <Button
+                            onClick={(e) => handleUpdate(category, index)}
+                            variant="outline"
                             disabled={isUpdating}
+                            className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
                           >
-                            <TbEdit />
-
+                            <FiEdit3 className="h-4 w-4" />{' '}
                             {isUpdating ? 'Updating...' : 'Update'}
-                          </button>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
+                          >
+                            <AiOutlineDelete className="h-4 w-4" /> Delete
+                          </Button>
                         </td>
                       </tr>
                     )),

@@ -571,8 +571,7 @@ function page() {
               <div className="flex flex-col">
                 <h1 className="text-4xl font-semibold">Open/Close Time</h1>
                 <p className="text-base font-normal text-gray-400">
-                  Atur waktu bukan dan tutup Ikuzo Playstation pada hari
-                  tertentu
+                  Atur waktu buka dan tutup Ikuzo Playstation pada hari tertentu
                 </p>
               </div>
             </Fade>
