@@ -67,7 +67,6 @@ function SpaceTimes() {
   }, [])
 
   const [formData, setFormData] = React.useState(null)
-  const [editingCategory, setEditingCategory] = React.useState(null)
   const [isUpdating, setIsUpdating] = React.useState(false)
 
   // Handle changes when editing a row
@@ -118,7 +117,11 @@ function SpaceTimes() {
     }
 
     if (!id) {
-      console.error('Missing document ID!')
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Missing document ID!`,
+      })
       setIsUpdating(false)
       return
     }
@@ -129,7 +132,11 @@ function SpaceTimes() {
       const docSnap = await getDoc(docRef)
 
       if (!docSnap.exists()) {
-        console.error('Document does not exist!')
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopsss!',
+          text: `Document does not exist!`,
+        })
         setIsUpdating(false)
         return
       }
@@ -145,10 +152,19 @@ function SpaceTimes() {
 
       console.log('Update successful!')
       fetchDataTimes()
-      alert('Data updated successfully!')
+      Toast.fire({
+        icon: 'success',
+        title: 'Ikuzoooo!',
+        text: `Successfully to add data. Please try again.`,
+      })
     } catch (error) {
       console.error('Update failed:', error)
       fetchDataTimes()
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Failed to update data. Please try again.`,
+      })
     }
 
     setIsUpdating(false)
@@ -185,7 +201,12 @@ function SpaceTimes() {
       !newEntry['time-set']?.['start-time'] ||
       !newEntry['time-set']?.['end-time']
     ) {
-      alert('Please fill in all fields before adding.')
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Please fill in all fields before adding.`,
+      })
+
       return
     }
 
@@ -231,9 +252,18 @@ function SpaceTimes() {
 
       if (error) {
         console.error('Error adding data:', error)
-        alert('Failed to add data. Please try again.')
+
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopsss!',
+          text: `Failed to add data. Please try again.`,
+        })
       } else {
-        alert('Data successfully added!')
+        Toast.fire({
+          icon: 'success',
+          title: 'Ikuzoooo!',
+          text: `Time entry successfully added!`,
+        })
 
         // Reset local state after successful addition
         setNewEntry({
@@ -245,12 +275,62 @@ function SpaceTimes() {
         setIsAdding(false)
         fetchDataTimes()
       }
-
-      fetchDataTimes()
     } catch (err) {
       console.error('Unexpected error:', err)
-      alert('Something went wrong!')
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Time entry fail deleted!`,
+      })
       fetchDataTimes()
+    }
+  }
+
+  const handleDelete = async (category, index) => {
+    let id
+    console.log({ category })
+    if (category === 'regularSpaceData') {
+      id = 'regular-space-doc'
+    } else if (category === 'privateSpaceData') {
+      id = 'private-space-doc'
+    } else {
+      id = 'premium-space-doc'
+    }
+
+    const docRef = doc(db, 'space-setting-times', id)
+
+    try {
+      // Fetch the existing document data
+      const docSnap = await getDoc(docRef)
+      if (!docSnap.exists()) {
+        alert('Document not found!')
+        return
+      }
+
+      const data = docSnap.data()
+      let existingTimes = data.times || []
+
+      console.log({ existingTimes })
+
+      // Remove the selected index
+      const updatedTimes = existingTimes.filter((_, i) => i !== index)
+
+      // Update Firestore with the modified array
+      await updateDoc(docRef, { times: updatedTimes })
+      fetchDataTimes()
+      Toast.fire({
+        icon: 'success',
+        title: 'Ikuzoooo!',
+        text: `Time entry successfully deleted!`,
+      })
+    } catch (error) {
+      console.error('Error deleting time entry:', error)
+      fetchDataTimes()
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Failed to delete data. Please try again.`,
+      })
     }
   }
 
@@ -419,6 +499,7 @@ function SpaceTimes() {
                             {isUpdating ? 'Updating...' : 'Update'}
                           </Button>
                           <Button
+                            onClick={() => handleDelete(category, index)}
                             variant="outline"
                             className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
                           >

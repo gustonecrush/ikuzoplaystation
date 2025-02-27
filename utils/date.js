@@ -152,6 +152,10 @@ export const convertToDate = (dateString) => {
 //   return times
 // }
 
+export const extractHour = (timeString) => {
+  return timeString.split(':')[0]
+}
+
 export const generateTimeArray = (
   customTimeSelectedArray = [
     {
@@ -452,4 +456,28 @@ export const formatDateOnTheUI = (dateStr) => {
   }
   const formattedDate = date.toLocaleDateString('en-US', options)
   return formattedDate
+}
+
+export const getToday = () => {
+  const days = [
+    'Minggu', // Sunday
+    'Senin', // Monday
+    'Selasa', // Tuesday
+    'Rabu', // Wednesday
+    'Kamis', // Thursday
+    'Jumat', // Friday
+    'Sabtu', // Saturday
+  ]
+
+  const today = new Date().getDay()
+  return days[today]
+}
+
+export function getIndonesianDay(dateString) {
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
+
+  const date = new Date(dateString)
+  console.log({ dateString })
+  console.log({ days })
+  return days[date.getDay()]
 }

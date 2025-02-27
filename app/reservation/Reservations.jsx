@@ -19,8 +19,10 @@ import {
   generateTimeArrayWithStep,
   getCurrentDate,
   getCurrentTime,
+  getIndonesianDay,
   getMaxDate,
   getMaxTime,
+  getToday,
 } from '@/utils/date'
 import { generateRandomString } from '@/utils/id'
 import { HashLoader } from 'react-spinners'
@@ -56,6 +58,7 @@ import { pricePackageDetermination } from '@/utils/price'
 import { IoMdBook, IoMdClose } from 'react-icons/io'
 import { RESERVATION_PLACE } from '@/constans/reservations'
 import getDocument from '@/firebase/firestore/getData'
+import { capitalizeAndFormat } from '@/utils/text'
 
 export default function Reservation() {
   // RESERVATION STATE DATA
@@ -94,22 +97,17 @@ export default function Reservation() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}`,
       )
-      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
 
         setReservesPosition(jsonData)
-        console.log(response.data)
 
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
-
       setIsLoading(false)
     }
   }
@@ -119,9 +117,7 @@ export default function Reservation() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
-      console.log(
-        `${baseUrl}/reservations?reserve_date=${date}&status=settlement&pending=pending`,
-      )
+
       if (response.status == 200) {
         const jsonData = await response.data
 
@@ -131,17 +127,12 @@ export default function Reservation() {
           endTime: reserve.reserve_end_time,
         }))
         setBookedSlots(slots)
-        console.log(response.data)
-
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
-
       setIsLoading(false)
     }
   }
@@ -155,16 +146,13 @@ export default function Reservation() {
         const jsonData = await response.data
 
         setPositions(jsonData.data)
-        console.log(response.data)
 
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
       setIsLoading(false)
     }
   }
@@ -179,14 +167,10 @@ export default function Reservation() {
         const jsonData = await response.data
 
         setDateClose(jsonData.data)
-
-        console.log({ customTimeSelected })
       } else {
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
       setIsLoading(false)
     }
   }
@@ -194,7 +178,6 @@ export default function Reservation() {
   const getTimeSelected = async (date) => {
     try {
       const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
-      console.log(`${baseUrl}/times?selected_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
 
@@ -203,14 +186,10 @@ export default function Reservation() {
         } else {
           setCustomTimeSelected([])
         }
-
-        console.log({ customTimeSelected })
       } else {
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
       setIsLoading(false)
     }
   }
@@ -224,7 +203,6 @@ export default function Reservation() {
 
   const [posisiReservasi, setPosisiReservasi] = useState(0)
   const [namaPosisiReservasi, setNamaPosisiReservasi] = useState('')
-  console.log({ namaPosisiReservasi })
 
   const handleZoomIn = () => {
     setScale((scale) => scale + 0.1)
@@ -245,7 +223,6 @@ export default function Reservation() {
       position: posisiReservasi,
     }
 
-    console.log({ data })
     // Assuming you have some state variables for your input values
     if (
       namaReservasi &&
@@ -293,23 +270,168 @@ export default function Reservation() {
           setPosisiReservasi(0)
           setNamaPosisiReservasi('')
           setContinueTapped(!continueTapped)
-          console.log(response)
         })
-        .catch((error) => {
-          console.log(error)
-        })
+        .catch((error) => {})
     } catch (error) {
       throw new Error(error)
     }
   }
 
   const fetchingAvailableReservation = async (date, position) => {
-    console.log('fetching')
     getAllReservation(date, position)
-    console.log('fetching', reserves)
   }
 
+  const [date, setDate] = useState(null)
+  const [selectedDate, setSelectedDate] = useState('')
+
+  const disableTimes =
+    reserves.length > 0
+      ? reserves
+          .map((reserve) => {
+            if (reserve.reserve_end_time) {
+              const [hour, minute, second] = reserve.reserve_end_time.split(':')
+              const formattedTime = `${hour}:${minute}`
+              return formattedTime
+            }
+            return null
+          })
+          .filter((time) => time !== null)
+      : []
+
+  const [drawerContent, setDrawerContent] = useState('default')
+  const [selectedSeat, setSelectedSeat] = React.useState(0)
+  const [catalogs, setCatalogs] = React.useState([])
+
+  const handleCatalogClick = async (noSeat) => {
+    setSelectedSeat(noSeat)
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/catalogs?no_seat=${noSeat}`,
+      )
+
+      if (response.data && response.data.length > 0) {
+        setDrawerContent('catalog')
+        setCatalogs(response.data)
+      } else {
+        throw new Error('No catalog data found')
+      }
+    } catch (error) {
+      setDrawerContent('catalog')
+      setCatalogs([])
+      console.error('Error fetching catalog data:', error)
+    }
+  }
+
+  const [
+    selectedReservationPlace,
+    setSelectedReservationPlace,
+  ] = React.useState(null)
+
+  // FILTERING CATALOGS FEATURE
+  const [filterKeyword, setFilterKeyword] = React.useState('')
+  const [filteredCatalogs, setFilteredCatalogs] = React.useState([])
+  const handleInputFilterCatalogChange = (e) => {
+    const value = e.target.value.toLowerCase()
+    setFilteredCatalogs(
+      catalogs.filter((catalog) =>
+        catalog.catalog_txt.toLowerCase().includes(value),
+      ),
+    )
+  }
+
+  const handleCloseCatalogClick = () => {
+    setDrawerContent('default')
+    setFilteredCatalogs([])
+    setFilterKeyword('')
+  }
+
+  const [privateSpaceData, setPrivateSpaceData] = React.useState(null)
+  const [regularSpaceData, setRegularSpaceData] = React.useState(null)
+  const [premiumSpaceData, setPremiumSpaceData] = React.useState(null)
+
+  async function fetchDataTimes() {
+    try {
+      const responses = await Promise.all([
+        getDocument('space-setting-times', 'private-space-doc'), // Index 0
+        getDocument('space-setting-times', 'premium-space-doc'), // Index 1
+        getDocument('space-setting-times', 'regular-space-doc'), // Index 2
+      ])
+
+      console.log('FETCHED RESPONSES:', responses)
+
+      // Extract data from responses
+      const privateData = responses[0]?.data
+      const premiumData = responses[1]?.data
+      const regularData = responses[2]?.data
+
+      console.log('Private Data:', privateData)
+      console.log('Premium Data:', premiumData)
+      console.log('Regular Data:', regularData)
+
+      // Set state with extracted values
+      setPrivateSpaceData(privateData)
+      setPremiumSpaceData(premiumData)
+      setRegularSpaceData(regularData)
+    } catch (error) {
+      console.error('Error fetching space settings:', error)
+    }
+  }
+
+  const getTimeSetForToday = (value) => {
+    const today = getIndonesianDay(selectedDate) // Get today's day
+
+    const times =
+      value === 'regular-space'
+        ? regularSpaceData.times
+        : value === 'private-space'
+        ? privateSpaceData.times
+        : value === 'premium-space'
+        ? premiumSpaceData.times
+        : []
+
+    console.log({ value, today, times })
+
+    // Find time-set where today's day exists
+    const foundItem = times.filter((item) =>
+      item['time-day'].split(',').includes(today),
+    )
+
+    console.log({ foundItem })
+
+    return foundItem.length === 1 ? foundItem[0]['time-set'] : null
+  }
+
+  const getTimeSetForTodayAgain = (value, selectedDate) => {
+    const today = getIndonesianDay(selectedDate) // Get today's day
+
+    const times =
+      value === 'regular-space'
+        ? regularSpaceData.times
+        : value === 'private-space'
+        ? privateSpaceData.times
+        : value === 'premium-space'
+        ? premiumSpaceData.times
+        : []
+
+    console.log({ value, today, times })
+
+    // Find time-set where today's day exists
+    const foundItem = times.filter((item) =>
+      item['time-day'].split(',').includes(today),
+    )
+
+    console.log({ foundItem })
+
+    return foundItem.length === 1 ? foundItem[0]['time-set'] : null
+  }
+
+  console.log({ regularSpaceData })
+  console.log({ premiumSpaceData })
+  console.log({ privateSpaceData })
+
   useEffect(() => {
+    fetchDataTimes()
+
     const snapScript = 'https://app.midtrans.com/snap/snap.js'
     const clientKey = process.env.NEXT_PUBLIC_CLIENT
     const script = document.createElement('script')
@@ -367,17 +489,13 @@ export default function Reservation() {
           const jsonData = await response.data
 
           setReservesPosition(jsonData)
-          console.log(response.data)
 
           setIsLoading(false)
         } else {
           setIsLoading(false)
-          console.log({ response })
           throw new Error('Failed to fetch data')
         }
       } catch (error) {
-        console.log(error)
-
         setIsLoading(false)
       }
     }
@@ -396,83 +514,14 @@ export default function Reservation() {
     }
   }, [startTimeReservasi, endTimeReservasi, imageRef, scale])
 
-  const [date, setDate] = useState(null)
-  const [selectedDate, setSelectedDate] = useState('')
-
-  const disableTimes =
-    reserves.length > 0
-      ? reserves
-          .map((reserve) => {
-            if (reserve.reserve_end_time) {
-              const [hour, minute, second] = reserve.reserve_end_time.split(':')
-              const formattedTime = `${hour}:${minute}`
-              return formattedTime
-            }
-            return null
-          })
-          .filter((time) => time !== null)
-      : []
-
-  const [drawerContent, setDrawerContent] = useState('default')
-  const [selectedSeat, setSelectedSeat] = React.useState(0)
-  const [catalogs, setCatalogs] = React.useState([])
-
-  const handleCatalogClick = async (noSeat) => {
-    setSelectedSeat(noSeat)
-    console.log({ noSeat })
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/catalogs?no_seat=${noSeat}`,
-      )
-
-      if (response.data && response.data.length > 0) {
-        setDrawerContent('catalog')
-        setCatalogs(response.data)
-      } else {
-        throw new Error('No catalog data found')
-      }
-    } catch (error) {
-      setDrawerContent('catalog')
-      setCatalogs([])
-      console.error('Error fetching catalog data:', error)
-    }
-  }
-
-  const [
-    selectedReservationPlace,
-    setSelectedReservationPlace,
-  ] = React.useState(null)
-
-  // FILTERING CATALOGS FEATURE
-  const [filterKeyword, setFilterKeyword] = React.useState('')
-  const [filteredCatalogs, setFilteredCatalogs] = React.useState([])
-  const handleInputFilterCatalogChange = (e) => {
-    const value = e.target.value.toLowerCase()
-    setFilteredCatalogs(
-      catalogs.filter((catalog) =>
-        catalog.catalog_txt.toLowerCase().includes(value),
-      ),
-    )
-  }
-
-  const handleCloseCatalogClick = () => {
-    setDrawerContent('default')
-    setFilteredCatalogs([])
-    setFilterKeyword('')
-  }
-
-  // React.useEffect(() => {
-  //   // Memastikan currentDate dan maxDate selalu update setiap hari
-  //   const interval = setInterval(() => {
-  //     setCurrentDate(getCurrentDate) // Set ke kemarin
-  //     setMaxDate(getMaxDate)
-  //   }, 24 * 60 * 60 * 1000) // Perbarui setiap 24 jam
-  //   return () => clearInterval(interval)
-  // }, [])
+  const [popoverOpen, setPopoverOpen] = React.useState(false)
 
   return (
     <>
-      {reservationContent == null ? (
+      {reservationContent == null ||
+      regularSpaceData == null ||
+      privateSpaceData == null ||
+      premiumSpaceData == null ? (
         <div className=" z-[999999] w-full h-full absolute top-50">
           <LoaderHome />
         </div>
@@ -587,9 +636,15 @@ export default function Reservation() {
                             setDate(date)
                             // const nextDay = addDays(date)
                             setSelectedDate(format(date, 'yyyy-MM-dd'))
-                            getAllReservationsPosition(
+                            getAllReservationsPositon(
                               format(date, 'yyyy-MM-dd'),
                             )
+                            if (selectedReservationPlace != '') {
+                              getTimeSetForTodayAgain(
+                                selectedReservationPlace,
+                                format(date, 'yyyy-MM-dd'),
+                              )
+                            }
                             getTimeSelected(format(date, 'yyyy-MM-dd'))
                           }}
                           disabled={(date) => {
@@ -616,17 +671,24 @@ export default function Reservation() {
                     </label>
                     <Select
                       value={selectedReservationPlace}
-                      onValueChange={(value) =>
+                      onValueChange={(value) => {
                         setSelectedReservationPlace(value)
-                      }
+                        getTimeSetForToday(value)
+                      }}
                       required
-                      className="border border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                      className="border border-border duration-500 bg-transparent text-white placeholder:text-gray-300 rounded-lg !px-3 !py-4"
                     >
                       <SelectTrigger className="py-5 px-3 text-base text-white">
                         <SelectValue
                           className="text-base text-white placeholder:text-white"
-                          placeholder="Choose Section"
-                        />
+                          placeholder="Choose Space"
+                        >
+                          {selectedReservationPlace == ''
+                            ? 'Choose Space'
+                            : capitalizeAndFormat(
+                                selectedReservationPlace || '',
+                              )}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup className="">
@@ -639,7 +701,31 @@ export default function Reservation() {
                               className="text-base"
                               value={place.slug}
                             >
-                              {place.name}
+                              <div className="flex flex-col gap-1">
+                                <span>{place.name}</span>
+
+                                <span className="text-gray-500 flex flex-col gap-0">
+                                  {(place.slug === 'regular-space' &&
+                                    regularSpaceData.times) ||
+                                  (place.slug === 'private-space' &&
+                                    privateSpaceData.times) ||
+                                  (place.slug === 'premium-space' &&
+                                    premiumSpaceData.times)
+                                    ? (place.slug === 'regular-space'
+                                        ? regularSpaceData.times
+                                        : place.slug === 'private-space'
+                                        ? privateSpaceData.times
+                                        : premiumSpaceData.times
+                                      ).map((time, index) => (
+                                        <span key={index}>
+                                          {time['time-day']} -{' '}
+                                          {time['time-set']['start-time']} -{' '}
+                                          {time['time-set']['end-time']}
+                                        </span>
+                                      ))
+                                    : null}
+                                </span>
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectGroup>

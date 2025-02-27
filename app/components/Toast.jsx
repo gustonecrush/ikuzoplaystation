@@ -1,7 +1,7 @@
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'
 
-import { Plus_Jakarta_Sans } from 'next/font/google';
-const plus_jakarta_sans = Plus_Jakarta_Sans({ subsets: ['latin'] });
+import { Plus_Jakarta_Sans } from 'next/font/google'
+const plus_jakarta_sans = Plus_Jakarta_Sans({ subsets: ['latin'] })
 
 const Toast = Swal.mixin({
   toast: true,
@@ -9,12 +9,12 @@ const Toast = Swal.mixin({
   showConfirmButton: false,
   showCloseButton: true,
   timer: 5000,
-  customClass: `${plus_jakarta_sans.className} font-plusJakartaSans`,
+  customClass: `${plus_jakarta_sans.className} font-plusJakartaSans leading-none`,
   timerProgressBar: true,
   didOpen: (toast) => {
-    toast.onmouseenter = Swal.stopTimer;
-    toast.onmouseleave = Swal.resumeTimer;
+    toast.onmouseenter = Swal.stopTimer
+    toast.onmouseleave = Swal.resumeTimer
   },
-});
+})
 
-export default Toast;
+export default Toast
