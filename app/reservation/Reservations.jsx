@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator'
 import {
   calculateTimeDifference,
   convertToDate,
+  extractHour,
   formatDate,
   generateTimeArray,
   generateTimeArrayWithStep,
@@ -180,6 +181,8 @@ export default function Reservation() {
       const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
+
+        console.log({ jsonData })
 
         if (jsonData.data.length > 0) {
           setCustomTimeSelected(jsonData.data)
@@ -514,7 +517,43 @@ export default function Reservation() {
     }
   }, [startTimeReservasi, endTimeReservasi, imageRef, scale])
 
-  const [popoverOpen, setPopoverOpen] = React.useState(false)
+  const timeSet = getTimeSetForTodayAgain(
+    selectedReservationPlace,
+    selectedDate,
+  )
+
+  console.log({ timeSet })
+
+  const fallbackTimeArray = [
+    {
+      open_time: 10,
+      close_time: 23,
+      date: selectedDate,
+    },
+  ]
+
+  let timeArrayStart =
+    regularSpaceData === null
+      ? customTimeSelected.length === 0
+        ? fallbackTimeArray
+        : customTimeSelected
+      : timeSet === null
+      ? customTimeSelected.length === 0
+        ? fallbackTimeArray
+        : customTimeSelected
+      : [
+          {
+            open_time: extractHour(timeSet['start-time']),
+            close_time: extractHour(timeSet['end-time']), // Ensure using end-time
+            date: selectedDate,
+          },
+        ]
+
+  const generatedTimes = generateTimeArray(
+    timeArrayStart,
+    selectedDate,
+    bookedSlots,
+  )
 
   return (
     <>
@@ -704,27 +743,33 @@ export default function Reservation() {
                               <div className="flex flex-col gap-1">
                                 <span>{place.name}</span>
 
-                                <span className="text-gray-500 flex flex-col gap-0">
-                                  {(place.slug === 'regular-space' &&
-                                    regularSpaceData.times) ||
-                                  (place.slug === 'private-space' &&
-                                    privateSpaceData.times) ||
-                                  (place.slug === 'premium-space' &&
-                                    premiumSpaceData.times)
-                                    ? (place.slug === 'regular-space'
-                                        ? regularSpaceData.times
-                                        : place.slug === 'private-space'
-                                        ? privateSpaceData.times
-                                        : premiumSpaceData.times
-                                      ).map((time, index) => (
-                                        <span key={index}>
-                                          {time['time-day']} -{' '}
-                                          {time['time-set']['start-time']} -{' '}
-                                          {time['time-set']['end-time']}
-                                        </span>
-                                      ))
-                                    : null}
-                                </span>
+                                {regularSpaceData == null ||
+                                premiumSpaceData == null ||
+                                privateSpaceData == null ? (
+                                  <></>
+                                ) : (
+                                  <span className="text-gray-500 flex flex-col gap-0">
+                                    {(place.slug === 'regular-space' &&
+                                      regularSpaceData.times) ||
+                                    (place.slug === 'private-space' &&
+                                      privateSpaceData.times) ||
+                                    (place.slug === 'premium-space' &&
+                                      premiumSpaceData.times)
+                                      ? (place.slug === 'regular-space'
+                                          ? regularSpaceData.times
+                                          : place.slug === 'private-space'
+                                          ? privateSpaceData.times
+                                          : premiumSpaceData.times
+                                        ).map((time, index) => (
+                                          <span key={index}>
+                                            {time['time-day']} -{' '}
+                                            {time['time-set']['start-time']} -{' '}
+                                            {time['time-set']['end-time']}
+                                          </span>
+                                        ))
+                                      : null}
+                                  </span>
+                                )}
                               </div>
                             </SelectItem>
                           ))}
@@ -992,18 +1037,16 @@ export default function Reservation() {
                                                         <SelectLabel className="text-sm">
                                                           Pilih Waktu Mulai
                                                         </SelectLabel>
-                                                        {generateTimeArray(
-                                                          customTimeSelected,
-                                                          selectedDate,
-                                                          bookedSlots,
-                                                        ).map((time, index) => (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        ))}
+                                                        {generatedTimes.map(
+                                                          (time, index) => (
+                                                            <SelectItem
+                                                              key={index}
+                                                              value={time}
+                                                            >
+                                                              {time}
+                                                            </SelectItem>
+                                                          ),
+                                                        )}
                                                       </SelectGroup>
                                                     </SelectContent>
                                                   </Select>
@@ -1388,18 +1431,16 @@ export default function Reservation() {
                                                         <SelectLabel className="text-sm">
                                                           Pilih Waktu Mulai
                                                         </SelectLabel>
-                                                        {generateTimeArray(
-                                                          customTimeSelected,
-                                                          selectedDate,
-                                                          bookedSlots,
-                                                        ).map((time, index) => (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        ))}
+                                                        {generatedTimes.map(
+                                                          (time, index) => (
+                                                            <SelectItem
+                                                              key={index}
+                                                              value={time}
+                                                            >
+                                                              {time}
+                                                            </SelectItem>
+                                                          ),
+                                                        )}
                                                       </SelectGroup>
                                                     </SelectContent>
                                                   </Select>
@@ -1784,18 +1825,16 @@ export default function Reservation() {
                                                         <SelectLabel className="text-sm">
                                                           Pilih Waktu Mulai
                                                         </SelectLabel>
-                                                        {generateTimeArray(
-                                                          customTimeSelected,
-                                                          selectedDate,
-                                                          bookedSlots,
-                                                        ).map((time, index) => (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        ))}
+                                                        {generatedTimes.map(
+                                                          (time, index) => (
+                                                            <SelectItem
+                                                              key={index}
+                                                              value={time}
+                                                            >
+                                                              {time}
+                                                            </SelectItem>
+                                                          ),
+                                                        )}
                                                       </SelectGroup>
                                                     </SelectContent>
                                                   </Select>
@@ -3149,18 +3188,16 @@ export default function Reservation() {
                                                         <SelectLabel className="text-sm">
                                                           Pilih Waktu Mulai
                                                         </SelectLabel>
-                                                        {generateTimeArray(
-                                                          customTimeSelected,
-                                                          selectedDate,
-                                                          bookedSlots,
-                                                        ).map((time, index) => (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        ))}
+                                                        {generatedTimes.map(
+                                                          (time, index) => (
+                                                            <SelectItem
+                                                              key={index}
+                                                              value={time}
+                                                            >
+                                                              {time}
+                                                            </SelectItem>
+                                                          ),
+                                                        )}
                                                       </SelectGroup>
                                                     </SelectContent>
                                                   </Select>
@@ -3545,18 +3582,16 @@ export default function Reservation() {
                                                         <SelectLabel className="text-sm">
                                                           Pilih Waktu Mulai
                                                         </SelectLabel>
-                                                        {generateTimeArray(
-                                                          customTimeSelected,
-                                                          selectedDate,
-                                                          bookedSlots,
-                                                        ).map((time, index) => (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        ))}
+                                                        {generatedTimes.map(
+                                                          (time, index) => (
+                                                            <SelectItem
+                                                              key={index}
+                                                              value={time}
+                                                            >
+                                                              {time}
+                                                            </SelectItem>
+                                                          ),
+                                                        )}
                                                       </SelectGroup>
                                                     </SelectContent>
                                                   </Select>
@@ -3944,18 +3979,16 @@ export default function Reservation() {
                                                         <SelectLabel className="text-sm">
                                                           Pilih Waktu Mulai
                                                         </SelectLabel>
-                                                        {generateTimeArray(
-                                                          customTimeSelected,
-                                                          selectedDate,
-                                                          bookedSlots,
-                                                        ).map((time, index) => (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        ))}
+                                                        {generatedTimes.map(
+                                                          (time, index) => (
+                                                            <SelectItem
+                                                              key={index}
+                                                              value={time}
+                                                            >
+                                                              {time}
+                                                            </SelectItem>
+                                                          ),
+                                                        )}
                                                       </SelectGroup>
                                                     </SelectContent>
                                                   </Select>
@@ -4341,18 +4374,16 @@ export default function Reservation() {
                                                         <SelectLabel className="text-sm">
                                                           Pilih Waktu Mulai
                                                         </SelectLabel>
-                                                        {generateTimeArray(
-                                                          customTimeSelected,
-                                                          selectedDate,
-                                                          bookedSlots,
-                                                        ).map((time, index) => (
-                                                          <SelectItem
-                                                            key={index}
-                                                            value={time}
-                                                          >
-                                                            {time}
-                                                          </SelectItem>
-                                                        ))}
+                                                        {generatedTimes.map(
+                                                          (time, index) => (
+                                                            <SelectItem
+                                                              key={index}
+                                                              value={time}
+                                                            >
+                                                              {time}
+                                                            </SelectItem>
+                                                          ),
+                                                        )}
                                                       </SelectGroup>
                                                     </SelectContent>
                                                   </Select>

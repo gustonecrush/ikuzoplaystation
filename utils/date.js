@@ -157,25 +157,19 @@ export const extractHour = (timeString) => {
 }
 
 export const generateTimeArray = (
-  customTimeSelectedArray = [
-    {
-      open_time: 10,
-      close_time: 23,
-      date: new Date().toISOString().split('T')[0],
-    },
-  ],
+  customTimeSelectedArray,
   date = new Date().toISOString().split('T')[0],
   bookedSlots,
 ) => {
-  if (customTimeSelectedArray.length == 0) {
-    customTimeSelectedArray = [
-      {
-        open_time: 10,
-        close_time: 23,
-        date: new Date().toISOString().split('T')[0],
-      },
-    ]
-  }
+  // if (customTimeSelectedArray.length == 0) {
+  //   customTimeSelectedArray = [
+  //     {
+  //       open_time: 10,
+  //       close_time: 23,
+  //       date: new Date().toISOString().split('T')[0],
+  //     },
+  //   ]
+  // }
   console.log('BOOKED', bookedSlots)
   console.log(date)
   console.log(customTimeSelectedArray)
