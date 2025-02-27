@@ -139,18 +139,19 @@ function DrawerInfoFacility({ facility }) {
           <InfoIcon className="w-6 h-6" />
         </div>
       </DrawerTrigger>
-      {privateSpaceData == null ||
-      premiumSpaceData == null ||
-      regularSpaceData == null ? (
-        <></>
-      ) : (
-        <DrawerContent className="active:border-none z-[1200] border-none outline-none md:max-w-3xl md:mx-auto">
-          <DrawerHeader className="text-left">
-            <DrawerTitle className="text-xl">{facility.name}</DrawerTitle>
-            <DrawerDescription>
-              IDR {facility.price}/hour and can only accomodate{' '}
-              {facility.capacity} person.
-            </DrawerDescription>
+
+      <DrawerContent className="active:border-none z-[1200] border-none outline-none md:max-w-3xl md:mx-auto">
+        <DrawerHeader className="text-left">
+          <DrawerTitle className="text-xl">{facility.name}</DrawerTitle>
+          <DrawerDescription>
+            IDR {facility.price}/hour and can only accomodate{' '}
+            {facility.capacity} person.
+          </DrawerDescription>
+          {privateSpaceData == null ||
+          premiumSpaceData == null ||
+          regularSpaceData == null ? (
+            <></>
+          ) : (
             <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
               <span>Available on : </span>
               {(getSpaceCategory(facility.name) === 'regular-space' &&
@@ -172,50 +173,50 @@ function DrawerInfoFacility({ facility }) {
                   ))
                 : null}
             </DrawerDescription>
-          </DrawerHeader>
+          )}
+        </DrawerHeader>
 
-          <div className="flex-relative w-full h-fit px-4">
-            <div
-              style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '10px',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              <Image
-                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
-                useMap="#image-map"
-                alt={facility.name}
-                width={0}
-                height={0}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                }}
-              />
-            </div>
-          </div>
-
+        <div className="flex-relative w-full h-fit px-4">
           <div
-            className="prose-sm prose-li:list-disc px-4 prose-li:m-0 prose-li:p-0 "
-            dangerouslySetInnerHTML={{
-              __html: facility && facility.benefits,
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '10px',
+              position: 'relative',
+              overflow: 'hidden',
             }}
-          ></div>
+          >
+            <Image
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
+              useMap="#image-map"
+              alt={facility.name}
+              width={0}
+              height={0}
+              style={{
+                width: '100%',
+                height: 'auto',
+              }}
+            />
+          </div>
+        </div>
 
-          <DrawerFooter className="pt-2">
-            <Link href={'/reservation'} className="w-full">
-              <Button
-                variant="outline"
-                className={`bg-orange w-full text-white border-orange py-5`}
-              >
-                Reserve Now
-              </Button>
-            </Link>
-          </DrawerFooter>
-        </DrawerContent>
-      )}
+        <div
+          className="prose-sm prose-li:list-disc px-4 prose-li:m-0 prose-li:p-0 "
+          dangerouslySetInnerHTML={{
+            __html: facility && facility.benefits,
+          }}
+        ></div>
+
+        <DrawerFooter className="pt-2">
+          <Link href={'/reservation'} className="w-full">
+            <Button
+              variant="outline"
+              className={`bg-orange w-full text-white border-orange py-5`}
+            >
+              Reserve Now
+            </Button>
+          </Link>
+        </DrawerFooter>
+      </DrawerContent>
     </Drawer>
   )
 }
