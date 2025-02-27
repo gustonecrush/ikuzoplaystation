@@ -38,8 +38,6 @@ function Hero({ children }) {
     }
   }
 
-  console.log({ contents })
-
   React.useEffect(() => {
     fetchContents()
   }, [])

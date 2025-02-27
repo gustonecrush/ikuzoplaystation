@@ -28,6 +28,8 @@ import {
 import { InfoIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import getDocument from '@/firebase/firestore/getData'
+import { getSpaceCategory } from '@/utils/text'
 
 export default function SwiperContainer2() {
   const [facilities, setFacilities] = React.useState([])
@@ -40,7 +42,6 @@ export default function SwiperContainer2() {
       if (response.status == 200) {
         const jsonData = await response.data
         setFacilities(jsonData.data)
-        console.log({ jsonData })
       } else {
         console.error({ error })
         throw new Error('Failed to fetch data')
@@ -60,8 +61,6 @@ export default function SwiperContainer2() {
       }
     }
   }
-
-  console.log({ facilities })
 
   React.useEffect(() => {
     fetchContents()
@@ -104,6 +103,35 @@ export default function SwiperContainer2() {
 }
 
 function DrawerInfoFacility({ facility }) {
+  const [privateSpaceData, setPrivateSpaceData] = React.useState(null)
+  const [regularSpaceData, setRegularSpaceData] = React.useState(null)
+  const [premiumSpaceData, setPremiumSpaceData] = React.useState(null)
+
+  async function fetchDataTimes() {
+    try {
+      const responses = await Promise.all([
+        getDocument('space-setting-times', 'private-space-doc'), // Index 0
+        getDocument('space-setting-times', 'premium-space-doc'), // Index 1
+        getDocument('space-setting-times', 'regular-space-doc'), // Index 2
+      ])
+
+      // Extract data from responses
+      const privateData = responses[0]?.data
+      const premiumData = responses[1]?.data
+      const regularData = responses[2]?.data
+
+      // Set state with extracted values
+      setPrivateSpaceData(privateData)
+      setPremiumSpaceData(premiumData)
+      setRegularSpaceData(regularData)
+    } catch (error) {
+      console.error('Error fetching space settings:', error)
+    }
+  }
+
+  React.useEffect(() => {
+    fetchDataTimes()
+  }, [])
   return (
     <Drawer>
       <DrawerTrigger asChild>
@@ -111,56 +139,83 @@ function DrawerInfoFacility({ facility }) {
           <InfoIcon className="w-6 h-6" />
         </div>
       </DrawerTrigger>
-      <DrawerContent className="active:border-none z-[1200] border-none outline-none md:max-w-3xl md:mx-auto">
-        <DrawerHeader className="text-left">
-          <DrawerTitle className="text-xl">{facility.name}</DrawerTitle>
-          <DrawerDescription>
-            IDR {facility.price}/hour and can only accomodate{' '}
-            {facility.capacity} person.
-          </DrawerDescription>
-        </DrawerHeader>
+      {privateSpaceData == null ||
+      premiumSpaceData == null ||
+      regularSpaceData == null ? (
+        <></>
+      ) : (
+        <DrawerContent className="active:border-none z-[1200] border-none outline-none md:max-w-3xl md:mx-auto">
+          <DrawerHeader className="text-left">
+            <DrawerTitle className="text-xl">{facility.name}</DrawerTitle>
+            <DrawerDescription>
+              IDR {facility.price}/hour and can only accomodate{' '}
+              {facility.capacity} person.
+            </DrawerDescription>
+            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+              <span>Available on : </span>
+              {(getSpaceCategory(facility.name) === 'regular-space' &&
+                regularSpaceData.times) ||
+              (getSpaceCategory(facility.name) === 'private-space' &&
+                privateSpaceData.times) ||
+              (getSpaceCategory(facility.name) === 'premium-space' &&
+                premiumSpaceData.times)
+                ? (getSpaceCategory(facility.name) === 'regular-space'
+                    ? regularSpaceData.times
+                    : getSpaceCategory(facility.name) === 'private-space'
+                    ? privateSpaceData.times
+                    : premiumSpaceData.times
+                  ).map((time, index) => (
+                    <span key={index}>
+                      • {time['time-day']} - {time['time-set']['start-time']} -{' '}
+                      {time['time-set']['end-time']}
+                    </span>
+                  ))
+                : null}
+            </DrawerDescription>
+          </DrawerHeader>
 
-        <div className="flex-relative w-full h-fit px-4">
-          <div
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '10px',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            <Image
-              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
-              useMap="#image-map"
-              alt={facility.name}
-              width={0}
-              height={0}
+          <div className="flex-relative w-full h-fit px-4">
+            <div
               style={{
-                width: '100%',
-                height: 'auto',
+                backgroundColor: '#ffffff',
+                borderRadius: '10px',
+                position: 'relative',
+                overflow: 'hidden',
               }}
-            />
-          </div>
-        </div>
-
-        <div
-          className="prose-sm prose-li:list-disc px-4 prose-li:m-0 prose-li:p-0 "
-          dangerouslySetInnerHTML={{
-            __html: facility && facility.benefits,
-          }}
-        ></div>
-
-        <DrawerFooter className="pt-2">
-          <Link href={'/reservation'} className="w-full">
-            <Button
-              variant="outline"
-              className={`bg-orange w-full text-white border-orange py-5`}
             >
-              Reserve Now
-            </Button>
-          </Link>
-        </DrawerFooter>
-      </DrawerContent>
+              <Image
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
+                useMap="#image-map"
+                alt={facility.name}
+                width={0}
+                height={0}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                }}
+              />
+            </div>
+          </div>
+
+          <div
+            className="prose-sm prose-li:list-disc px-4 prose-li:m-0 prose-li:p-0 "
+            dangerouslySetInnerHTML={{
+              __html: facility && facility.benefits,
+            }}
+          ></div>
+
+          <DrawerFooter className="pt-2">
+            <Link href={'/reservation'} className="w-full">
+              <Button
+                variant="outline"
+                className={`bg-orange w-full text-white border-orange py-5`}
+              >
+                Reserve Now
+              </Button>
+            </Link>
+          </DrawerFooter>
+        </DrawerContent>
+      )}
     </Drawer>
   )
 }

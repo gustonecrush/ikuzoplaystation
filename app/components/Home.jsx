@@ -25,8 +25,6 @@ export default function Home() {
     setSearchContent(dataContentSearch.data)
   }
 
-  console.log({ searchContent })
-
   const fetchSections = async () => {
     setIsLoading(true)
     try {
@@ -38,17 +36,13 @@ export default function Home() {
         setSectionsUpdate(jsonData.data)
         setIsLoading(false)
       } else {
-        console.error({ error })
         setIsLoading(true)
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.error({ error })
       setIsLoading(true)
     }
   }
-
-  console.log({ sectionsUpdate })
 
   React.useEffect(() => {
     fetchSections()

@@ -26,7 +26,6 @@ const SwiperContainer = () => {
       if (response.status == 200) {
         const jsonData = await response.data
         setGames(jsonData.data)
-        console.log({ jsonData })
       } else {
         console.error({ error })
         throw new Error('Failed to fetch data')
