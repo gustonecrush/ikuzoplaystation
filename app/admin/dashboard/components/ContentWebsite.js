@@ -235,7 +235,7 @@ function ContentWebsite() {
       'label-tempat-reservasi': labelTempatReservasi,
       'label-whatsapp': labelWhatsapp,
       'placeholder-name': placeholderName,
-      'placeholder-tanggal-reservasi': placeholderName,
+      'placeholder-tanggal-reservasi': placeholderTanggalReservasi,
       'placeholder-whatsapp': placeholderWhatsapp,
       'reservation-description': reservationDesc,
       'reservation-title': reservationTitle,
