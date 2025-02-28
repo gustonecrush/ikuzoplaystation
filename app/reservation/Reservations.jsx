@@ -19,6 +19,7 @@ import {
   formatDate,
   generateTimeArray,
   generateTimeArrayWithStep,
+  generateTimeArrayWithStepUser,
   getCurrentDate,
   getCurrentTime,
   getIndonesianDay,
@@ -91,7 +92,6 @@ export default function Reservation() {
   const [reserves, setReserves] = useState([])
   const [bookedSlots, setBookedSlots] = useState([])
   const [reservesPosition, setReservesPosition] = useState([])
-  const timeArray = generateTimeArrayWithStep(startTimeReservasi, bookedSlots)
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const getAllReservationsPositon = async (date) => {
@@ -556,6 +556,12 @@ export default function Reservation() {
     bookedSlots,
   )
 
+  const timeArray = generateTimeArrayWithStepUser(
+    startTimeReservasi,
+    bookedSlots,
+    timeSet != null ? extractHour(timeSet['end-time']) : 23,
+  )
+
   return (
     <>
       {reservationContent == null ||
@@ -567,7 +573,7 @@ export default function Reservation() {
         </div>
       ) : (
         <section className="bg-transparent w-full h-full md:max-w-4xl md:mx-auto font-jakarta px-5 py-5 md:pb-10 absolute z-50">
-          <Link href="/" className="flex items-center justify-between">
+          <Link href="/" className="flex items-center justify-center">
             <Fade>
               <Image
                 src={'/logo-orange.png'}
@@ -580,7 +586,7 @@ export default function Reservation() {
             </Fade>
           </Link>
 
-          <div className="px-5 py-5 text-black bg-gray-700 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 shadow-md rounded-lg flex flex-row gap-3 items-center">
+          <div className="px-5 py-5 text-black bg-gray-700 bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 shadow-md rounded-lg flex flex-col text-center gap-3 items-center justify-center">
             <Fade>
               <Image
                 src={!continueTapped ? '/reserve.png' : '/checkout.png'}
@@ -593,7 +599,7 @@ export default function Reservation() {
 
             <Fade>
               <div className="flex flex-col">
-                <h1 className="text-3xl font-bold font-montserrat text-orange">
+                <h1 className="text-3xl font-bold uppercase font-montserrat leading-none text-orange">
                   {!continueTapped
                     ? reservationContent['reservation-title']
                     : 'Payment'}
@@ -730,8 +736,8 @@ export default function Reservation() {
                               )}
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup className="">
+                      <SelectContent className="w-4/5 ml-3" side="top">
+                        <SelectGroup>
                           <SelectLabel className="text-base">
                             Pilih Tempat Reservasi
                           </SelectLabel>
@@ -1099,12 +1105,7 @@ export default function Reservation() {
                                                           '' &&
                                                         timeArray.length !=
                                                           0 ? (
-                                                          generateTimeArrayWithStep(
-                                                            convertToExtendedTime(
-                                                              startTimeReservasi,
-                                                            ),
-                                                            bookedSlots,
-                                                          ).map(
+                                                          timeArray.map(
                                                             (time, index) => {
                                                               const isDisabled = disableTimes.includes(
                                                                 time,
@@ -1516,10 +1517,7 @@ export default function Reservation() {
                                                           '' &&
                                                         timeArray.length !=
                                                           0 ? (
-                                                          generateTimeArrayWithStep(
-                                                            startTimeReservasi,
-                                                            bookedSlots,
-                                                          ).map(
+                                                          timeArray.map(
                                                             (time, index) => {
                                                               const isDisabled = disableTimes.includes(
                                                                 time,
@@ -1931,10 +1929,7 @@ export default function Reservation() {
                                                           '' &&
                                                         timeArray.length !=
                                                           0 ? (
-                                                          generateTimeArrayWithStep(
-                                                            startTimeReservasi,
-                                                            bookedSlots,
-                                                          ).map(
+                                                          timeArray.map(
                                                             (time, index) => {
                                                               const isDisabled = disableTimes.includes(
                                                                 time,
@@ -2366,7 +2361,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
                                                 timeArray.length != 0 ? (
-                                                  generateTimeArrayWithStep(
+                                                  generateTimeArrayWithStepUser(
                                                     startTimeReservasi,
                                                     bookedSlots,
                                                   ).map((time, index) => {
@@ -2689,7 +2684,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
                                                 timeArray.length != 0 ? (
-                                                  generateTimeArrayWithStep(
+                                                  generateTimeArrayWithStepUser(
                                                     startTimeReservasi,
                                                     bookedSlots,
                                                   ).map((time, index) => {
@@ -3006,7 +3001,7 @@ export default function Reservation() {
                                                 </SelectLabel>
                                                 {startTimeReservasi != '' &&
                                                 timeArray.length != 0 ? (
-                                                  generateTimeArrayWithStep(
+                                                  generateTimeArrayWithStepUser(
                                                     startTimeReservasi,
                                                     bookedSlots,
                                                   ).map((time, index) => {
@@ -3315,10 +3310,7 @@ export default function Reservation() {
                                                           '' &&
                                                         timeArray.length !=
                                                           0 ? (
-                                                          generateTimeArrayWithStep(
-                                                            startTimeReservasi,
-                                                            bookedSlots,
-                                                          ).map(
+                                                          timeArray.map(
                                                             (time, index) => {
                                                               const isDisabled = disableTimes.includes(
                                                                 time,
@@ -3729,10 +3721,7 @@ export default function Reservation() {
                                                           '' &&
                                                         timeArray.length !=
                                                           0 ? (
-                                                          generateTimeArrayWithStep(
-                                                            startTimeReservasi,
-                                                            bookedSlots,
-                                                          ).map(
+                                                          timeArray.map(
                                                             (time, index) => {
                                                               const isDisabled = disableTimes.includes(
                                                                 time,
@@ -4146,10 +4135,7 @@ export default function Reservation() {
                                                           '' &&
                                                         timeArray.length !=
                                                           0 ? (
-                                                          generateTimeArrayWithStep(
-                                                            startTimeReservasi,
-                                                            bookedSlots,
-                                                          ).map(
+                                                          timeArray.map(
                                                             (time, index) => {
                                                               const isDisabled = disableTimes.includes(
                                                                 time,
@@ -4561,10 +4547,7 @@ export default function Reservation() {
                                                           '' &&
                                                         timeArray.length !=
                                                           0 ? (
-                                                          generateTimeArrayWithStep(
-                                                            startTimeReservasi,
-                                                            bookedSlots,
-                                                          ).map(
+                                                          timeArray.map(
                                                             (time, index) => {
                                                               const isDisabled = disableTimes.includes(
                                                                 time,

@@ -220,13 +220,6 @@ function page() {
       },
       cell: ({ row }) => (
         <div className={`flex items-center justify-center gap-1`}>
-          <Button
-            variant="outline"
-            className="border-black border-opacity-5 bg-black bg-opacity-10 text-xs text-black"
-          >
-            <IoIosInformationCircle className="h-4 w-4" /> Info
-          </Button>
-
           <AlertDialog className="bg-black/20">
             <AlertDialogTrigger asChild>
               <Button

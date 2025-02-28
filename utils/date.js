@@ -386,7 +386,7 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
   const maxHour = 23
   const maxMinute = 30
 
-  const [hourStr, minuteStr] = selectedTime.split(':')
+  const [hourStr, minuteStr] = convertToExtendedTime(selectedTime).split(':')
   const selectedHour = parseInt(hourStr)
   const selectedMinute = parseInt(minuteStr)
 
@@ -412,7 +412,13 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
         const time = `${formattedHour}:${formattedMinute}`
 
         // Check if the time is within the range of selected time to nearestStartTime
-        if (isTimeBetween(time, selectedTime, nearestStartTime)) {
+        if (
+          isTimeBetween(
+            time,
+            convertToExtendedTime(selectedTime),
+            nearestStartTime,
+          )
+        ) {
           times.push(convertToStandardTime(time))
         }
 
@@ -455,6 +461,104 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
       }
     }
   }
+
+  console.log('end times', times)
+
+  return times
+}
+
+export const convertNumber = (num) => {
+  if (num >= 25 && num <= 30) {
+    return num - 24 // Shifts 25 -> 1, 26 -> 2, ..., 30 -> 6
+  }
+  return num // Return original number if outside range
+}
+
+export const generateTimeArrayWithStepUser = (
+  selectedTime,
+  bookedSlots,
+  maxHour,
+) => {
+  const times = []
+  const maxMinute = 30
+
+  const [hourStr, minuteStr] = convertToExtendedTime(selectedTime).split(':')
+  const selectedHour = parseInt(hourStr)
+  const selectedMinute = parseInt(minuteStr)
+
+  // Check if bookedSlots is not empty
+  if (bookedSlots.length !== 0) {
+    // Find the nearest startTime after the selected time
+    let nearestStartTime = ''
+    for (const slot of bookedSlots) {
+      const [startHour, startMinute] = slot.startTime.split(':')
+      const slotStartTime = parseInt(startHour) * 60 + parseInt(startMinute)
+      const selectedTimeMinutes = selectedHour * 60 + selectedMinute
+      if (slotStartTime > selectedTimeMinutes) {
+        nearestStartTime = slot.startTime
+        break
+      }
+    }
+
+    // Generate times from the selected time to the nearest startTime with step one hour
+    if (nearestStartTime) {
+      for (let hour = selectedHour + 1; hour <= parseInt(maxHour); hour++) {
+        const formattedHour = hour.toString().padStart(2, '0')
+        const formattedMinute = selectedMinute.toString().padStart(2, '0')
+        const time = `${formattedHour}:${formattedMinute}`
+
+        // Check if the time is within the range of selected time to nearestStartTime
+        if (
+          isTimeBetween(
+            time,
+            convertToExtendedTime(selectedTime),
+            nearestStartTime,
+          )
+        ) {
+          times.push(convertToStandardTime(time))
+        }
+
+        // If the nearestStartTime is reached, break the loop
+        if (`${hour}:00` === nearestStartTime) {
+          break
+        }
+      }
+    } else {
+      // If no nearest startTime, generate times with step one hour until 23:30
+      for (let hour = selectedHour + 1; hour <= parseInt(maxHour); hour++) {
+        const formattedHour = hour.toString().padStart(2, '0')
+        const formattedMinute = selectedMinute.toString().padStart(2, '0')
+        const time = `${formattedHour}:${formattedMinute}`
+
+        // Exclude selectedTime
+        if (time !== selectedTime) {
+          times.push(convertToStandardTime(time))
+        }
+
+        if (hour === parseInt(maxHour) && selectedMinute === maxMinute) {
+          break
+        }
+      }
+    }
+  } else {
+    // If bookedSlots is empty, generate times with step one hour until 23:30
+    for (let hour = selectedHour + 1; hour <= parseInt(maxHour); hour++) {
+      const formattedHour = hour.toString().padStart(2, '0')
+      const formattedMinute = selectedMinute.toString().padStart(2, '0')
+      const time = `${formattedHour}:${formattedMinute}`
+
+      // Exclude selectedTime
+      if (time !== selectedTime) {
+        times.push(convertToStandardTime(time))
+      }
+
+      if (hour === parseInt(maxHour) && selectedMinute === maxMinute) {
+        break
+      }
+    }
+  }
+
+  console.log('end times', times)
 
   return times
 }
