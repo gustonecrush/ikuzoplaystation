@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator'
 import {
   calculateTimeDifference,
   convertToDate,
+  convertToExtendedTime,
   extractHour,
   formatDate,
   generateTimeArray,
@@ -1099,7 +1100,9 @@ export default function Reservation() {
                                                         timeArray.length !=
                                                           0 ? (
                                                           generateTimeArrayWithStep(
-                                                            startTimeReservasi,
+                                                            convertToExtendedTime(
+                                                              startTimeReservasi,
+                                                            ),
                                                             bookedSlots,
                                                           ).map(
                                                             (time, index) => {

@@ -429,42 +429,60 @@ function page() {
     setCatalogImg(e.target.files[0])
   }
 
+  const [isUploadingNewCatalog, setIsUploadingNewCatalog] = React.useState(
+    false,
+  )
   const handleUploadNewCatalogOnSeat = async (e) => {
     e.preventDefault()
+    setIsUploadingNewCatalog(true)
 
-    const data = new FormData()
-    data.append('no_seat', noSeat)
-    data.append('catalog_img', catalogImg)
-    data.append('catalog_txt', catalogTxt)
+    if (checkedSeats.length === 0) {
+      Toast.fire({
+        icon: 'warning',
+        title: 'Pilih setidaknya satu seat!',
+      })
+      setIsUploadingNewCatalog(false)
+      return
+    }
 
     try {
-      const response = await axios.post(`${baseUrl}/catalogs`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
+      const uploadPromises = checkedSeats.map(async (seat) => {
+        const data = new FormData()
+        data.append('no_seat', seat)
+        data.append('catalog_img', catalogImg)
+        data.append('catalog_txt', catalogTxt)
+
+        return axios.post(`${baseUrl}/catalogs`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        })
       })
+
+      await Promise.all(uploadPromises) // Wait for all uploads to complete
 
       Toast.fire({
         icon: 'success',
-        title: `Data katalog seat berhasil diupload!`,
+        title: 'Data katalog seat berhasil diupload!',
       })
 
-      console.log(response)
+      setIsUploadingNewCatalog(true)
 
       setOpen(false)
       getAllDataCatalogs()
-      setNoSeat(null)
+      setCheckedSeats([]) // Clear selected seats after upload
       setCatalogImg(null)
-      setCatalogTxt(null)
+      setCatalogTxt('')
       setOpenCreateReservationForm(false)
     } catch (error) {
       console.error({ error })
       setOpenCreateReservationForm(false)
       setOpen(false)
+      setIsUploadingNewCatalog(true)
       Toast.fire({
         icon: 'error',
-        title: `Data katalog seat gagal diupload!`,
+        title: 'Data katalog seat gagal diupload!',
       })
     }
   }
@@ -477,6 +495,24 @@ function page() {
   React.useEffect(() => {
     getAllDataCatalogs()
   }, [])
+
+  const [selectedSpace, setSelectedSpace] = React.useState('')
+  const seatMap = {
+    'Regular Space': [1, 2, 3, 4, 5, 6, 7, 8],
+    'Premium Space': [13, 14, 15, 16, 17],
+    'Private Space': [18, 19, 20, 21, 22],
+  }
+  const [checkedSeats, setCheckedSeats] = React.useState([])
+  const handleSeatChange = (seat) => {
+    setCheckedSeats(
+      (prevSeats) =>
+        prevSeats.includes(seat)
+          ? prevSeats.filter((s) => s !== seat) // Hapus jika sudah dicentang
+          : [...prevSeats, seat], // Tambahkan jika dicentang
+    )
+  }
+
+  console.log({ checkedSeats })
 
   return (
     <main className="flex w-full h-screen rounded-3xl">
@@ -664,19 +700,41 @@ function page() {
                   <form className="flex flex-col gap-2">
                     <>
                       <div>
-                        <label className="text-black" htmlFor="nama">
-                          No Seat
+                        <label className="block">
+                          <span className="font-medium">Select Space</span>
+                          <select
+                            value={selectedSpace}
+                            onChange={(e) => setSelectedSpace(e.target.value)}
+                            className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
+                          >
+                            <option value="">Pilih Space</option>
+                            <option value="Regular Space">Regular Space</option>
+                            <option value="Private Space">Private Space</option>
+                            <option value="Premium Space">Premium Space</option>
+                          </select>
                         </label>
-                        <input
-                          type="number"
-                          value={noSeat}
-                          onChange={(e) => setNoSeat(e.target.value)}
-                          name="no_seat"
-                          id="no_seat"
-                          placeholder="Masukkan No Seat"
-                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                          required
-                        />
+
+                        {selectedSpace && seatMap[selectedSpace] && (
+                          <div>
+                            <label className="text-black" htmlFor="nama">
+                              No Seat
+                            </label>
+                            {seatMap[selectedSpace].map((seat) => {
+                              const facilityName = getFacilityName(seat) // Dapatkan nama fasilitas
+                              const isChecked = checkedSeats.includes(seat)
+                              return (
+                                <span key={seat} className="block">
+                                  <input
+                                    type="checkbox"
+                                    value={`${seat}`}
+                                    onChange={() => handleSeatChange(seat)}
+                                  />{' '}
+                                  Seat {seat} - {facilityName}
+                                </span>
+                              )
+                            })}
+                          </div>
+                        )}
                       </div>
 
                       <div>
@@ -712,20 +770,30 @@ function page() {
                 </fieldset>
 
                 <AlertDialogFooter>
-                  <AlertDialogCancel
-                    onClick={(e) => setOpenCreateReservationForm(false)}
-                  >
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={(e) =>
-                      openUpdate
-                        ? handleUpdateFacilityContent(idSelected)
-                        : handleUploadNewCatalogOnSeat(e)
-                    }
-                  >
-                    Upload
-                  </AlertDialogAction>
+                  {isUploadingNewCatalog ? (
+                    <>
+                      <Button type="outline" disabled>
+                        Uploading...
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <AlertDialogCancel
+                        onClick={(e) => setOpenCreateReservationForm(false)}
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={(e) =>
+                          openUpdate
+                            ? handleUpdateFacilityContent(idSelected)
+                            : handleUploadNewCatalogOnSeat(e)
+                        }
+                      >
+                        Upload
+                      </AlertDialogAction>
+                    </>
+                  )}
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

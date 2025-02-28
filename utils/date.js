@@ -156,6 +156,22 @@ export const extractHour = (timeString) => {
   return timeString.split(':')[0]
 }
 
+export const convertToStandardTime = (time) => {
+  let [hour, minute] = time.split(':').map(Number)
+  if (hour >= 25 && hour <= 30) {
+    hour = hour - 24 // Ubah ke format 01-06
+  }
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+}
+
+export const convertToExtendedTime = (time) => {
+  let [hour, minute] = time.split(':').map(Number)
+  if (hour >= 1 && hour <= 6) {
+    hour = hour + 24 // Ubah ke format 25-30
+  }
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+}
+
 export const generateTimeArray = (
   customTimeSelectedArray,
   date = new Date().toISOString().split('T')[0],
@@ -215,10 +231,14 @@ export const generateTimeArray = (
         if (
           bookedSlots.length === 0 ||
           !bookedSlots.some((slot) =>
-            isTimeBetween(time, slot.startTime, slot.endTime),
+            isTimeBetween(
+              convertToStandardTime(time),
+              slot.startTime,
+              slot.endTime,
+            ),
           )
         ) {
-          times.push(time)
+          times.push(convertToStandardTime(time))
         }
       }
     }
@@ -393,7 +413,7 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
 
         // Check if the time is within the range of selected time to nearestStartTime
         if (isTimeBetween(time, selectedTime, nearestStartTime)) {
-          times.push(time)
+          times.push(convertToStandardTime(time))
         }
 
         // If the nearestStartTime is reached, break the loop
@@ -410,7 +430,7 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
 
         // Exclude selectedTime
         if (time !== selectedTime) {
-          times.push(time)
+          times.push(convertToStandardTime(time))
         }
 
         if (hour === maxHour && selectedMinute === maxMinute) {
@@ -427,7 +447,7 @@ export const generateTimeArrayWithStep = (selectedTime, bookedSlots) => {
 
       // Exclude selectedTime
       if (time !== selectedTime) {
-        times.push(time)
+        times.push(convertToStandardTime(time))
       }
 
       if (hour === maxHour && selectedMinute === maxMinute) {
