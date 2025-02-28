@@ -777,7 +777,7 @@ export default function Reservation() {
                                         className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
                                         onClick={() => {
                                           setPosisiReservasi(number)
-                                          if (number < 4) {
+                                          if (number <= 4) {
                                             setNamaPosisiReservasi(
                                               positions[6].name,
                                             )
@@ -809,17 +809,17 @@ export default function Reservation() {
                                     <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto pb-5">
                                       <DrawerHeader className="text-left">
                                         <DrawerTitle>
-                                          {number < 4
+                                          {number <= 4
                                             ? positions[6].name
                                             : positions[0].name}
                                         </DrawerTitle>
                                         <DrawerDescription>
                                           IDR{' '}
-                                          {number < 4
+                                          {number <= 4
                                             ? positions[6].price
                                             : positions[0].price}
                                           /hour and can only accomodate{' '}
-                                          {number < 4
+                                          {number <= 4
                                             ? positions[6].capacity
                                             : positions[0].capacity}{' '}
                                           person (position {number}).
@@ -838,7 +838,7 @@ export default function Reservation() {
                                             src={`${
                                               process.env.NEXT_PUBLIC_IMAGE_URL
                                             }${
-                                              number < 4
+                                              number <= 4
                                                 ? positions[6].pict
                                                 : positions[0].pict
                                             }`}
