@@ -18,6 +18,7 @@ import {
   convertToStandardTime,
   extractHour,
   formatDate,
+  formatTimestampIndonesian,
   generateTimeArray,
   generateTimeArrayWithStep,
   generateTimeArrayWithStepUser,
@@ -63,6 +64,7 @@ import { IoMdBook, IoMdClose } from 'react-icons/io'
 import { RESERVATION_PLACE } from '@/constans/reservations'
 import getDocument from '@/firebase/firestore/getData'
 import { capitalizeAndFormat } from '@/utils/text'
+import { MdOutlineUpdate } from 'react-icons/md'
 
 export default function Reservation() {
   // RESERVATION STATE DATA
@@ -307,6 +309,8 @@ export default function Reservation() {
   const [selectedSeat, setSelectedSeat] = React.useState(0)
   const [catalogs, setCatalogs] = React.useState([])
 
+  const [latestUpdatedAt, setLatestUpdatedAt] = useState('')
+
   const handleCatalogClick = async (noSeat) => {
     setSelectedSeat(noSeat)
     try {
@@ -315,8 +319,20 @@ export default function Reservation() {
       )
 
       if (response.data && response.data.length > 0) {
+        const sortedCatalogs = response.data.sort((a, b) =>
+          a.catalog_txt.localeCompare(b.catalog_txt),
+        ) // Sort alphabetically (A-Z)
+
+        // Find the latest updated_at value
+        const latestUpdatedAt = response.data.reduce((latest, catalog) => {
+          return new Date(catalog.updated_at) > new Date(latest.updated_at)
+            ? catalog
+            : latest
+        }, response.data[0]).updated_at
+
         setDrawerContent('catalog')
-        setCatalogs(response.data)
+        setCatalogs(sortedCatalogs)
+        setLatestUpdatedAt(latestUpdatedAt)
       } else {
         throw new Error('No catalog data found')
       }
@@ -326,6 +342,9 @@ export default function Reservation() {
       console.error('Error fetching catalog data:', error)
     }
   }
+
+  console.log({ catalogs })
+  console.log({ latestUpdatedAt })
 
   const [
     selectedReservationPlace,
@@ -337,11 +356,11 @@ export default function Reservation() {
   const [filteredCatalogs, setFilteredCatalogs] = React.useState([])
   const handleInputFilterCatalogChange = (e) => {
     const value = e.target.value.toLowerCase()
-    setFilteredCatalogs(
-      catalogs.filter((catalog) =>
-        catalog.catalog_txt.toLowerCase().includes(value),
-      ),
-    )
+    const filteredAndSortedCatalogs = catalogs
+      .filter((catalog) => catalog.catalog_txt.toLowerCase().includes(value))
+      .sort((a, b) => a.catalog_txt.localeCompare(b.catalog_txt)) // Sort alphabetically
+
+    setFilteredCatalogs(filteredAndSortedCatalogs)
   }
 
   const handleCloseCatalogClick = () => {
@@ -933,16 +952,30 @@ export default function Reservation() {
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
-                                          <input
-                                            value={filterKeyword}
-                                            onChange={(e) => {
-                                              handleInputFilterCatalogChange(e)
-                                              setFilterKeyword(e.target.value)
-                                            }}
-                                            required
-                                            placeholder={'Search game'}
-                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
-                                          />
+                                          <>
+                                            <input
+                                              value={filterKeyword}
+                                              onChange={(e) => {
+                                                handleInputFilterCatalogChange(
+                                                  e,
+                                                )
+                                                setFilterKeyword(e.target.value)
+                                              }}
+                                              required
+                                              placeholder={'Search game'}
+                                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
+                                            />
+                                            {(catalogs.length != 0 ||
+                                              filteredCatalogs.length != 0) && (
+                                              <span className="text-gray-400 text-sm mx-5 flex mt-2">
+                                                <MdOutlineUpdate className="text-lg" />
+                                                Last updated at{' '}
+                                                {formatTimestampIndonesian(
+                                                  latestUpdatedAt,
+                                                )}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
 
                                         {timeSet == null ? (
@@ -1354,16 +1387,30 @@ export default function Reservation() {
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
-                                          <input
-                                            value={filterKeyword}
-                                            onChange={(e) => {
-                                              handleInputFilterCatalogChange(e)
-                                              setFilterKeyword(e.target.value)
-                                            }}
-                                            required
-                                            placeholder={'Search game'}
-                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
-                                          />
+                                          <>
+                                            <input
+                                              value={filterKeyword}
+                                              onChange={(e) => {
+                                                handleInputFilterCatalogChange(
+                                                  e,
+                                                )
+                                                setFilterKeyword(e.target.value)
+                                              }}
+                                              required
+                                              placeholder={'Search game'}
+                                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
+                                            />
+                                            {(catalogs.length != 0 ||
+                                              filteredCatalogs.length != 0) && (
+                                              <span className="text-gray-400 text-sm mx-5 flex mt-2">
+                                                <MdOutlineUpdate className="text-lg" />
+                                                Last updated at{' '}
+                                                {formatTimestampIndonesian(
+                                                  latestUpdatedAt,
+                                                )}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
                                         {timeSet == null ? (
                                           <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -1766,16 +1813,30 @@ export default function Reservation() {
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
-                                          <input
-                                            value={filterKeyword}
-                                            onChange={(e) => {
-                                              handleInputFilterCatalogChange(e)
-                                              setFilterKeyword(e.target.value)
-                                            }}
-                                            required
-                                            placeholder={'Search game'}
-                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
-                                          />
+                                          <>
+                                            <input
+                                              value={filterKeyword}
+                                              onChange={(e) => {
+                                                handleInputFilterCatalogChange(
+                                                  e,
+                                                )
+                                                setFilterKeyword(e.target.value)
+                                              }}
+                                              required
+                                              placeholder={'Search game'}
+                                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
+                                            />
+                                            {(catalogs.length != 0 ||
+                                              filteredCatalogs.length != 0) && (
+                                              <span className="text-gray-400 text-sm mx-5 flex mt-2">
+                                                <MdOutlineUpdate className="text-lg" />
+                                                Last updated at{' '}
+                                                {formatTimestampIndonesian(
+                                                  latestUpdatedAt,
+                                                )}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
                                         {timeSet == null ? (
                                           <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -3146,16 +3207,30 @@ export default function Reservation() {
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
-                                          <input
-                                            value={filterKeyword}
-                                            onChange={(e) => {
-                                              handleInputFilterCatalogChange(e)
-                                              setFilterKeyword(e.target.value)
-                                            }}
-                                            required
-                                            placeholder={'Search game'}
-                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
-                                          />
+                                          <>
+                                            <input
+                                              value={filterKeyword}
+                                              onChange={(e) => {
+                                                handleInputFilterCatalogChange(
+                                                  e,
+                                                )
+                                                setFilterKeyword(e.target.value)
+                                              }}
+                                              required
+                                              placeholder={'Search game'}
+                                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
+                                            />
+                                            {(catalogs.length != 0 ||
+                                              filteredCatalogs.length != 0) && (
+                                              <span className="text-gray-400 text-sm mx-5 flex mt-2">
+                                                <MdOutlineUpdate className="text-lg" />
+                                                Last updated at{' '}
+                                                {formatTimestampIndonesian(
+                                                  latestUpdatedAt,
+                                                )}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
 
                                         {timeSet == null ? (
@@ -3559,16 +3634,30 @@ export default function Reservation() {
                                           </DrawerDescription>
                                         </DrawerHeader>{' '}
                                         {drawerContent !== 'default' && (
-                                          <input
-                                            value={filterKeyword}
-                                            onChange={(e) => {
-                                              handleInputFilterCatalogChange(e)
-                                              setFilterKeyword(e.target.value)
-                                            }}
-                                            required
-                                            placeholder={'Search game'}
-                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
-                                          />
+                                          <>
+                                            <input
+                                              value={filterKeyword}
+                                              onChange={(e) => {
+                                                handleInputFilterCatalogChange(
+                                                  e,
+                                                )
+                                                setFilterKeyword(e.target.value)
+                                              }}
+                                              required
+                                              placeholder={'Search game'}
+                                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
+                                            />
+                                            {(catalogs.length != 0 ||
+                                              filteredCatalogs.length != 0) && (
+                                              <span className="text-gray-400 text-sm mx-5 flex mt-2">
+                                                <MdOutlineUpdate className="text-lg" />
+                                                Last updated at{' '}
+                                                {formatTimestampIndonesian(
+                                                  latestUpdatedAt,
+                                                )}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
                                         {timeSet == null ? (
                                           <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -3973,16 +4062,30 @@ export default function Reservation() {
                                           </DrawerDescription>
                                         </DrawerHeader>{' '}
                                         {drawerContent !== 'default' && (
-                                          <input
-                                            value={filterKeyword}
-                                            onChange={(e) => {
-                                              handleInputFilterCatalogChange(e)
-                                              setFilterKeyword(e.target.value)
-                                            }}
-                                            required
-                                            placeholder={'Search game'}
-                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
-                                          />
+                                          <>
+                                            <input
+                                              value={filterKeyword}
+                                              onChange={(e) => {
+                                                handleInputFilterCatalogChange(
+                                                  e,
+                                                )
+                                                setFilterKeyword(e.target.value)
+                                              }}
+                                              required
+                                              placeholder={'Search game'}
+                                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
+                                            />
+                                            {(catalogs.length != 0 ||
+                                              filteredCatalogs.length != 0) && (
+                                              <span className="text-gray-400 text-sm mx-5 flex mt-2">
+                                                <MdOutlineUpdate className="text-lg" />
+                                                Last updated at{' '}
+                                                {formatTimestampIndonesian(
+                                                  latestUpdatedAt,
+                                                )}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
                                         {timeSet == null ? (
                                           <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -4383,17 +4486,32 @@ export default function Reservation() {
                                             (position {number}).
                                           </DrawerDescription>
                                         </DrawerHeader>
+                                        flex{' '}
                                         {drawerContent !== 'default' && (
-                                          <input
-                                            value={filterKeyword}
-                                            onChange={(e) => {
-                                              handleInputFilterCatalogChange(e)
-                                              setFilterKeyword(e.target.value)
-                                            }}
-                                            required
-                                            placeholder={'Search game'}
-                                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
-                                          />
+                                          <>
+                                            <input
+                                              value={filterKeyword}
+                                              onChange={(e) => {
+                                                handleInputFilterCatalogChange(
+                                                  e,
+                                                )
+                                                setFilterKeyword(e.target.value)
+                                              }}
+                                              required
+                                              placeholder={'Search game'}
+                                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
+                                            />
+                                            {(catalogs.length != 0 ||
+                                              filteredCatalogs.length != 0) && (
+                                              <span className="text-gray-400 text-sm mx-5 flex mt-2">
+                                                <MdOutlineUpdate className="text-lg" />
+                                                Last updated at{' '}
+                                                {formatTimestampIndonesian(
+                                                  latestUpdatedAt,
+                                                )}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
                                         {timeSet == null ? (
                                           <div className="w-full mt-10 mb-8  flex items-center justify-center">
@@ -4694,7 +4812,6 @@ export default function Reservation() {
                                             </div>
                                           </div>
                                         )}
-
                                         <DrawerFooter className="pt-2">
                                           {drawerContent === 'default' ? (
                                             <div className="flex flex-col gap-2 px-2 mt-2">

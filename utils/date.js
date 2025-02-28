@@ -152,6 +152,22 @@ export const convertToDate = (dateString) => {
 //   return times
 // }
 
+export const formatTimestampIndonesian = (timestamp) => {
+  const date = new Date(timestamp)
+
+  // Format options for Indonesian locale
+  const options = {
+    year: 'numeric',
+    month: 'long', // "Februari"
+    day: '2-digit', // "28"
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false, // Use 24-hour format
+  }
+
+  return date.toLocaleString('id-ID', options).replace(',', '')
+}
+
 export const extractHour = (timeString) => {
   return timeString.split(':')[0]
 }

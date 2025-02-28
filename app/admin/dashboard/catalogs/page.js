@@ -460,7 +460,7 @@ function page() {
         title: 'Data katalog seat berhasil diupload!',
       })
 
-      setIsUploadingNewCatalog(true)
+      setIsUploadingNewCatalog(false)
 
       setOpen(false)
       getAllDataCatalogs()
@@ -472,7 +472,7 @@ function page() {
       console.error({ error })
       setOpenCreateReservationForm(false)
       setOpen(false)
-      setIsUploadingNewCatalog(true)
+      setIsUploadingNewCatalog(false)
       Toast.fire({
         icon: 'error',
         title: 'Data katalog seat gagal diupload!',
