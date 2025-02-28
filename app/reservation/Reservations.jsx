@@ -15,6 +15,7 @@ import {
   calculateTimeDifference,
   convertToDate,
   convertToExtendedTime,
+  convertToStandardTime,
   extractHour,
   formatDate,
   generateTimeArray,
@@ -771,7 +772,9 @@ export default function Reservation() {
                                           <span key={index}>
                                             {time['time-day']} -{' '}
                                             {time['time-set']['start-time']} -{' '}
-                                            {time['time-set']['end-time']}
+                                            {convertToStandardTime(
+                                              time['time-set']['end-time'],
+                                            )}
                                           </span>
                                         ))
                                       : null}
