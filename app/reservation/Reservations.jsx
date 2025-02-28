@@ -934,7 +934,24 @@ export default function Reservation() {
                                             className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
                                           />
                                         )}
-                                        {drawerContent === 'default' ? (
+
+                                        {timeSet == null ? (
+                                          <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                              <Image
+                                                src={'/error.png'}
+                                                width={0}
+                                                height={0}
+                                                className="w-[150px]"
+                                                alt={'No content available'}
+                                              />
+                                              <p className="text-base font-normal text-gray-400">
+                                                Oopss!!! Sorry Ikuzo, this space
+                                                is closed not operating today.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : drawerContent === 'default' ? (
                                           <div className="flex-relative w-full h-fit px-5">
                                             <div
                                               style={{
@@ -1231,14 +1248,19 @@ export default function Reservation() {
 
                                         {drawerContent === 'default' ? (
                                           <div className="flex flex-col gap-2 px-5 mt-3">
-                                            <DrawerClose asChild>
-                                              <Button
-                                                variant="outline"
-                                                className={`bg-orange text-white border-orange py-5`}
-                                              >
-                                                Continue
-                                              </Button>
-                                            </DrawerClose>
+                                            {timeSet != null ? (
+                                              <DrawerClose asChild>
+                                                <Button
+                                                  variant="outline"
+                                                  className={`bg-orange text-white border-orange py-5`}
+                                                >
+                                                  Continue
+                                                </Button>
+                                              </DrawerClose>
+                                            ) : (
+                                              <></>
+                                            )}
+
                                             <Button
                                               variant="outline"
                                               className={`bg-transparent text-orange border-orange py-5`}
@@ -1336,7 +1358,23 @@ export default function Reservation() {
                                             className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
                                           />
                                         )}
-                                        {drawerContent === 'default' ? (
+                                        {timeSet == null ? (
+                                          <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                              <Image
+                                                src={'/error.png'}
+                                                width={0}
+                                                height={0}
+                                                className="w-[150px]"
+                                                alt={'No content available'}
+                                              />
+                                              <p className="text-base font-normal text-gray-400">
+                                                Oopss!!! Sorry Ikuzo, this space
+                                                is closed not operating today.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : drawerContent === 'default' ? (
                                           <div className="flex-relative w-full h-fit px-5">
                                             <div
                                               style={{
@@ -1625,14 +1663,19 @@ export default function Reservation() {
 
                                         {drawerContent === 'default' ? (
                                           <div className="flex flex-col gap-2 px-5 mt-2">
-                                            <DrawerClose asChild>
-                                              <Button
-                                                variant="outline"
-                                                className={`bg-orange text-white border-orange py-5`}
-                                              >
-                                                Continue
-                                              </Button>
-                                            </DrawerClose>
+                                            {timeSet == null ? (
+                                              <></>
+                                            ) : (
+                                              <DrawerClose asChild>
+                                                <Button
+                                                  variant="outline"
+                                                  className={`bg-orange text-white border-orange py-5`}
+                                                >
+                                                  Continue
+                                                </Button>
+                                              </DrawerClose>
+                                            )}
+
                                             <Button
                                               variant="outline"
                                               className={`bg-transparent text-orange border-orange py-5`}
@@ -1730,7 +1773,23 @@ export default function Reservation() {
                                             className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
                                           />
                                         )}
-                                        {drawerContent === 'default' ? (
+                                        {timeSet == null ? (
+                                          <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                              <Image
+                                                src={'/error.png'}
+                                                width={0}
+                                                height={0}
+                                                className="w-[150px]"
+                                                alt={'No content available'}
+                                              />
+                                              <p className="text-base font-normal text-gray-400">
+                                                Oopss!!! Sorry Ikuzo, this space
+                                                is closed not operating today.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : drawerContent === 'default' ? (
                                           <div className="flex-relative w-full h-fit px-5">
                                             <div
                                               style={{
@@ -2019,14 +2078,18 @@ export default function Reservation() {
 
                                         {drawerContent === 'default' ? (
                                           <div className="flex flex-col gap-2 px-5 mt-2">
-                                            <DrawerClose asChild>
-                                              <Button
-                                                variant="outline"
-                                                className={`bg-orange text-white border-orange py-5`}
-                                              >
-                                                Continue
-                                              </Button>
-                                            </DrawerClose>
+                                            {timeSet == null ? (
+                                              <></>
+                                            ) : (
+                                              <DrawerClose asChild>
+                                                <Button
+                                                  variant="outline"
+                                                  className={`bg-orange text-white border-orange py-5`}
+                                                >
+                                                  Continue
+                                                </Button>
+                                              </DrawerClose>
+                                            )}
                                             <Button
                                               variant="outline"
                                               className={`bg-transparent text-orange border-orange py-5`}
@@ -3093,7 +3156,24 @@ export default function Reservation() {
                                             className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
                                           />
                                         )}
-                                        {drawerContent === 'default' ? (
+
+                                        {timeSet == null ? (
+                                          <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                              <Image
+                                                src={'/error.png'}
+                                                width={0}
+                                                height={0}
+                                                className="w-[150px]"
+                                                alt={'No content available'}
+                                              />
+                                              <p className="text-base font-normal text-gray-400">
+                                                Oopss!!! Sorry Ikuzo, this space
+                                                is closed not operating today.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : drawerContent === 'default' ? (
                                           <div className="flex-relative w-full h-fit px-5">
                                             <div
                                               style={{
@@ -3383,14 +3463,18 @@ export default function Reservation() {
                                         <DrawerFooter className="pt-2">
                                           {drawerContent === 'default' ? (
                                             <div className="flex flex-col gap-2 px-2 mt-2">
-                                              <DrawerClose asChild>
-                                                <Button
-                                                  variant="outline"
-                                                  className={`bg-orange text-white border-orange py-5`}
-                                                >
-                                                  Continue
-                                                </Button>
-                                              </DrawerClose>
+                                              {timeSet == null ? (
+                                                <></>
+                                              ) : (
+                                                <DrawerClose asChild>
+                                                  <Button
+                                                    variant="outline"
+                                                    className={`bg-orange text-white border-orange py-5`}
+                                                  >
+                                                    Continue
+                                                  </Button>
+                                                </DrawerClose>
+                                              )}
                                               <Button
                                                 variant="outline"
                                                 className={`bg-transparent text-orange border-orange py-5`}
@@ -3488,7 +3572,23 @@ export default function Reservation() {
                                             className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
                                           />
                                         )}
-                                        {drawerContent === 'default' ? (
+                                        {timeSet == null ? (
+                                          <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                              <Image
+                                                src={'/error.png'}
+                                                width={0}
+                                                height={0}
+                                                className="w-[150px]"
+                                                alt={'No content available'}
+                                              />
+                                              <p className="text-base font-normal text-gray-400">
+                                                Oopss!!! Sorry Ikuzo, this space
+                                                is closed not operating today.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : drawerContent === 'default' ? (
                                           <div className="flex-relative w-full h-fit px-5">
                                             <div
                                               style={{
@@ -3776,12 +3876,16 @@ export default function Reservation() {
                                         {drawerContent === 'default' ? (
                                           <div className="flex flex-col gap-2 px-5 my-2">
                                             <DrawerClose asChild>
-                                              <Button
-                                                variant="outline"
-                                                className={`bg-orange text-white border-orange py-5`}
-                                              >
-                                                Continue
-                                              </Button>
+                                              {timeSet == null ? (
+                                                <></>
+                                              ) : (
+                                                <Button
+                                                  variant="outline"
+                                                  className={`bg-orange text-white border-orange py-5`}
+                                                >
+                                                  Continue
+                                                </Button>
+                                              )}
                                             </DrawerClose>
                                             <Button
                                               variant="outline"
@@ -3885,7 +3989,23 @@ export default function Reservation() {
                                             className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
                                           />
                                         )}
-                                        {drawerContent === 'default' ? (
+                                        {timeSet == null ? (
+                                          <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                              <Image
+                                                src={'/error.png'}
+                                                width={0}
+                                                height={0}
+                                                className="w-[150px]"
+                                                alt={'No content available'}
+                                              />
+                                              <p className="text-base font-normal text-gray-400">
+                                                Oopss!!! Sorry Ikuzo, this space
+                                                is closed not operating today.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : drawerContent === 'default' ? (
                                           <div className="flex-relative w-full h-fit px-5">
                                             <div
                                               style={{
@@ -4172,14 +4292,18 @@ export default function Reservation() {
                                         )}
                                         {drawerContent === 'default' ? (
                                           <div className="flex flex-col gap-2 px-5 my-2">
-                                            <DrawerClose asChild>
-                                              <Button
-                                                variant="outline"
-                                                className={`bg-orange text-white border-orange py-5`}
-                                              >
-                                                Continue
-                                              </Button>
-                                            </DrawerClose>
+                                            {timeSet == null ? (
+                                              <></>
+                                            ) : (
+                                              <DrawerClose asChild>
+                                                <Button
+                                                  variant="outline"
+                                                  className={`bg-orange text-white border-orange py-5`}
+                                                >
+                                                  Continue
+                                                </Button>
+                                              </DrawerClose>
+                                            )}
                                             <Button
                                               variant="outline"
                                               className={`bg-transparent text-orange border-orange py-5`}
@@ -4279,7 +4403,23 @@ export default function Reservation() {
                                             className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 mx-5 !py-2 "
                                           />
                                         )}
-                                        {drawerContent === 'default' ? (
+                                        {timeSet == null ? (
+                                          <div className="w-full mt-10 mb-8  flex items-center justify-center">
+                                            <div className="flex flex-col gap-1 items-center justify-center">
+                                              <Image
+                                                src={'/error.png'}
+                                                width={0}
+                                                height={0}
+                                                className="w-[150px]"
+                                                alt={'No content available'}
+                                              />
+                                              <p className="text-base font-normal text-gray-400">
+                                                Oopss!!! Sorry Ikuzo, this space
+                                                is closed not operating today.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : drawerContent === 'default' ? (
                                           <div className="flex-relative w-full h-fit px-5">
                                             <div
                                               style={{
@@ -4569,14 +4709,18 @@ export default function Reservation() {
                                         <DrawerFooter className="pt-2">
                                           {drawerContent === 'default' ? (
                                             <div className="flex flex-col gap-2 px-2 mt-2">
-                                              <DrawerClose asChild>
-                                                <Button
-                                                  variant="outline"
-                                                  className={`bg-orange text-white border-orange py-5`}
-                                                >
-                                                  Continue
-                                                </Button>
-                                              </DrawerClose>
+                                              {timeSet == null ? (
+                                                <></>
+                                              ) : (
+                                                <DrawerClose asChild>
+                                                  <Button
+                                                    variant="outline"
+                                                    className={`bg-orange text-white border-orange py-5`}
+                                                  >
+                                                    Continue
+                                                  </Button>
+                                                </DrawerClose>
+                                              )}
                                               <Button
                                                 variant="outline"
                                                 className={`bg-transparent text-orange border-orange py-5`}
