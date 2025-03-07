@@ -594,7 +594,7 @@ export default function Reservation() {
   ]
 
   let timeArrayStart =
-    regularSpaceData === null
+    timeSet === null
       ? fallbackTimeArray
       : [
           {
