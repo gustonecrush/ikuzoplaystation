@@ -358,9 +358,9 @@ function page() {
   }
 
   const facilityMapping = {
-    'PS4 Reguler': [1, 2, 3, 4, 5],
+    'PS4 Reguler': [1, 2, 3, 4],
     'Ikuzo Racing Simulator': [6, 7],
-    'PS5 Reguler+': [8],
+    'PS5 Reguler': [5, 8],
     'Squad Open Space': [13, 14, 15, 16],
     'Family Open Space': [17],
     'Family VIP Room': [18, 19],
