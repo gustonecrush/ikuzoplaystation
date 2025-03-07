@@ -363,8 +363,8 @@ function page() {
     'PS5 Reguler+': [8],
     'Squad Open Space': [13, 14, 15, 16],
     'Family Open Space': [17],
-    'LoveBirds VIP Room': [18, 19],
-    'Family VIP Room': [20, 21, 22],
+    'Family VIP Room': [18, 19],
+    'LoveBirds VIP Room': [20, 21, 22],
   }
 
   const getFacilityName = (seatNumber) => {

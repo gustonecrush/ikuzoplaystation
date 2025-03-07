@@ -82,7 +82,7 @@ const Page = () => {
         '1 Person Capacity, Online Multiplayer Support, 6-8 Racing Games Collection, Expert Staff Assistance, VR Mode Add-on available.',
     },
     {
-      name: 'PS5 Reguler+',
+      name: 'PS5 Reguler',
       price: 35000,
       capacity: 4,
       description:
@@ -134,13 +134,13 @@ const Page = () => {
 
   function mapSeatToFacility(no_seat) {
     const facilityMapping = {
-      'PS4 Reguler': [1, 2, 3, 4, 5],
+      'PS4 Reguler': [1, 2, 3, 4],
       'Ikuzo Racing Simulator': [6, 7],
-      'PS5 Reguler+': [8],
+      'PS5 Reguler': [5, 8],
       'Squad Open Space': [13, 14, 15, 16],
       'Family Open Space': [17],
-      'LoveBirds VIP Room': [18, 19],
-      'Family VIP Room': [20, 21, 22],
+      'Family VIP Room': [18, 19],
+      'LoveBirds VIP Room': [20, 21, 22],
     }
 
     // Map seat numbers to their respective facilities
