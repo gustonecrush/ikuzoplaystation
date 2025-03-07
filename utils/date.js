@@ -190,7 +190,7 @@ export const convertToExtendedTime = (time) => {
 
 export const generateTimeArray = (
   customTimeSelectedArray,
-  date = new Date().toISOString().split('T')[0],
+  date,
   bookedSlots,
 ) => {
   // if (customTimeSelectedArray.length == 0) {
@@ -205,16 +205,23 @@ export const generateTimeArray = (
   console.log('BOOKED', bookedSlots)
   console.log(date)
   console.log(customTimeSelectedArray)
+
   const times = []
   const today = new Date()
   const currentHour = today.getHours()
   const currentMinute = today.getMinutes()
+  console.log(today.toISOString().split('T')[0])
 
   customTimeSelectedArray.forEach((customTimeSelected) => {
     let startHour, startMinute
     if (date === today.toISOString().split('T')[0]) {
-      startHour = currentHour
-      startMinute = Math.ceil(currentMinute / 10) * 10
+      if (currentHour < customTimeSelected.open_time) {
+        startHour = customTimeSelected.open_time
+        startMinute = 0
+      } else {
+        startHour = currentHour
+        startMinute = Math.ceil(currentMinute / 10) * 10
+      }
     } else {
       if (customTimeSelected.date === date) {
         startHour = customTimeSelected.open_time

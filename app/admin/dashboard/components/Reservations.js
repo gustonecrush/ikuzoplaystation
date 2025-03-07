@@ -595,13 +595,7 @@ export default function Reservation() {
 
   let timeArrayStart =
     regularSpaceData === null
-      ? customTimeSelected.length === 0
-        ? fallbackTimeArray
-        : customTimeSelected
-      : timeSet === null
-      ? customTimeSelected.length === 0
-        ? fallbackTimeArray
-        : customTimeSelected
+      ? fallbackTimeArray
       : [
           {
             open_time: extractHour(timeSet['start-time']),
@@ -1698,9 +1692,9 @@ export default function Reservation() {
                                         onClick={() => {
                                           setPosisiReservasi(number)
                                           setNamaPosisiReservasi(
-                                            positions[4].name,
+                                            positions[5].name,
                                           )
-                                          setPricePerReserve(positions[4].price)
+                                          setPricePerReserve(positions[5].price)
                                           fetchingAvailableReservation(
                                             selectedDate,
                                             number,
@@ -1722,12 +1716,12 @@ export default function Reservation() {
                                     <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                       <DrawerHeader className="text-left">
                                         <DrawerTitle>
-                                          {positions[4].name}
+                                          {positions[5].name}
                                         </DrawerTitle>
                                         <DrawerDescription>
-                                          IDR {positions[4].price}/hour and can
+                                          IDR {positions[5].price}/hour and can
                                           only accomodate{' '}
-                                          {positions[4].capacity} person
+                                          {positions[5].capacity} person
                                           (position {number}).
                                         </DrawerDescription>
                                       </DrawerHeader>
@@ -1742,7 +1736,7 @@ export default function Reservation() {
                                           }}
                                         >
                                           <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[5].pict}`}
                                             useMap="#image-map"
                                             alt=""
                                             style={{
@@ -2946,10 +2940,10 @@ export default function Reservation() {
                                           onClick={() => {
                                             setPosisiReservasi(number)
                                             setNamaPosisiReservasi(
-                                              positions[4].name,
+                                              positions[5].name,
                                             )
                                             setPricePerReserve(
-                                              positions[4].price,
+                                              positions[5].price,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -2968,12 +2962,12 @@ export default function Reservation() {
                                       <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                         <DrawerHeader className="text-left">
                                           <DrawerTitle>
-                                            {positions[4].name}
+                                            {positions[5].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[4].price}/hour and
+                                            IDR {positions[5].price}/hour and
                                             can only accomodate{' '}
-                                            {positions[4].capacity} person
+                                            {positions[5].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
                                         </DrawerHeader>
@@ -2988,7 +2982,7 @@ export default function Reservation() {
                                             }}
                                           >
                                             <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
+                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[5].pict}`}
                                               useMap="#image-map"
                                               alt=""
                                               style={{
@@ -3199,10 +3193,10 @@ export default function Reservation() {
                                           onClick={() => {
                                             setPosisiReservasi(number)
                                             setNamaPosisiReservasi(
-                                              positions[5].name,
+                                              positions[4].name,
                                             )
                                             setPricePerReserve(
-                                              positions[5].price,
+                                              positions[4].price,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -3221,12 +3215,12 @@ export default function Reservation() {
                                       <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
                                         <DrawerHeader className="text-left">
                                           <DrawerTitle>
-                                            {positions[5].name}
+                                            {positions[4].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[5].price}/hour and
+                                            IDR {positions[4].price}/hour and
                                             can only accommodate{' '}
-                                            {positions[5].capacity} person
+                                            {positions[4].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
                                         </DrawerHeader>
@@ -3241,7 +3235,7 @@ export default function Reservation() {
                                             }}
                                           >
                                             <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[5].pict}`}
+                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
                                               useMap="#image-map"
                                               alt=""
                                               style={{
