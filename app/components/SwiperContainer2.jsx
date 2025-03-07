@@ -46,6 +46,7 @@ export default function SwiperContainer2() {
         console.error({ error })
         throw new Error('Failed to fetch data')
       }
+      console.log({ response })
     } catch (error) {
       console.error({ error })
       if (error.code == 'ERR_NETWORK') {
