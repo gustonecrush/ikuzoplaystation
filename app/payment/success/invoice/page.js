@@ -25,6 +25,8 @@ const Invoice = () => {
   const [showInvoice, setShowInvoice] = React.useState(false)
   const [data, setData] = React.useState(null)
 
+  const [isLoading, setIsLoading] = React.useState(false)
+
   const getReservationByID = async () => {
     try {
       const response = await axios.get(
@@ -70,14 +72,18 @@ const Invoice = () => {
 
       const imageDataURL = canvas.toDataURL('image/png')
       console.log(imageDataURL)
-      handleUpdateContent(base64ToFile(imageDataURL))
+      handleUpdateContent(base64ToFile(imageDataURL, order_id))
     })
   }
 
   const handleUpdateContent = async (file) => {
+    setIsLoading(true)
     const formData = new FormData()
 
     console.log('File object:', file)
+    console.log('File Name:', file.name)
+    console.log('File Type:', file.type)
+    console.log('File Size:', file.size)
 
     formData.append('reserve_id', data.reserve_name)
     formData.append('reserve_name', data.reserve_name)
@@ -101,9 +107,11 @@ const Invoice = () => {
           },
         },
       )
+      setIsLoading(false)
       console.log('Invoice upload successful:', response)
     } catch (error) {
       console.error('Error while uploading invoice:', error)
+      setIsLoading(false)
     }
   }
 
@@ -332,7 +340,7 @@ const Invoice = () => {
             title={'Successfully Pay'}
             width={0}
             height={0}
-            className="w-[300px] h-fit object-contain"
+            className="w-[320px] h-fit object-contain"
           />
           <div className="flex flex-col gap-1 items-center mt-7 text-center">
             <h1 className="text-xl font-semibold">Pembayaran Berhasil!</h1>
