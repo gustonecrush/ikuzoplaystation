@@ -16,32 +16,40 @@ import { FiEdit3 } from 'react-icons/fi'
 import { removeSpaces, toPascalCase } from '@/utils/text'
 
 function FacilityPrices({ facilities }) {
-  const [familyOpenRoomData, setFamilyOpenRoomData] = React.useState(null)
+  const [familyVIPRoomData, setFamilyVIPRoomData] = React.useState(null)
   const [familyOpenSpaceData, setFamilyOpenSpaceData] = React.useState(null)
+  const [squadOpenSpaceData, setSquadOpenSpaceData] = React.useState(null)
   const [allFacilityPriceData, setAllFacilityPriceData] = React.useState(null)
 
   async function fetchDataPrices() {
     const dataFamilyRoom = await getDocument(
       'facility-setting-prices',
-      'family-open-room',
+      'family-vip-room',
     )
     const dataFamilySpace = await getDocument(
       'facility-setting-prices',
       'family-open-space',
     )
-    setFamilyOpenRoomData(dataFamilyRoom.data)
+    const dataSquadOpenSpace = await getDocument(
+      'facility-setting-prices',
+      'squad-open-space',
+    )
+    setFamilyVIPRoomData(dataFamilyRoom.data)
+    setSquadOpenSpaceData(dataSquadOpenSpace.data)
     setFamilyOpenSpaceData(dataFamilySpace.data)
     setAllFacilityPriceData({
-      familyOpenRoomData: dataFamilyRoom.data,
+      familyVIPRoomData: dataFamilyRoom.data,
       familyOpenSpaceData: dataFamilySpace.data,
+      squadOpenSpaceData: dataSquadOpenSpace.data,
     })
     setFormData({
-      familyOpenRoomData: dataFamilyRoom.data,
+      familyVIPRoomData: dataFamilyRoom.data,
       familyOpenSpaceData: dataFamilySpace.data,
+      squadOpenSpaceData: dataSquadOpenSpace.data,
     })
   }
 
-  console.log({ familyOpenRoomData })
+  console.log({ familyVIPRoomData })
   console.log({ familyOpenSpaceData })
 
   const [isLoading, setIsLoading] = React.useState(false)
@@ -80,10 +88,12 @@ function FacilityPrices({ facilities }) {
     const entry = formData[categoryKey].prices[index]
 
     let id
-    if (category === 'familyOpenRoomData') {
-      id = 'family-open-room'
+    if (category === 'familyVIPRoomData') {
+      id = 'family-vip-room'
     } else if (category === 'familyOpenSpaceData') {
       id = 'family-open-space'
+    } else if (category === 'squadOpenSpaceData') {
+      id = 'squad-open-space'
     } else {
       id = 'premium-space-doc'
     }
@@ -144,7 +154,7 @@ function FacilityPrices({ facilities }) {
 
   const [isAdding, setIsAdding] = React.useState(false)
   const [newEntry, setNewEntry] = React.useState({
-    category: 'FamilyOpenRoom', // Default category
+    category: 'FamilyVIPRoom', // Default category
     day: '',
     price: '',
   })
@@ -182,10 +192,12 @@ function FacilityPrices({ facilities }) {
 
     // Define document ID based on category
     let id
-    if (newEntry.category === 'FamilyOpenRoom') {
-      id = 'family-open-room'
+    if (newEntry.category === 'FamilyVIPRoom') {
+      id = 'family-vip-room'
     } else if (newEntry.category === 'FamilyOpenSpace') {
       id = 'family-open-space'
+    } else if (newEntry.category === 'SquadOpenSpace') {
+      id = 'squad-open-space'
     } else {
       id = 'premium-space-doc'
     }
@@ -237,7 +249,7 @@ function FacilityPrices({ facilities }) {
 
         // Reset local state after successful addition
         setNewEntry({
-          category: 'FamilyOpenSpace',
+          category: 'FamilyVIPRoom',
           day: '',
           price: '',
         })
@@ -259,10 +271,12 @@ function FacilityPrices({ facilities }) {
   const handleDelete = async (category, index) => {
     let id
     console.log({ category })
-    if (category === 'familyOpenRoomData') {
-      id = 'family-open-room'
+    if (category === 'familyVIPRoomData') {
+      id = 'family-vip-room'
     } else if (category === 'familyOpenSpaceData') {
       id = 'family-open-space'
+    } else if (category === 'squadOpenSpaceData') {
+      id = 'squad-open-space'
     } else {
       id = 'premium-space-doc'
     }
@@ -308,8 +322,9 @@ function FacilityPrices({ facilities }) {
     <section className={`w-full flex flex-col gap-5 -mt-12`}>
       {isLoading ||
       allFacilityPriceData == null ||
-      familyOpenRoomData == null ||
+      familyVIPRoomData == null ||
       familyOpenSpaceData == null ||
+      squadOpenSpaceData == null ||
       formData == null ? (
         <div className="flex items-center justify-center p-10">
           <HashLoader color="#FF6200" />
@@ -346,7 +361,7 @@ function FacilityPrices({ facilities }) {
                     className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
                   >
                     {facilities.map((facility, index) => (
-                      <option key={index} value={toPascalCase(facility.name)}>
+                      <option key={index} value={removeSpaces(facility.name)}>
                         {facility.name}
                       </option>
                     ))}
