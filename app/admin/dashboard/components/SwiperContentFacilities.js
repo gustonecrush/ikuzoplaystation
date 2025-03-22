@@ -52,6 +52,8 @@ import Image from 'next/image'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { FiEdit3 } from 'react-icons/fi'
 import { HashLoader } from 'react-spinners'
+import SpaceTimes from './SpaceTimes'
+import FacilityPrices from './FacilityPrices'
 
 const SwiperContentFacilities = ({
   isLoading,
@@ -333,6 +335,10 @@ const SwiperContentFacilities = ({
     fetchSections()
   }, [])
 
+  const [isSettingFacilityPrice, setIsSettingFacilityPrice] = React.useState(
+    false,
+  )
+
   return (
     <section className={`w-full flex flex-col gap-5`}>
       {isLoading ? (
@@ -341,7 +347,7 @@ const SwiperContentFacilities = ({
         </div>
       ) : (
         <>
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-row gap-2 h-fit">
             <Dialog open={open}>
               <DialogTrigger asChild onClick={() => setOpen(!open)}>
                 <Button variant="outline" className="w-fit">
@@ -559,97 +565,125 @@ const SwiperContentFacilities = ({
                 </DialogClose>
               </DialogContent>
             </Dialog>
+            <Button
+              onClick={() => setIsSettingFacilityPrice(true)}
+              variant="outline"
+              className="w-fit"
+            >
+              Setting Facility Prices
+            </Button>
+            {isSettingFacilityPrice && (
+              <Button
+                onClick={() => setIsSettingFacilityPrice(false)}
+                variant="outline"
+                className="w-fit"
+              >
+                Back to Main Setting
+              </Button>
+            )}
           </div>
 
-          {facilities.length == 0 ? (
-            <div className="w-full mt-14 mb-16  flex items-center justify-center">
-              <div className="flex flex-col gap-1 items-center justify-center">
-                <Image
-                  src={'/error.png'}
-                  width={0}
-                  height={0}
-                  className="w-[200px]"
-                  alt={'No content available'}
-                />
-                <p className="text-base font-normal text-gray-400">
-                  There is no any contents right now ikuzo!
-                </p>
-              </div>
+          {isSettingFacilityPrice ? (
+            <div className="mt-16">
+              {facilities.length !== 0 && (
+                <FacilityPrices facilities={facilities} />
+              )}
             </div>
           ) : (
-            <Swiper
-              effect={'coverflow'}
-              grabCursor={true}
-              centeredSlides={true}
-              slidesPerView={'auto'}
-              initialSlide={2}
-              coverflowEffect={{
-                rotate: 50,
-                stretch: 0,
-                depth: 100,
-                modifier: 1,
-                slideShadows: true,
-              }}
-              pagination={true}
-              modules={[EffectCoverflow, Pagination]}
-              className="mySwiper mx-10"
-            >
-              {facilities.map((facility, index) => (
-                <SwiperSlide key={index} className="wide">
-                  <div className="relative">
-                    <div className="flex flex-row gap-1 absolute top-4 right-4 w-fit p-1 bg-gray-700  bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 rounded-lg">
-                      <Button
-                        onClick={() => handleOpenFormForUpdating(facility)}
-                        variant="outline"
-                        className="ml-auto border border-yellow-500 bg-transparent hover:bg-yellow-600  hover:text-white text-base text-yellow-500"
-                      >
-                        <FiEdit3 className="h-7 w-5" />
-                      </Button>
-                      <form action="" method="post" className="">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="ml-auto border border-red-500 bg-transparent hover:bg-red-600   hover:text-white text-base text-red-500"
-                            >
-                              <AiOutlineDelete className="h-7 w-5" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Are you absolutely sure?
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete your content and remove your
-                                data from our servers.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={(e) =>
-                                  handleDeleteFacilityContent(facility.id)
-                                }
-                              >
-                                Continue
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </form>
-                    </div>
-
-                    <img
-                      alt={facility.name}
-                      className="rounded-md"
-                      src={process.env.NEXT_PUBLIC_IMAGE_URL + facility.pict}
+            <>
+              {facilities.length == 0 ? (
+                <div className="w-full mt-14 mb-16  flex items-center justify-center">
+                  <div className="flex flex-col gap-1 items-center justify-center">
+                    <Image
+                      src={'/error.png'}
+                      width={0}
+                      height={0}
+                      className="w-[200px]"
+                      alt={'No content available'}
                     />
+                    <p className="text-base font-normal text-gray-400">
+                      There is no any contents right now ikuzo!
+                    </p>
                   </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                </div>
+              ) : (
+                <Swiper
+                  effect={'coverflow'}
+                  grabCursor={true}
+                  centeredSlides={true}
+                  slidesPerView={'auto'}
+                  initialSlide={2}
+                  coverflowEffect={{
+                    rotate: 50,
+                    stretch: 0,
+                    depth: 100,
+                    modifier: 1,
+                    slideShadows: true,
+                  }}
+                  pagination={true}
+                  modules={[EffectCoverflow, Pagination]}
+                  className="mySwiper mx-10"
+                >
+                  {facilities.map((facility, index) => (
+                    <SwiperSlide key={index} className="wide">
+                      <div className="relative">
+                        <div className="flex flex-row gap-1 absolute top-4 right-4 w-fit p-1 bg-gray-700  bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-20 border border-gray-100 border-opacity-25 rounded-lg">
+                          <Button
+                            onClick={() => handleOpenFormForUpdating(facility)}
+                            variant="outline"
+                            className="ml-auto border border-yellow-500 bg-transparent hover:bg-yellow-600  hover:text-white text-base text-yellow-500"
+                          >
+                            <FiEdit3 className="h-7 w-5" />
+                          </Button>
+                          <form action="" method="post" className="">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className="ml-auto border border-red-500 bg-transparent hover:bg-red-600   hover:text-white text-base text-red-500"
+                                >
+                                  <AiOutlineDelete className="h-7 w-5" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete your content and remove
+                                    your data from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={(e) =>
+                                      handleDeleteFacilityContent(facility.id)
+                                    }
+                                  >
+                                    Continue
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </form>
+                        </div>
+
+                        <img
+                          alt={facility.name}
+                          className="rounded-md"
+                          src={
+                            process.env.NEXT_PUBLIC_IMAGE_URL + facility.pict
+                          }
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              )}
+            </>
           )}
         </>
       )}
