@@ -19,6 +19,20 @@ export const getSpaceCategory = (facilityName) => {
   return 'unknown'
 }
 
+export const getFacilityId = (category) => {
+  const facilityMap = {
+    'Family VIP Room': 'family-vip-room',
+    'Family Open Space': 'family-open-space',
+    'Squad Open Space': 'squad-open-space',
+    'LoveBirds VIP Room': 'lovebirds-vip-room',
+    'PS4 Reguler': 'ps4-reguler',
+    'PS5 Reguler': 'ps5-reguler',
+    'Ikuzo Racing Simulator': 'ikuzo-racing-simulator',
+  }
+
+  return facilityMap[category] || 'unknown'
+}
+
 export const toPascalCase = (str) => {
   return str
     .split('-')

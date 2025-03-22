@@ -63,7 +63,7 @@ import { pricePackageDetermination } from '@/utils/price'
 import { IoMdBook, IoMdClose } from 'react-icons/io'
 import { RESERVATION_PLACE } from '@/constans/reservations'
 import getDocument from '@/firebase/firestore/getData'
-import { capitalizeAndFormat } from '@/utils/text'
+import { capitalizeAndFormat, getFacilityId } from '@/utils/text'
 import { MdOutlineUpdate } from 'react-icons/md'
 
 export default function Reservation() {
@@ -83,6 +83,55 @@ export default function Reservation() {
   const [pricePerReserve, setPricePerReserve] = React.useState(0)
 
   const [reservationContent, setReservationContent] = React.useState(null)
+
+  const [familyVIPRoomData, setFamilyVIPRoomData] = React.useState(null)
+  const [lovebirdsVIPRoomData, setLovebirdsVIPRoomData] = React.useState(null)
+  const [familyOpenSpaceData, setFamilyOpenSpaceData] = React.useState(null)
+  const [squadOpenSpaceData, setSquadOpenSpaceData] = React.useState(null)
+  const [ps4RegulerData, setPs4RegulerData] = React.useState(null)
+  const [ps5RegulerData, setPs5RegulerData] = React.useState(null)
+  const [
+    ikuzoRacingSimulatorData,
+    setIkuzoRacingSimulatorData,
+  ] = React.useState(null)
+
+  async function fetchDataPrices() {
+    const dataFamilyRoom = await getDocument(
+      'facility-setting-prices',
+      'family-vip-room',
+    )
+    const dataLovebirdsRoom = await getDocument(
+      'facility-setting-prices',
+      'lovebirds-vip-room',
+    )
+    const dataFamilySpace = await getDocument(
+      'facility-setting-prices',
+      'family-open-space',
+    )
+    const dataSquadOpenSpace = await getDocument(
+      'facility-setting-prices',
+      'squad-open-space',
+    )
+    const dataPs4Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps4-reguler',
+    )
+    const dataPs5Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps5-reguler',
+    )
+    const dataIkuzoRacingSimulator = await getDocument(
+      'facility-setting-prices',
+      'ikuzo-racing-simulator',
+    )
+    setFamilyVIPRoomData(dataFamilyRoom.data)
+    setLovebirdsVIPRoomData(dataLovebirdsRoom.data)
+    setSquadOpenSpaceData(dataSquadOpenSpace.data)
+    setPs4RegulerData(dataPs4Reguler.data)
+    setPs5RegulerData(dataPs5Reguler.data)
+    setIkuzoRacingSimulatorData(dataIkuzoRacingSimulator.data)
+    setFamilyOpenSpaceData(dataFamilySpace.data)
+  }
 
   async function fetchDataContents() {
     const dataContentReservation = await getDocument(
@@ -383,18 +432,10 @@ export default function Reservation() {
         getDocument('space-setting-times', 'regular-space-doc'), // Index 2
       ])
 
-      console.log('FETCHED RESPONSES:', responses)
-
-      // Extract data from responses
       const privateData = responses[0]?.data
       const premiumData = responses[1]?.data
       const regularData = responses[2]?.data
 
-      console.log('Private Data:', privateData)
-      console.log('Premium Data:', premiumData)
-      console.log('Regular Data:', regularData)
-
-      // Set state with extracted values
       setPrivateSpaceData(privateData)
       setPremiumSpaceData(premiumData)
       setRegularSpaceData(regularData)
@@ -426,6 +467,39 @@ export default function Reservation() {
 
     return foundItem.length === 1 ? foundItem[0]['time-set'] : null
   }
+
+  const getPriceSetForToday = (value, selectedDate) => {
+    const today = getIndonesianDay(selectedDate)
+    const prices =
+      value === 'ps5-reguler'
+        ? ps5RegulerData.prices
+        : value === 'ikuzo-racing-simulator'
+        ? ikuzoRacingSimulatorData.prices
+        : value === 'ps4-reguler'
+        ? ps4RegulerData.prices
+        : value === 'family-vip-room'
+        ? familyVIPRoomData.prices
+        : value === 'lovebirds-vip-room'
+        ? lovebirdsVIPRoomData.prices
+        : value === 'family-open-space'
+        ? familyOpenSpaceData.prices
+        : value === 'squad-open-space'
+        ? squadOpenSpaceData.prices
+        : []
+
+    console.log({ value, today, prices })
+
+    // Find time-set where today's day exists
+    const foundItem = prices.filter((item) =>
+      item['day'].split(',').includes(today),
+    )
+
+    console.log({ foundItem })
+
+    return foundItem.length === 1 ? foundItem[0]['price'] : ''
+  }
+
+  console.log({ getPriceSetForToday })
 
   const getTimeSetForTodayAgain = (value, selectedDate) => {
     const today = getIndonesianDay(selectedDate) // Get today's day
@@ -528,6 +602,7 @@ export default function Reservation() {
 
     getAllPositions()
     fetchDataContents()
+    fetchDataPrices()
 
     const intervalTime = 500
     const interval = setInterval(() => {
@@ -583,7 +658,14 @@ export default function Reservation() {
       {reservationContent == null ||
       regularSpaceData == null ||
       privateSpaceData == null ||
-      premiumSpaceData == null ? (
+      premiumSpaceData == null ||
+      familyVIPRoomData == null ||
+      familyOpenSpaceData == null ||
+      squadOpenSpaceData == null ||
+      lovebirdsVIPRoomData == null ||
+      ps4RegulerData == null ||
+      ps5RegulerData == null ||
+      ikuzoRacingSimulatorData == null ? (
         <div className=" z-[999999] w-full h-full absolute top-50">
           <LoaderHome />
         </div>
@@ -936,15 +1018,55 @@ export default function Reservation() {
                                               : positions[0].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR{' '}
-                                            {number <= 4
-                                              ? positions[6].price
-                                              : positions[0].price}
-                                            /hour and can only accomodate{' '}
+                                            Can only accomodate{' '}
                                             {number <= 4
                                               ? positions[6].capacity
                                               : positions[0].capacity}{' '}
                                             person (position {number}).
+                                          </DrawerDescription>
+                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                            <span className="font-semibold">
+                                              Price on:
+                                            </span>
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                number <= 4
+                                                  ? positions[6].name
+                                                  : positions[0].name,
+                                              ) // Get the facility ID
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.day} - IDR{' '}
+                                                        {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
@@ -1376,10 +1498,51 @@ export default function Reservation() {
                                             {positions[1].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[1].price}/hour and
-                                            can only accomodate{' '}
+                                            Can only accomodate{' '}
                                             {positions[1].capacity} person
                                             (position {number}).
+                                          </DrawerDescription>
+                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                            <span className="font-semibold">
+                                              Price on:
+                                            </span>
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[1].name,
+                                              ) // Get the facility ID
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.day} - IDR{' '}
+                                                        {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
@@ -1802,10 +1965,51 @@ export default function Reservation() {
                                             {positions[0].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[0].price}/hour and
-                                            can only accomodate{' '}
+                                            Can only accomodate{' '}
                                             {positions[0].capacity} person
                                             (position {number}).
+                                          </DrawerDescription>
+                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                            <span className="font-semibold">
+                                              Price on:
+                                            </span>
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[0].name,
+                                              ) // Get the facility ID
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.day} - IDR{' '}
+                                                        {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
@@ -3196,10 +3400,51 @@ export default function Reservation() {
                                             {positions[3].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[3].price}/hour and
-                                            can only accommodate{' '}
+                                            Can only accommodate{' '}
                                             {positions[3].capacity} person
                                             (position {number}).
+                                          </DrawerDescription>
+                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                            <span className="font-semibold">
+                                              Price on:
+                                            </span>
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[3].name,
+                                              ) // Get the facility ID
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.day} - IDR{' '}
+                                                        {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         {drawerContent !== 'default' && (
@@ -3623,10 +3868,51 @@ export default function Reservation() {
                                             {positions[2].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[2].price}/hour and
-                                            can only accomodate{' '}
+                                            Can only accomodate{' '}
                                             {positions[2].capacity} person
                                             (position {number}).
+                                          </DrawerDescription>
+                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                            <span className="font-semibold">
+                                              Price on:
+                                            </span>
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[2].name,
+                                              ) // Get the facility ID
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.day} - IDR{' '}
+                                                        {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
                                         </DrawerHeader>{' '}
                                         {drawerContent !== 'default' && (
@@ -4051,10 +4337,51 @@ export default function Reservation() {
                                             {positions[4].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[4].price}/hour and
-                                            can only accomodate{' '}
+                                            Can only accomodate{' '}
                                             {positions[4].capacity} person
                                             (position {number}).
+                                          </DrawerDescription>
+                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                            <span className="font-semibold">
+                                              Price on:
+                                            </span>
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[4].name,
+                                              ) // Get the facility ID
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.day} - IDR{' '}
+                                                        {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
                                         </DrawerHeader>{' '}
                                         {drawerContent !== 'default' && (
@@ -4476,10 +4803,51 @@ export default function Reservation() {
                                             {positions[5].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            IDR {positions[5].price}/hour and
-                                            can only accommodate{' '}
+                                            Can only accommodate{' '}
                                             {positions[5].capacity} person
                                             (position {number}).
+                                          </DrawerDescription>
+                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                            <span className="font-semibold">
+                                              Price on:
+                                            </span>
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[5].name,
+                                              ) // Get the facility ID
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.day} - IDR{' '}
+                                                        {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
                                         </DrawerHeader>
                                         flex{' '}

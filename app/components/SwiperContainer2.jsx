@@ -29,7 +29,7 @@ import { InfoIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import getDocument from '@/firebase/firestore/getData'
-import { getSpaceCategory } from '@/utils/text'
+import { getFacilityId, getSpaceCategory } from '@/utils/text'
 
 export default function SwiperContainer2() {
   const [facilities, setFacilities] = React.useState([])
@@ -130,8 +130,58 @@ function DrawerInfoFacility({ facility }) {
     }
   }
 
+  const [familyVIPRoomData, setFamilyVIPRoomData] = React.useState(null)
+  const [lovebirdsVIPRoomData, setLovebirdsVIPRoomData] = React.useState(null)
+  const [familyOpenSpaceData, setFamilyOpenSpaceData] = React.useState(null)
+  const [squadOpenSpaceData, setSquadOpenSpaceData] = React.useState(null)
+  const [ps4RegulerData, setPs4RegulerData] = React.useState(null)
+  const [ps5RegulerData, setPs5RegulerData] = React.useState(null)
+  const [
+    ikuzoRacingSimulatorData,
+    setIkuzoRacingSimulatorData,
+  ] = React.useState(null)
+
+  async function fetchDataPrices() {
+    const dataFamilyRoom = await getDocument(
+      'facility-setting-prices',
+      'family-vip-room',
+    )
+    const dataLovebirdsRoom = await getDocument(
+      'facility-setting-prices',
+      'lovebirds-vip-room',
+    )
+    const dataFamilySpace = await getDocument(
+      'facility-setting-prices',
+      'family-open-space',
+    )
+    const dataSquadOpenSpace = await getDocument(
+      'facility-setting-prices',
+      'squad-open-space',
+    )
+    const dataPs4Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps4-reguler',
+    )
+    const dataPs5Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps5-reguler',
+    )
+    const dataIkuzoRacingSimulator = await getDocument(
+      'facility-setting-prices',
+      'ikuzo-racing-simulator',
+    )
+    setFamilyVIPRoomData(dataFamilyRoom.data)
+    setLovebirdsVIPRoomData(dataLovebirdsRoom.data)
+    setSquadOpenSpaceData(dataSquadOpenSpace.data)
+    setPs4RegulerData(dataPs4Reguler.data)
+    setPs5RegulerData(dataPs5Reguler.data)
+    setIkuzoRacingSimulatorData(dataIkuzoRacingSimulator.data)
+    setFamilyOpenSpaceData(dataFamilySpace.data)
+  }
+
   React.useEffect(() => {
     fetchDataTimes()
+    fetchDataPrices()
   }, [])
   return (
     <Drawer>
@@ -145,68 +195,106 @@ function DrawerInfoFacility({ facility }) {
         <DrawerHeader className="text-left">
           <DrawerTitle className="text-xl">{facility.name}</DrawerTitle>
           <DrawerDescription>
-            IDR {facility.price}/hour and can only accomodate{' '}
-            {facility.capacity} person.
+            Can only accomodate {facility.capacity} person.
           </DrawerDescription>
+        </DrawerHeader>{' '}
+        <div className="h-[400px] overflow-y-scroll px-4">
+          <div className="flex-relative w-full h-fit mb-2 ">
+            <div
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '10px',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              <Image
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
+                useMap="#image-map"
+                alt={facility.name}
+                width={0}
+                height={0}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                }}
+              />
+            </div>
+          </div>
           {privateSpaceData == null ||
           premiumSpaceData == null ||
-          regularSpaceData == null ? (
+          regularSpaceData == null ||
+          familyVIPRoomData == null ||
+          familyOpenSpaceData == null ||
+          squadOpenSpaceData == null ||
+          lovebirdsVIPRoomData == null ||
+          ps4RegulerData == null ||
+          ps5RegulerData == null ||
+          ikuzoRacingSimulatorData == null ? (
             <></>
           ) : (
-            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-              <span>Available on : </span>
-              {(getSpaceCategory(facility.name) === 'regular-space' &&
-                regularSpaceData.times) ||
-              (getSpaceCategory(facility.name) === 'private-space' &&
-                privateSpaceData.times) ||
-              (getSpaceCategory(facility.name) === 'premium-space' &&
-                premiumSpaceData.times)
-                ? (getSpaceCategory(facility.name) === 'regular-space'
-                    ? regularSpaceData.times
-                    : getSpaceCategory(facility.name) === 'private-space'
-                    ? privateSpaceData.times
-                    : premiumSpaceData.times
-                  ).map((time, index) => (
-                    <span key={index}>
-                      • {time['time-day']} - {time['time-set']['start-time']} -{' '}
-                      {time['time-set']['end-time']}
-                    </span>
-                  ))
-                : null}
-            </DrawerDescription>
+            <>
+              <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                <span className="font-semibold">Price on:</span>
+                {(() => {
+                  const facilityId = getFacilityId(facility.name) // Get the facility ID
+                  const priceData =
+                    facilityId === 'ps5-reguler'
+                      ? ps5RegulerData.prices
+                      : facilityId === 'ikuzo-racing-simulator'
+                      ? ikuzoRacingSimulatorData.prices
+                      : facilityId === 'ps4-reguler'
+                      ? ps4RegulerData.prices
+                      : facilityId === 'family-vip-room'
+                      ? familyVIPRoomData.prices
+                      : facilityId === 'lovebirds-vip-room'
+                      ? lovebirdsVIPRoomData.prices
+                      : facilityId === 'family-open-space'
+                      ? familyOpenSpaceData.prices
+                      : facilityId === 'squad-open-space'
+                      ? squadOpenSpaceData.prices
+                      : []
+
+                  return priceData.length > 0
+                    ? priceData.map((price, index) => (
+                        <span key={index}>
+                          • {price.day} - IDR {price.price}/hour
+                        </span>
+                      ))
+                    : null
+                })()}
+              </DrawerDescription>
+              <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                <span className="font-semibold">Available on : </span>
+                {(getSpaceCategory(facility.name) === 'regular-space' &&
+                  regularSpaceData.times) ||
+                (getSpaceCategory(facility.name) === 'private-space' &&
+                  privateSpaceData.times) ||
+                (getSpaceCategory(facility.name) === 'premium-space' &&
+                  premiumSpaceData.times)
+                  ? (getSpaceCategory(facility.name) === 'regular-space'
+                      ? regularSpaceData.times
+                      : getSpaceCategory(facility.name) === 'private-space'
+                      ? privateSpaceData.times
+                      : premiumSpaceData.times
+                    ).map((time, index) => (
+                      <span key={index}>
+                        • {time['time-day']} - {time['time-set']['start-time']}{' '}
+                        - {time['time-set']['end-time']}
+                      </span>
+                    ))
+                  : null}
+              </DrawerDescription>
+            </>
           )}
-        </DrawerHeader>
 
-        <div className="flex-relative w-full h-fit px-4">
           <div
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: '10px',
-              position: 'relative',
-              overflow: 'hidden',
+            className="prose-sm prose-li:list-disc text-justify text-muted-foreground prose-li:m-0 prose-li:p-0 mt-2"
+            dangerouslySetInnerHTML={{
+              __html: facility && facility.benefits,
             }}
-          >
-            <Image
-              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${facility.pict}`}
-              useMap="#image-map"
-              alt={facility.name}
-              width={0}
-              height={0}
-              style={{
-                width: '100%',
-                height: 'auto',
-              }}
-            />
-          </div>
+          ></div>
         </div>
-
-        <div
-          className="prose-sm prose-li:list-disc px-4 prose-li:m-0 prose-li:p-0 "
-          dangerouslySetInnerHTML={{
-            __html: facility && facility.benefits,
-          }}
-        ></div>
-
         <DrawerFooter className="pt-2">
           <Link href={'/reservation'} className="w-full">
             <Button
