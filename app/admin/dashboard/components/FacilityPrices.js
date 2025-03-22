@@ -17,14 +17,25 @@ import { removeSpaces, toPascalCase } from '@/utils/text'
 
 function FacilityPrices({ facilities }) {
   const [familyVIPRoomData, setFamilyVIPRoomData] = React.useState(null)
+  const [lovebirdsVIPRoomData, setLovebirdsVIPRoomData] = React.useState(null)
   const [familyOpenSpaceData, setFamilyOpenSpaceData] = React.useState(null)
   const [squadOpenSpaceData, setSquadOpenSpaceData] = React.useState(null)
+  const [ps4RegulerData, setPs4RegulerData] = React.useState(null)
+  const [ps5RegulerData, setPs5RegulerData] = React.useState(null)
+  const [
+    ikuzoRacingSimulatorData,
+    setIkuzoRacingSimulatorData,
+  ] = React.useState(null)
   const [allFacilityPriceData, setAllFacilityPriceData] = React.useState(null)
 
   async function fetchDataPrices() {
     const dataFamilyRoom = await getDocument(
       'facility-setting-prices',
       'family-vip-room',
+    )
+    const dataLovebirdsRoom = await getDocument(
+      'facility-setting-prices',
+      'lovebirds-vip-room',
     )
     const dataFamilySpace = await getDocument(
       'facility-setting-prices',
@@ -34,23 +45,44 @@ function FacilityPrices({ facilities }) {
       'facility-setting-prices',
       'squad-open-space',
     )
+    const dataPs4Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps4-reguler',
+    )
+    const dataPs5Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps5-reguler',
+    )
+    const dataIkuzoRacingSimulator = await getDocument(
+      'facility-setting-prices',
+      'ikuzo-racing-simulator',
+    )
     setFamilyVIPRoomData(dataFamilyRoom.data)
+    setLovebirdsVIPRoomData(dataLovebirdsRoom.data)
     setSquadOpenSpaceData(dataSquadOpenSpace.data)
+    setPs4RegulerData(dataPs4Reguler.data)
+    setPs5RegulerData(dataPs5Reguler.data)
+    setIkuzoRacingSimulatorData(dataIkuzoRacingSimulator.data)
     setFamilyOpenSpaceData(dataFamilySpace.data)
     setAllFacilityPriceData({
       familyVIPRoomData: dataFamilyRoom.data,
       familyOpenSpaceData: dataFamilySpace.data,
       squadOpenSpaceData: dataSquadOpenSpace.data,
+      lovebirdsVIPRoomData: dataLovebirdsRoom.data,
+      ps4RegulerData: dataPs4Reguler.data,
+      ps5RegulerData: dataPs5Reguler.data,
+      ikuzoRacingSimulatorData: dataIkuzoRacingSimulator.data,
     })
     setFormData({
       familyVIPRoomData: dataFamilyRoom.data,
       familyOpenSpaceData: dataFamilySpace.data,
       squadOpenSpaceData: dataSquadOpenSpace.data,
+      lovebirdsVIPRoomData: dataLovebirdsRoom.data,
+      ps4RegulerData: dataPs4Reguler.data,
+      ps5RegulerData: dataPs5Reguler.data,
+      ikuzoRacingSimulatorData: dataIkuzoRacingSimulator.data,
     })
   }
-
-  console.log({ familyVIPRoomData })
-  console.log({ familyOpenSpaceData })
 
   const [isLoading, setIsLoading] = React.useState(false)
 
@@ -94,6 +126,14 @@ function FacilityPrices({ facilities }) {
       id = 'family-open-space'
     } else if (category === 'squadOpenSpaceData') {
       id = 'squad-open-space'
+    } else if (category === 'lovebirdsVIPRoomData') {
+      id = 'lovebirds-vip-room'
+    } else if (category === 'ps4RegulerData') {
+      id = 'ps4-reguler'
+    } else if (category === 'ps5RegulerData') {
+      id = 'ps5-reguler'
+    } else if (category === 'ikuzoRacingSimulatorData') {
+      id = 'ikuzo-racing-simulator'
     } else {
       id = 'premium-space-doc'
     }
@@ -198,6 +238,14 @@ function FacilityPrices({ facilities }) {
       id = 'family-open-space'
     } else if (newEntry.category === 'SquadOpenSpace') {
       id = 'squad-open-space'
+    } else if (newEntry.category === 'LoveBirdsVIPRoom') {
+      id = 'lovebirds-vip-room'
+    } else if (newEntry.category === 'PS4Reguler') {
+      id = 'ps4-reguler'
+    } else if (newEntry.category === 'PS5Reguler') {
+      id = 'ps5-reguler'
+    } else if (newEntry.category === 'IkuzoRacingSimulator') {
+      id = 'ikuzo-racing-simulator'
     } else {
       id = 'premium-space-doc'
     }
@@ -277,6 +325,14 @@ function FacilityPrices({ facilities }) {
       id = 'family-open-space'
     } else if (category === 'squadOpenSpaceData') {
       id = 'squad-open-space'
+    } else if (category === 'lovebirdsVIPRoomData') {
+      id = 'lovebirds-vip-room'
+    } else if (category === 'ps4RegulerData') {
+      id = 'ps4-reguler'
+    } else if (category === 'ps5RegulerData') {
+      id = 'ps5-reguler'
+    } else if (category === 'ikuzoRacingSimulatorData') {
+      id = 'ikuzo-racing-simulator'
     } else {
       id = 'premium-space-doc'
     }
@@ -325,6 +381,10 @@ function FacilityPrices({ facilities }) {
       familyVIPRoomData == null ||
       familyOpenSpaceData == null ||
       squadOpenSpaceData == null ||
+      lovebirdsVIPRoomData == null ||
+      ps4RegulerData == null ||
+      ps5RegulerData == null ||
+      ikuzoRacingSimulatorData == null ||
       formData == null ? (
         <div className="flex items-center justify-center p-10">
           <HashLoader color="#FF6200" />
