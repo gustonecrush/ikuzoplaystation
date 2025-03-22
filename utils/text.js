@@ -25,3 +25,7 @@ export const toPascalCase = (str) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join('')
 }
+
+export const removeSpaces = (str) => {
+  return str.replace(/\s+/g, '')
+}

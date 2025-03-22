@@ -13,10 +13,11 @@ import firebaseApp from '@/firebase/config'
 import addData from '@/firebase/firestore/addData'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { FiEdit3 } from 'react-icons/fi'
-import { toPascalCase } from '@/utils/text'
+import { removeSpaces, toPascalCase } from '@/utils/text'
 
 function FacilityPrices({ facilities }) {
   const [familyOpenRoomData, setFamilyOpenRoomData] = React.useState(null)
+  const [familyOpenSpaceData, setFamilyOpenSpaceData] = React.useState(null)
   const [allFacilityPriceData, setAllFacilityPriceData] = React.useState(null)
 
   async function fetchDataPrices() {
@@ -24,16 +25,24 @@ function FacilityPrices({ facilities }) {
       'facility-setting-prices',
       'family-open-room',
     )
+    const dataFamilySpace = await getDocument(
+      'facility-setting-prices',
+      'family-open-space',
+    )
     setFamilyOpenRoomData(dataFamilyRoom.data)
+    setFamilyOpenSpaceData(dataFamilySpace.data)
     setAllFacilityPriceData({
       familyOpenRoomData: dataFamilyRoom.data,
+      familyOpenSpaceData: dataFamilySpace.data,
     })
     setFormData({
       familyOpenRoomData: dataFamilyRoom.data,
+      familyOpenSpaceData: dataFamilySpace.data,
     })
   }
 
   console.log({ familyOpenRoomData })
+  console.log({ familyOpenSpaceData })
 
   const [isLoading, setIsLoading] = React.useState(false)
 
@@ -71,10 +80,10 @@ function FacilityPrices({ facilities }) {
     const entry = formData[categoryKey].prices[index]
 
     let id
-    if (categoryKey === 'familyOpenRoomData') {
+    if (category === 'familyOpenRoomData') {
       id = 'family-open-room'
-    } else if (categoryKey === 'privateSpaceData') {
-      id = 'private-space-doc'
+    } else if (category === 'familyOpenSpaceData') {
+      id = 'family-open-space'
     } else {
       id = 'premium-space-doc'
     }
@@ -150,6 +159,7 @@ function FacilityPrices({ facilities }) {
   const handleNewTimeChange = (field, value) => {
     setNewEntry((prev) => ({
       ...prev,
+      [field]: value,
     }))
   }
 
@@ -158,11 +168,7 @@ function FacilityPrices({ facilities }) {
     const categoryKey = newEntry.category.toLowerCase() // Convert category to match Firestore collection keys
 
     // Validate input fields
-    if (
-      !newEntry['time-day'] ||
-      !newEntry['time-set']?.['start-time'] ||
-      !newEntry['time-set']?.['end-time']
-    ) {
+    if (!newEntry['day'] || !newEntry['price']) {
       Toast.fire({
         icon: 'error',
         title: 'Oopsss!',
@@ -172,18 +178,20 @@ function FacilityPrices({ facilities }) {
       return
     }
 
+    console.log(newEntry.category)
+
     // Define document ID based on category
     let id
-    if (newEntry.category === 'RegularSpace') {
-      id = 'regular-space-doc'
-    } else if (newEntry.category === 'PrivateSpace') {
-      id = 'private-space-doc'
+    if (newEntry.category === 'FamilyOpenRoom') {
+      id = 'family-open-room'
+    } else if (newEntry.category === 'FamilyOpenSpace') {
+      id = 'family-open-space'
     } else {
       id = 'premium-space-doc'
     }
 
     // Reference to the document
-    const docRef = doc(db, 'space-setting-times', id)
+    const docRef = doc(db, 'facility-setting-prices', id)
 
     try {
       // Fetch the existing document data
@@ -192,25 +200,25 @@ function FacilityPrices({ facilities }) {
 
       if (docSnap.exists()) {
         const data = docSnap.data()
-        existingPrices = data.times || [] // Keep existing times if available
+        existingPrices = data.prices || [] // Keep existing times if available
       }
 
       // New entry data to be pushed
       const newEntryData = {
-        'time-day': newEntry['time-day'],
-        'time-set': {
-          'start-time': newEntry['time-set']['start-time'],
-          'end-time': newEntry['time-set']['end-time'],
-        },
+        day: newEntry['day'],
+        price: newEntry['price'],
       }
 
       // Append new entry to the existing times array
       existingPrices.push(newEntryData)
 
       // Update Firestore with the modified times array
-      const { result, error } = await addData('space-setting-times', id, {
-        times: existingPrices,
+      const { result, error } = await addData('facility-setting-prices', id, {
+        prices: existingPrices,
       })
+
+      console.log({ result })
+      console.log({ error })
 
       if (error) {
         console.error('Error adding data:', error)
@@ -224,14 +232,14 @@ function FacilityPrices({ facilities }) {
         Toast.fire({
           icon: 'success',
           title: 'Ikuzoooo!',
-          text: `Time entry successfully added!`,
+          text: `Price entry successfully added!`,
         })
 
         // Reset local state after successful addition
         setNewEntry({
-          category: 'RegularSpace',
-          'time-day': '',
-          'time-set': { 'start-time': '', 'end-time': '' },
+          category: 'FamilyOpenSpace',
+          day: '',
+          price: '',
         })
 
         setIsAdding(false)
@@ -242,7 +250,7 @@ function FacilityPrices({ facilities }) {
       Toast.fire({
         icon: 'error',
         title: 'Oopsss!',
-        text: `Time entry fail deleted!`,
+        text: `Price entry fail added!`,
       })
       fetchDataPrices()
     }
@@ -253,8 +261,8 @@ function FacilityPrices({ facilities }) {
     console.log({ category })
     if (category === 'familyOpenRoomData') {
       id = 'family-open-room'
-    } else if (category === 'privateSpaceData') {
-      id = 'private-space-doc'
+    } else if (category === 'familyOpenSpaceData') {
+      id = 'family-open-space'
     } else {
       id = 'premium-space-doc'
     }
@@ -301,6 +309,7 @@ function FacilityPrices({ facilities }) {
       {isLoading ||
       allFacilityPriceData == null ||
       familyOpenRoomData == null ||
+      familyOpenSpaceData == null ||
       formData == null ? (
         <div className="flex items-center justify-center p-10">
           <HashLoader color="#FF6200" />
@@ -329,12 +338,15 @@ function FacilityPrices({ facilities }) {
                   <select
                     value={newEntry.category}
                     onChange={(e) =>
-                      handleNewEntryChange('category', e.target.value)
+                      handleNewEntryChange(
+                        'category',
+                        removeSpaces(e.target.value),
+                      )
                     }
                     className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
                   >
                     {facilities.map((facility, index) => (
-                      <option key={index} value="FamilyOpenRoom">
+                      <option key={index} value={toPascalCase(facility.name)}>
                         {facility.name}
                       </option>
                     ))}
