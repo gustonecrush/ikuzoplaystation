@@ -323,6 +323,7 @@ export default function Reservation() {
           setSelectedReservationPlace('')
           setSelectedDate('')
           setStartTimeReservasi('')
+          setSelectedPriceToday('')
           setEndTimeReservasi('')
           setIdReservasi('')
           setPosisiReservasi(0)
@@ -468,38 +469,46 @@ export default function Reservation() {
     return foundItem.length === 1 ? foundItem[0]['time-set'] : null
   }
 
+  const [selectedPriceToday, setSelectedPriceToday] = React.useState('')
+
   const getPriceSetForToday = (value, selectedDate) => {
     const today = getIndonesianDay(selectedDate)
+    const valueConverted = getFacilityId(value)
     const prices =
-      value === 'ps5-reguler'
+      valueConverted === 'ps5-reguler'
         ? ps5RegulerData.prices
-        : value === 'ikuzo-racing-simulator'
+        : valueConverted === 'ikuzo-racing-simulator'
         ? ikuzoRacingSimulatorData.prices
-        : value === 'ps4-reguler'
+        : valueConverted === 'ps4-reguler'
         ? ps4RegulerData.prices
-        : value === 'family-vip-room'
+        : valueConverted === 'family-vip-room'
         ? familyVIPRoomData.prices
-        : value === 'lovebirds-vip-room'
+        : valueConverted === 'lovebirds-vip-room'
         ? lovebirdsVIPRoomData.prices
-        : value === 'family-open-space'
+        : valueConverted === 'family-open-space'
         ? familyOpenSpaceData.prices
-        : value === 'squad-open-space'
+        : valueConverted === 'squad-open-space'
         ? squadOpenSpaceData.prices
         : []
 
     console.log({ value, today, prices })
 
     // Find time-set where today's day exists
-    const foundItem = prices.filter((item) =>
+    const foundPrice = prices.filter((item) =>
       item['day'].split(',').includes(today),
     )
 
-    console.log({ foundItem })
+    console.log({ foundPrice })
 
-    return foundItem.length === 1 ? foundItem[0]['price'] : ''
+    foundPrice.length === 1
+      ? setSelectedPriceToday(foundPrice[0]['price'])
+      : setSelectedPriceToday('')
+
+    return foundPrice.length === 1 ? foundPrice[0]['price'] : ''
   }
 
   console.log({ getPriceSetForToday })
+  console.log({ selectedPriceToday })
 
   const getTimeSetForTodayAgain = (value, selectedDate) => {
     const today = getIndonesianDay(selectedDate) // Get today's day
@@ -987,12 +996,20 @@ export default function Reservation() {
                                               setPricePerReserve(
                                                 positions[6].price,
                                               )
+                                              getPriceSetForToday(
+                                                positions[6].name,
+                                                selectedDate,
+                                              )
                                             } else {
                                               setNamaPosisiReservasi(
                                                 positions[0].name,
                                               )
                                               setPricePerReserve(
                                                 positions[0].price,
+                                              )
+                                              getPriceSetForToday(
+                                                positions[0].name,
+                                                selectedDate,
                                               )
                                             }
 
@@ -1482,6 +1499,10 @@ export default function Reservation() {
                                               selectedDate,
                                               number,
                                             )
+                                            getPriceSetForToday(
+                                              positions[1].name,
+                                              selectedDate,
+                                            )
                                           }}
                                           style={{
                                             transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
@@ -1944,6 +1965,10 @@ export default function Reservation() {
                                             )
                                             setPricePerReserve(
                                               positions[0].price,
+                                            )
+                                            getPriceSetForToday(
+                                              positions[0].name,
+                                              selectedDate,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -3380,6 +3405,10 @@ export default function Reservation() {
                                             setPricePerReserve(
                                               positions[3].price,
                                             )
+                                            getPriceSetForToday(
+                                              positions[3].name,
+                                              selectedDate,
+                                            )
                                             fetchingAvailableReservation(
                                               selectedDate,
                                               number,
@@ -3847,6 +3876,10 @@ export default function Reservation() {
                                             )
                                             setPricePerReserve(
                                               positions[2].price,
+                                            )
+                                            getPriceSetForToday(
+                                              positions[2].name,
+                                              selectedDate,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -4317,6 +4350,10 @@ export default function Reservation() {
                                             setPricePerReserve(
                                               positions[4].price,
                                             )
+                                            getPriceSetForToday(
+                                              positions[4].name,
+                                              selectedDate,
+                                            )
                                             fetchingAvailableReservation(
                                               selectedDate,
                                               number,
@@ -4782,6 +4819,10 @@ export default function Reservation() {
                                             )
                                             setPricePerReserve(
                                               positions[5].price,
+                                            )
+                                            getPriceSetForToday(
+                                              positions[5].name,
+                                              selectedDate,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -5335,7 +5376,7 @@ export default function Reservation() {
                             {pricePackageDetermination(
                               posisiReservasi,
                               totalTime,
-                              pricePerReserve,
+                              parseInt(selectedPriceToday),
                             )}
                           </p>
                         </div>
@@ -5375,7 +5416,7 @@ export default function Reservation() {
                   pricePackageDetermination(
                     posisiReservasi,
                     totalTime,
-                    pricePerReserve,
+                    parseInt(selectedPriceToday),
                   ) + 4000
                 }
                 productName={`Reservation ${namaPosisiReservasi}`}
