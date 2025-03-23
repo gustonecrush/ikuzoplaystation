@@ -74,7 +74,7 @@ import { RESERVATION_PLACE } from '@/constans/reservations'
 import { IoMdBook } from 'react-icons/io'
 import getDocument from '@/firebase/firestore/getData'
 import LoaderHome from '@/app/components/LoaderHome'
-import { capitalizeAndFormat } from '@/utils/text'
+import { capitalizeAndFormat, getFacilityId } from '@/utils/text'
 
 export default function Reservation() {
   const [drawerContent, setDrawerContent] = useState('default')
@@ -385,6 +385,55 @@ export default function Reservation() {
     console.log('fetching', reserves)
   }
 
+  const [familyVIPRoomData, setFamilyVIPRoomData] = React.useState(null)
+  const [lovebirdsVIPRoomData, setLovebirdsVIPRoomData] = React.useState(null)
+  const [familyOpenSpaceData, setFamilyOpenSpaceData] = React.useState(null)
+  const [squadOpenSpaceData, setSquadOpenSpaceData] = React.useState(null)
+  const [ps4RegulerData, setPs4RegulerData] = React.useState(null)
+  const [ps5RegulerData, setPs5RegulerData] = React.useState(null)
+  const [
+    ikuzoRacingSimulatorData,
+    setIkuzoRacingSimulatorData,
+  ] = React.useState(null)
+
+  async function fetchDataPrices() {
+    const dataFamilyRoom = await getDocument(
+      'facility-setting-prices',
+      'family-vip-room',
+    )
+    const dataLovebirdsRoom = await getDocument(
+      'facility-setting-prices',
+      'lovebirds-vip-room',
+    )
+    const dataFamilySpace = await getDocument(
+      'facility-setting-prices',
+      'family-open-space',
+    )
+    const dataSquadOpenSpace = await getDocument(
+      'facility-setting-prices',
+      'squad-open-space',
+    )
+    const dataPs4Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps4-reguler',
+    )
+    const dataPs5Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps5-reguler',
+    )
+    const dataIkuzoRacingSimulator = await getDocument(
+      'facility-setting-prices',
+      'ikuzo-racing-simulator',
+    )
+    setFamilyVIPRoomData(dataFamilyRoom.data)
+    setLovebirdsVIPRoomData(dataLovebirdsRoom.data)
+    setSquadOpenSpaceData(dataSquadOpenSpace.data)
+    setPs4RegulerData(dataPs4Reguler.data)
+    setPs5RegulerData(dataPs5Reguler.data)
+    setIkuzoRacingSimulatorData(dataIkuzoRacingSimulator.data)
+    setFamilyOpenSpaceData(dataFamilySpace.data)
+  }
+
   const [privateSpaceData, setPrivateSpaceData] = React.useState(null)
   const [regularSpaceData, setRegularSpaceData] = React.useState(null)
   const [premiumSpaceData, setPremiumSpaceData] = React.useState(null)
@@ -441,6 +490,44 @@ export default function Reservation() {
     return foundItem.length === 1 ? foundItem[0]['time-set'] : null
   }
 
+  const [selectedPriceToday, setSelectedPriceToday] = React.useState('')
+
+  const getPriceSetForToday = (value, selectedDate) => {
+    const today = getIndonesianDay(selectedDate)
+    const valueConverted = getFacilityId(value)
+    const prices =
+      valueConverted === 'ps5-reguler'
+        ? ps5RegulerData.prices
+        : valueConverted === 'ikuzo-racing-simulator'
+        ? ikuzoRacingSimulatorData.prices
+        : valueConverted === 'ps4-reguler'
+        ? ps4RegulerData.prices
+        : valueConverted === 'family-vip-room'
+        ? familyVIPRoomData.prices
+        : valueConverted === 'lovebirds-vip-room'
+        ? lovebirdsVIPRoomData.prices
+        : valueConverted === 'family-open-space'
+        ? familyOpenSpaceData.prices
+        : valueConverted === 'squad-open-space'
+        ? squadOpenSpaceData.prices
+        : []
+
+    console.log({ value, today, prices })
+
+    // Find time-set where today's day exists
+    const foundPrice = prices.filter((item) =>
+      item['day'].split(',').includes(today),
+    )
+
+    console.log({ foundPrice })
+
+    foundPrice.length === 1
+      ? setSelectedPriceToday(foundPrice[0]['price'])
+      : setSelectedPriceToday('')
+
+    return foundPrice.length === 1 ? foundPrice[0]['price'] : ''
+  }
+
   const getTimeSetForTodayAgain = (value, selectedDate) => {
     const today = getIndonesianDay(selectedDate) // Get today's day
 
@@ -467,6 +554,7 @@ export default function Reservation() {
 
   useEffect(() => {
     fetchDataTimes()
+    fetchDataPrices()
 
     const snapScript = 'https://app.midtrans.com/snap/snap.js'
     const clientKey = process.env.NEXT_PUBLIC_CLIENT
@@ -620,7 +708,14 @@ export default function Reservation() {
     <>
       {regularSpaceData == null ||
       privateSpaceData == null ||
-      premiumSpaceData == null ? (
+      premiumSpaceData == null ||
+      familyVIPRoomData == null ||
+      familyOpenSpaceData == null ||
+      squadOpenSpaceData == null ||
+      lovebirdsVIPRoomData == null ||
+      ps4RegulerData == null ||
+      ps5RegulerData == null ||
+      ikuzoRacingSimulatorData == null ? (
         <div className=" z-[999999] w-full h-full absolute top-50">
           <LoaderHome />
         </div>
@@ -924,12 +1019,20 @@ export default function Reservation() {
                                               setPricePerReserve(
                                                 positions[6].price,
                                               )
+                                              getPriceSetForToday(
+                                                positions[6].name,
+                                                selectedDate,
+                                              )
                                             } else {
                                               setNamaPosisiReservasi(
                                                 positions[0].name,
                                               )
                                               setPricePerReserve(
                                                 positions[0].price,
+                                              )
+                                              getPriceSetForToday(
+                                                positions[0].name,
+                                                selectedDate,
                                               )
                                             }
                                             fetchingAvailableReservation(
@@ -1196,6 +1299,10 @@ export default function Reservation() {
                                             setPricePerReserve(
                                               positions[1].price,
                                             )
+                                            getPriceSetForToday(
+                                              positions[1].name,
+                                              selectedDate,
+                                            )
                                             fetchingAvailableReservation(
                                               selectedDate,
                                               number,
@@ -1445,6 +1552,10 @@ export default function Reservation() {
                                             )
                                             setPricePerReserve(
                                               positions[0].price,
+                                            )
+                                            getPriceSetForToday(
+                                              positions[0].name,
+                                              selectedDate,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -2449,6 +2560,10 @@ export default function Reservation() {
                                             setPricePerReserve(
                                               positions[3].price,
                                             )
+                                            getPriceSetForToday(
+                                              positions[3].name,
+                                              selectedDate,
+                                            )
                                             fetchingAvailableReservation(
                                               selectedDate,
                                               number,
@@ -2695,6 +2810,10 @@ export default function Reservation() {
                                             )
                                             setPricePerReserve(
                                               positions[2].price,
+                                            )
+                                            getPriceSetForToday(
+                                              positions[2].name,
+                                              selectedDate,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -2944,6 +3063,10 @@ export default function Reservation() {
                                             )
                                             setPricePerReserve(
                                               positions[4].price,
+                                            )
+                                            getPriceSetForToday(
+                                              positions[4].name,
+                                              selectedDate,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -3197,6 +3320,10 @@ export default function Reservation() {
                                             )
                                             setPricePerReserve(
                                               positions[5].price,
+                                            )
+                                            getPriceSetForToday(
+                                              positions[5].name,
+                                              selectedDate,
                                             )
                                             fetchingAvailableReservation(
                                               selectedDate,
@@ -3587,7 +3714,7 @@ export default function Reservation() {
                             {pricePackageDetermination(
                               posisiReservasi,
                               totalTime,
-                              pricePerReserve,
+                              parseInt(selectedPriceToday),
                             )}
                           </p>
                         </div>
@@ -3628,7 +3755,7 @@ export default function Reservation() {
                     pricePackageDetermination(
                       posisiReservasi,
                       totalTime,
-                      pricePerReserve,
+                      parseInt(selectedPriceToday),
                     ) + 4000
                   }
                   productName={`Reservation ${namaPosisiReservasi}`}
@@ -3688,7 +3815,7 @@ export default function Reservation() {
                 Pastikan customer telah membayar kepada kasir dengan nominal
                 sebesar{' '}
                 <span className="font-bold text-orange text-lg">{`IDR ${
-                  totalTime * pricePerReserve
+                  totalTime * parseInt(selectedPriceToday)
                 }`}</span>{' '}
                 untuk waktu{' '}
                 <span className=" font-semibold">
