@@ -11,6 +11,7 @@ import SwiperContentGames from '@/app/components/SwiperContentGames'
 import SwiperContentFacilities from '@/app/admin/dashboard/components/SwiperContentFacilities'
 import { useRouter } from 'next/navigation'
 import ContentWebsite from '../components/ContentWebsite'
+import ListSections from '../components/ListSections'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -161,6 +162,14 @@ function page() {
             <SwiperContentFacilities
               isLoading={isLoading}
               facilities={facilities}
+              fetchContentFacilities={fetchContents}
+            />
+          )}
+
+          {selectedFeature == 'sections' && (
+            <ListSections
+              isLoading={isLoading}
+              facilities={sections}
               fetchContentFacilities={fetchContents}
             />
           )}

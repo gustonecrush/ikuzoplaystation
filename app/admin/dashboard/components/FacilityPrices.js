@@ -3,7 +3,6 @@
 import React from 'react'
 
 // shadcn ui components
-import { Button } from '@/components/ui/button'
 
 import Toast from '@/app/components/Toast'
 import { HashLoader } from 'react-spinners'
@@ -14,6 +13,11 @@ import addData from '@/firebase/firestore/addData'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { FiEdit3 } from 'react-icons/fi'
 import { removeSpaces, toPascalCase } from '@/utils/text'
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 
 function FacilityPrices({ facilities }) {
   const [familyVIPRoomData, setFamilyVIPRoomData] = React.useState(null)
@@ -27,6 +31,7 @@ function FacilityPrices({ facilities }) {
     setIkuzoRacingSimulatorData,
   ] = React.useState(null)
   const [allFacilityPriceData, setAllFacilityPriceData] = React.useState(null)
+  const [formData, setFormData] = React.useState(null)
 
   async function fetchDataPrices() {
     const dataFamilyRoom = await getDocument(
@@ -84,13 +89,14 @@ function FacilityPrices({ facilities }) {
     })
   }
 
+  console.log({ formData })
+
   const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
     fetchDataPrices()
   }, [])
 
-  const [formData, setFormData] = React.useState(null)
   const [isUpdating, setIsUpdating] = React.useState(false)
 
   // Handle changes when editing a row
@@ -102,10 +108,26 @@ function FacilityPrices({ facilities }) {
     })
   }
 
+  const handleChangeCustom = (category, index, field, value) => {
+    setFormData((prev) => {
+      const newData = { ...prev }
+      newData[category]['custom-prices'][index][field] = value
+      return { ...newData }
+    })
+  }
+
   const handlePriceChange = (category, index, field, value) => {
     setFormData((prev) => {
       const newData = { ...prev }
       newData[category].prices[index][field] = value
+      return { ...newData }
+    })
+  }
+
+  const handlePriceChangeCustom = (category, index, field, value) => {
+    setFormData((prev) => {
+      const newData = { ...prev }
+      newData[category]['custom-prices'][index][field] = value
       return { ...newData }
     })
   }
@@ -192,6 +214,85 @@ function FacilityPrices({ facilities }) {
     setIsUpdating(false)
   }
 
+  const handleUpdateCustom = async (category, index) => {
+    setIsUpdating(true)
+
+    const categoryKey = category // 'regularSpaceData', 'privateSpaceData', etc.
+    const entry = formData[categoryKey]['custom-prices'][index]
+
+    let id
+    if (category === 'familyVIPRoomData') {
+      id = 'family-vip-room'
+    } else if (category === 'familyOpenSpaceData') {
+      id = 'family-open-space'
+    } else if (category === 'squadOpenSpaceData') {
+      id = 'squad-open-space'
+    } else if (category === 'lovebirdsVIPRoomData') {
+      id = 'lovebirds-vip-room'
+    } else if (category === 'ps4RegulerData') {
+      id = 'ps4-reguler'
+    } else if (category === 'ps5RegulerData') {
+      id = 'ps5-reguler'
+    } else if (category === 'ikuzoRacingSimulatorData') {
+      id = 'ikuzo-racing-simulator'
+    } else {
+      id = 'premium-space-doc'
+    }
+
+    if (!id) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Missing document ID!`,
+      })
+      setIsUpdating(false)
+      return
+    }
+
+    try {
+      // Get the existing data from Firestore (if needed)
+      const docRef = doc(db, 'facility-setting-prices', id)
+      const docSnap = await getDoc(docRef)
+
+      if (!docSnap.exists()) {
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopsss!',
+          text: `Document does not exist!`,
+        })
+        setIsUpdating(false)
+        return
+      }
+
+      // Update the specific index in the `times` array
+      const existingData = docSnap.data()
+      const updatedPrices = [...existingData['custom-prices']] // Clone the array
+      updatedPrices[index] = entry // Update specific index
+
+      await updateDoc(docRef, {
+        ['custom-prices']: updatedPrices, // Replace the whole array
+      })
+
+      console.log('Update successful!')
+      fetchDataPrices()
+      Toast.fire({
+        icon: 'success',
+        title: 'Ikuzoooo!',
+        text: `Successfully to add data. Please try again.`,
+      })
+    } catch (error) {
+      console.error('Update failed:', error)
+      fetchDataPrices()
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Failed to update data. Please try again.`,
+      })
+    }
+
+    setIsUpdating(false)
+  }
+
   const [isAdding, setIsAdding] = React.useState(false)
   const [newEntry, setNewEntry] = React.useState({
     category: 'FamilyVIPRoom', // Default category
@@ -200,6 +301,25 @@ function FacilityPrices({ facilities }) {
   })
   const handleNewEntryChange = (field, value) => {
     setNewEntry((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const [newEntryCustom, setNewEntryCustom] = React.useState({
+    category: 'FamilyVIPRoom', // Default category
+    date: '',
+    price: '',
+  })
+  const handleNewEntryChangeCustom = (field, value) => {
+    setNewEntryCustom((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const handleNewTimeChangeCustom = (field, value) => {
+    setNewEntryCustom((prev) => ({
       ...prev,
       [field]: value,
     }))
@@ -316,6 +436,108 @@ function FacilityPrices({ facilities }) {
     }
   }
 
+  const handleAddDataCustom = async () => {
+    const categoryKey = newEntryCustom.category.toLowerCase() // Convert category to match Firestore collection keys
+
+    // Validate input fields
+    if (!newEntryCustom['date'] || !newEntryCustom['price']) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Please fill in all fields before adding.`,
+      })
+
+      return
+    }
+
+    console.log(newEntryCustom.category)
+
+    // Define document ID based on category
+    let id
+    if (newEntryCustom.category === 'FamilyVIPRoom') {
+      id = 'family-vip-room'
+    } else if (newEntryCustom.category === 'FamilyOpenSpace') {
+      id = 'family-open-space'
+    } else if (newEntryCustom.category === 'SquadOpenSpace') {
+      id = 'squad-open-space'
+    } else if (newEntryCustom.category === 'LoveBirdsVIPRoom') {
+      id = 'lovebirds-vip-room'
+    } else if (newEntryCustom.category === 'PS4Reguler') {
+      id = 'ps4-reguler'
+    } else if (newEntryCustom.category === 'PS5Reguler') {
+      id = 'ps5-reguler'
+    } else if (newEntryCustom.category === 'IkuzoRacingSimulator') {
+      id = 'ikuzo-racing-simulator'
+    } else {
+      id = 'premium-space-doc'
+    }
+
+    // Reference to the document
+    const docRef = doc(db, 'facility-setting-prices', id)
+
+    try {
+      // Fetch the existing document data
+      const docSnap = await getDoc(docRef)
+      let existingPrices = []
+
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        existingPrices = data['custom-prices'] || [] // Keep existing times if available
+      }
+
+      // New entry data to be pushed
+      const newEntryCustomData = {
+        date: newEntryCustom['date'],
+        price: newEntryCustom['price'],
+      }
+
+      // Append new entry to the existing times array
+      existingPrices.push(newEntryCustomData)
+
+      // Update Firestore with the modified times array
+      const { result, error } = await addData('facility-setting-prices', id, {
+        'custom-prices': existingPrices,
+      })
+
+      console.log({ result })
+      console.log({ error })
+
+      if (error) {
+        console.error('Error adding data:', error)
+
+        Toast.fire({
+          icon: 'error',
+          title: 'Oopsss!',
+          text: `Failed to add data. Please try again.`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'success',
+          title: 'Ikuzoooo!',
+          text: `Price entry successfully added!`,
+        })
+
+        // Reset local state after successful addition
+        setNewEntryCustom({
+          category: 'FamilyVIPRoom',
+          day: '',
+          price: '',
+        })
+
+        setIsAdding(false)
+        fetchDataPrices()
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Price entry fail added!`,
+      })
+      fetchDataPrices()
+    }
+  }
+
   const handleDelete = async (category, index) => {
     let id
     console.log({ category })
@@ -374,6 +596,64 @@ function FacilityPrices({ facilities }) {
     }
   }
 
+  const handleDeleteCustom = async (category, index) => {
+    let id
+    console.log({ category })
+    if (category === 'familyVIPRoomData') {
+      id = 'family-vip-room'
+    } else if (category === 'familyOpenSpaceData') {
+      id = 'family-open-space'
+    } else if (category === 'squadOpenSpaceData') {
+      id = 'squad-open-space'
+    } else if (category === 'lovebirdsVIPRoomData') {
+      id = 'lovebirds-vip-room'
+    } else if (category === 'ps4RegulerData') {
+      id = 'ps4-reguler'
+    } else if (category === 'ps5RegulerData') {
+      id = 'ps5-reguler'
+    } else if (category === 'ikuzoRacingSimulatorData') {
+      id = 'ikuzo-racing-simulator'
+    } else {
+      id = 'premium-space-doc'
+    }
+
+    const docRef = doc(db, 'facility-setting-prices', id)
+
+    try {
+      // Fetch the existing document data
+      const docSnap = await getDoc(docRef)
+      if (!docSnap.exists()) {
+        alert('Document not found!')
+        return
+      }
+
+      const data = docSnap.data()
+      let existingPrices = data['custom-prices'] || []
+
+      console.log({ existingPrices })
+
+      // Remove the selected index
+      const updatedPrices = existingPrices.filter((_, i) => i !== index)
+
+      // Update Firestore with the modified array
+      await updateDoc(docRef, { 'custom-prices': updatedPrices })
+      fetchDataPrices()
+      Toast.fire({
+        icon: 'success',
+        title: 'Ikuzoooo!',
+        text: `Price entry successfully deleted!`,
+      })
+    } catch (error) {
+      console.error('Error deleting price entry:', error)
+      fetchDataPrices()
+      Toast.fire({
+        icon: 'error',
+        title: 'Oopsss!',
+        text: `Failed to delete data. Please try again.`,
+      })
+    }
+  }
+
   return (
     <section className={`w-full flex flex-col gap-5 -mt-12`}>
       {isLoading ||
@@ -390,160 +670,340 @@ function FacilityPrices({ facilities }) {
           <HashLoader color="#FF6200" />
         </div>
       ) : (
-        <>
-          <div className="w-full mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
-            {/* Add New Data Section */}
-            <button
-              onClick={() => setIsAdding(!isAdding)}
-              className="mt-6 px-6 py-2 bg-orange text-white rounded-md hover:bg-orange"
-            >
-              {isAdding ? 'Cancel' : 'Add Data'}
-            </button>
-
-            {isAdding && (
-              <div className="mt-6 p-6 bg-gray-100 rounded-lg shadow-md">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                  Add New Data
-                </h3>
-
-                <label className="block mb-4">
-                  <span className="text-gray-700 font-medium">
-                    Select Category
-                  </span>
-                  <select
-                    value={newEntry.category}
-                    onChange={(e) =>
-                      handleNewEntryChange(
-                        'category',
-                        removeSpaces(e.target.value),
-                      )
-                    }
-                    className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
-                  >
-                    {facilities.map((facility, index) => (
-                      <option key={index} value={removeSpaces(facility.name)}>
-                        {facility.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="block mb-4">
-                  <span className="text-gray-700 font-medium">Days</span>
-                  <input
-                    type="text"
-                    value={newEntry['day']}
-                    placeholder="Day"
-                    onChange={(e) =>
-                      handleNewEntryChange('day', e.target.value)
-                    }
-                    className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
-                  />
-                </label>
-
-                <div className="">
-                  <span className="text-gray-700 font-medium">
-                    Price of Day
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Price in Rupiah"
-                    value={newEntry['price']}
-                    onChange={(e) =>
-                      handleNewTimeChange('price', e.target.value)
-                    }
-                    className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
-                  />
-                </div>
-
+        <Tabs defaultValue="account" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="account">Daily</TabsTrigger>
+            <TabsTrigger value="password">Holiday</TabsTrigger>
+          </TabsList>
+          <TabsContent value="account">
+            <>
+              <div className="w-full mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
+                {/* Add New Data Section */}
                 <button
-                  onClick={handleAddData}
-                  className="mt-4 px-6 py-2 bg-orange text-white rounded-md hover:bg-orange w-full transition"
+                  onClick={() => setIsAdding(!isAdding)}
+                  className="mt-6 px-6 py-2 bg-orange text-white rounded-md hover:bg-orange"
                 >
-                  Add
+                  {isAdding ? 'Cancel' : 'Add Data'}
                 </button>
-              </div>
-            )}
 
-            {/* Table Section */}
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-700">
-              Facility Prices Data Table
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border border-gray-300">
-                <thead className="bg-gray-200">
-                  <tr>
-                    <th className="border px-4 py-2">Facility</th>
-                    <th className="border px-4 py-2">Days</th>
-                    <th className="border px-4 py-2">Price</th>
-                    <th className="border px-4 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(formData).map((category) =>
-                    formData[category].prices.map((price, index) => (
-                      <tr key={`${category}-${index}`} className="border-b">
-                        <td className="border px-4 py-2 font-semibold capitalize">
-                          {category.replace('Data', ' ')}
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="text"
-                            value={price['day']}
-                            onChange={(e) =>
-                              handleChange(
-                                category,
-                                index,
-                                'day',
-                                e.target.value,
-                              )
-                            }
-                            className="w-full p-2 border rounded-md"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="text"
-                            value={price['price']}
-                            onChange={(e) =>
-                              handlePriceChange(
-                                category,
-                                index,
-                                'price',
-                                e.target.value,
-                              )
-                            }
-                            className="w-full p-2 border rounded-md"
-                          />
-                        </td>
-                        <td className="border px-4 py-2 gap-2 flex">
-                          <Button
-                            onClick={(e) => handleUpdate(category, index)}
-                            variant="outline"
-                            disabled={isUpdating}
-                            className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
+                {isAdding && (
+                  <div className="mt-6 p-6 bg-gray-100 rounded-lg shadow-md">
+                    <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                      Add New Data
+                    </h3>
+
+                    <label className="block mb-4">
+                      <span className="text-gray-700 font-medium">
+                        Select Category
+                      </span>
+                      <select
+                        value={newEntry.category}
+                        onChange={(e) =>
+                          handleNewEntryChange(
+                            'category',
+                            removeSpaces(e.target.value),
+                          )
+                        }
+                        className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
+                      >
+                        {facilities.map((facility, index) => (
+                          <option
+                            key={index}
+                            value={removeSpaces(facility.name)}
                           >
-                            <FiEdit3 className="h-4 w-4" />{' '}
-                            {isUpdating ? 'Updating...' : 'Update'}
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(category, index)}
-                            variant="outline"
-                            className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
-                          >
-                            <AiOutlineDelete className="h-4 w-4" /> Delete
-                          </Button>
-                        </td>
+                            {facility.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block mb-4">
+                      <span className="text-gray-700 font-medium">Days</span>
+                      <input
+                        type="text"
+                        value={newEntry['day']}
+                        placeholder="Day"
+                        onChange={(e) =>
+                          handleNewEntryChange('day', e.target.value)
+                        }
+                        className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
+                      />
+                    </label>
+
+                    <div className="">
+                      <span className="text-gray-700 font-medium">
+                        Price of Day
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Price in Rupiah"
+                        value={newEntry['price']}
+                        onChange={(e) =>
+                          handleNewTimeChange('price', e.target.value)
+                        }
+                        className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleAddData}
+                      className="mt-4 px-6 py-2 bg-orange text-white rounded-md hover:bg-orange w-full transition"
+                    >
+                      Add
+                    </button>
+                  </div>
+                )}
+
+                {/* Table Section */}
+                <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-700">
+                  Facility Prices Data Table
+                </h2>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border border-gray-300">
+                    <thead className="bg-gray-200">
+                      <tr>
+                        <th className="border px-4 py-2">Facility</th>
+                        <th className="border px-4 py-2">Days</th>
+                        <th className="border px-4 py-2">Price</th>
+                        <th className="border px-4 py-2">Actions</th>
                       </tr>
-                    )),
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
+                    </thead>
+                    <tbody>
+                      {Object.keys(formData).map((category) =>
+                        formData[category].prices.map((price, index) => (
+                          <tr key={`${category}-${index}`} className="border-b">
+                            <td className="border px-4 py-2 font-semibold capitalize">
+                              {category.replace('Data', ' ')}
+                            </td>
+                            <td className="border px-4 py-2">
+                              <input
+                                type="text"
+                                value={price['day']}
+                                onChange={(e) =>
+                                  handleChange(
+                                    category,
+                                    index,
+                                    'day',
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-full p-2 border rounded-md"
+                              />
+                            </td>
+                            <td className="border px-4 py-2">
+                              <input
+                                type="text"
+                                value={price['price']}
+                                onChange={(e) =>
+                                  handlePriceChange(
+                                    category,
+                                    index,
+                                    'price',
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-full p-2 border rounded-md"
+                              />
+                            </td>
+                            <td className="border px-4 py-2 gap-2 flex">
+                              <Button
+                                onClick={(e) => handleUpdate(category, index)}
+                                variant="outline"
+                                disabled={isUpdating}
+                                className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
+                              >
+                                <FiEdit3 className="h-4 w-4" />{' '}
+                                {isUpdating ? 'Updating...' : 'Update'}
+                              </Button>
+                              <Button
+                                onClick={() => handleDelete(category, index)}
+                                variant="outline"
+                                className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
+                              >
+                                <AiOutlineDelete className="h-4 w-4" /> Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        )),
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          </TabsContent>
+          <TabsContent value="password">
+            <>
+              <div className="w-full mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
+                {/* Add New Data Section */}
+                <button
+                  onClick={() => setIsAdding(!isAdding)}
+                  className="mt-6 px-6 py-2 bg-orange text-white rounded-md hover:bg-orange"
+                >
+                  {isAdding ? 'Cancel' : 'Add Data'}
+                </button>
+
+                {isAdding && (
+                  <div className="mt-6 p-6 bg-gray-100 rounded-lg shadow-md">
+                    <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                      Add New Data
+                    </h3>
+
+                    <label className="block mb-4">
+                      <span className="text-gray-700 font-medium">
+                        Select Category
+                      </span>
+                      <select
+                        value={newEntryCustom.category}
+                        onChange={(e) =>
+                          handleNewEntryChangeCustom(
+                            'category',
+                            removeSpaces(e.target.value),
+                          )
+                        }
+                        className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
+                      >
+                        {facilities.map((facility, index) => (
+                          <option
+                            key={index}
+                            value={removeSpaces(facility.name)}
+                          >
+                            {facility.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="block mb-4">
+                      <span className="text-gray-700 font-medium">Date</span>
+                      <td className="border px-4 py-2">
+                        <Input
+                          type="date"
+                          value={newEntryCustom['date'] || ''} // Ensure value is in YYYY-MM-DD format
+                          onChange={(e) =>
+                            handleNewEntryChangeCustom('date', e.target.value)
+                          }
+                          className="w-full p-2 border rounded-md"
+                        />
+                      </td>
+                    </label>
+
+                    <div className="">
+                      <span className="text-gray-700 font-medium">
+                        Price of Day
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Price in Rupiah"
+                        value={newEntryCustom['price']}
+                        onChange={(e) =>
+                          handleNewTimeChangeCustom('price', e.target.value)
+                        }
+                        className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleAddDataCustom}
+                      className="mt-4 px-6 py-2 bg-orange text-white rounded-md hover:bg-orange w-full transition"
+                    >
+                      Add
+                    </button>
+                  </div>
+                )}
+
+                {/* Table Section */}
+                <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-700">
+                  Facility Prices Data Table
+                </h2>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border border-gray-300">
+                    <thead className="bg-gray-200">
+                      <tr>
+                        <th className="border px-4 py-2">Facility</th>
+                        <th className="border px-4 py-2">Date</th>
+                        <th className="border px-4 py-2">Price</th>
+                        <th className="border px-4 py-2">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.keys(formData).map((category) =>
+                        formData[category]['custom-prices'].map(
+                          (price, index) => (
+                            <tr
+                              key={`${category}-${index}`}
+                              className="border-b"
+                            >
+                              <td className="border px-4 py-2 font-semibold capitalize">
+                                {category.replace('Data', ' ')}
+                              </td>
+                              <td className="border px-4 py-2">
+                                <Input
+                                  type="date"
+                                  value={price['date'] || ''} // Ensure value is in YYYY-MM-DD format
+                                  onChange={(e) =>
+                                    handleChangeCustom(
+                                      category,
+                                      index,
+                                      'date',
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-full p-2 border rounded-md"
+                                />
+                              </td>
+
+                              <td className="border px-4 py-2">
+                                <input
+                                  type="text"
+                                  value={price['price']}
+                                  onChange={(e) =>
+                                    handlePriceChangeCustom(
+                                      category,
+                                      index,
+                                      'price',
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-full p-2 border rounded-md"
+                                />
+                              </td>
+                              <td className="border px-4 py-2 gap-2 flex">
+                                <Button
+                                  onClick={(e) =>
+                                    handleUpdateCustom(category, index)
+                                  }
+                                  variant="outline"
+                                  disabled={isUpdating}
+                                  className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
+                                >
+                                  <FiEdit3 className="h-4 w-4" />{' '}
+                                  {isUpdating ? 'Updating...' : 'Update'}
+                                </Button>
+                                <Button
+                                  onClick={() =>
+                                    handleDeleteCustom(category, index)
+                                  }
+                                  variant="outline"
+                                  className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
+                                >
+                                  <AiOutlineDelete className="h-4 w-4" /> Delete
+                                </Button>
+                              </td>
+                            </tr>
+                          ),
+                        ),
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          </TabsContent>
+        </Tabs>
       )}
     </section>
   )
 }
+
 export default FacilityPrices
