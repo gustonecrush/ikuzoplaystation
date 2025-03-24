@@ -310,6 +310,7 @@ function FacilityPrices({ facilities }) {
     category: 'FamilyVIPRoom', // Default category
     date: '',
     price: '',
+    keterangan: '',
   })
   const handleNewEntryChangeCustom = (field, value) => {
     setNewEntryCustom((prev) => ({
@@ -440,7 +441,11 @@ function FacilityPrices({ facilities }) {
     const categoryKey = newEntryCustom.category.toLowerCase() // Convert category to match Firestore collection keys
 
     // Validate input fields
-    if (!newEntryCustom['date'] || !newEntryCustom['price']) {
+    if (
+      !newEntryCustom['date'] ||
+      !newEntryCustom['price'] ||
+      !newEntryCustom['keterangan']
+    ) {
       Toast.fire({
         icon: 'error',
         title: 'Oopsss!',
@@ -489,6 +494,7 @@ function FacilityPrices({ facilities }) {
       const newEntryCustomData = {
         date: newEntryCustom['date'],
         price: newEntryCustom['price'],
+        keterangan: newEntryCustom['keterangan'],
       }
 
       // Append new entry to the existing times array
@@ -522,6 +528,7 @@ function FacilityPrices({ facilities }) {
           category: 'FamilyVIPRoom',
           day: '',
           price: '',
+          keterangan: '',
         })
 
         setIsAdding(false)
@@ -903,6 +910,24 @@ function FacilityPrices({ facilities }) {
                       />
                     </div>
 
+                    <div className="">
+                      <span className="text-gray-700 font-medium">
+                        Keterangan
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Keterangan"
+                        value={newEntryCustom['keterangan']}
+                        onChange={(e) =>
+                          handleNewTimeChangeCustom(
+                            'keterangan',
+                            e.target.value,
+                          )
+                        }
+                        className="w-full p-2 border rounded-md focus:ring focus:ring-orange-300"
+                      />
+                    </div>
+
                     <button
                       onClick={handleAddDataCustom}
                       className="mt-4 px-6 py-2 bg-orange text-white rounded-md hover:bg-orange w-full transition"
@@ -923,6 +948,7 @@ function FacilityPrices({ facilities }) {
                         <th className="border px-4 py-2">Facility</th>
                         <th className="border px-4 py-2">Date</th>
                         <th className="border px-4 py-2">Price</th>
+                        <th className="border px-4 py-2">Keterangan</th>
                         <th className="border px-4 py-2">Actions</th>
                       </tr>
                     </thead>
@@ -962,6 +988,21 @@ function FacilityPrices({ facilities }) {
                                       category,
                                       index,
                                       'price',
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-full p-2 border rounded-md"
+                                />
+                              </td>
+                              <td className="border px-4 py-2">
+                                <input
+                                  type="text"
+                                  value={price['keterangan']}
+                                  onChange={(e) =>
+                                    handlePriceChangeCustom(
+                                      category,
+                                      index,
+                                      'keterangan',
                                       e.target.value,
                                     )
                                   }
