@@ -260,7 +260,7 @@ function ListSections({ isLoading, sections, fetchContentFacilities }) {
   }
   return (
     <section className={`w-full flex flex-col gap-5`}>
-      {isLoading ? (
+      {isLoading && sections == null ? (
         <div className="flex items-center justify-center p-10">
           <HashLoader color="#FF6200" />
         </div>

@@ -169,7 +169,7 @@ function page() {
           {selectedFeature == 'sections' && (
             <ListSections
               isLoading={isLoading}
-              facilities={sections}
+              sections={sections}
               fetchContentFacilities={fetchContents}
             />
           )}
