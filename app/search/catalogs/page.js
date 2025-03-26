@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { FiSearch } from 'react-icons/fi'
 import Image from 'next/image'
@@ -14,6 +14,8 @@ import LoaderHome from '@/app/components/LoaderHome'
 import SwiperContainerCatalogs from '@/app/components/SwiperContainerCatalogs'
 import { getFacilityId } from '@/utils/text'
 import { DrawerDescription } from '@/components/ui/drawer'
+
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
 const Page = () => {
   const [catalogTxt, setCatalogTxt] = useState('')
@@ -330,82 +332,109 @@ const Page = () => {
                             className="w-[150px] object-cover mb-2"
                           />
 
-                          <p className="text-gray-600">
-                            Available on:{' '}
-                            <span className="font-semibold flex flex-col">
-                              <span>
-                                {' '}
-                                <ul className="list-decimal pl-6">
-                                  {(() => {
-                                    const facilities = mapSeatToFacility(
-                                      searchResults[catalog_txt]?.no_seat,
-                                    )
-                                    return facilities.map((facility, index) => (
-                                      <li key={index}>
-                                        {facility.name}
+                          <div className="text-gray-600">
+                            {/* Button to Open Dialog */}
+                            <Dialog>
+                              <DialogTrigger className="bg-orange text-white px-4 py-2 rounded-lg font-medium shadow-md hover:bg-orange/90 transition">
+                                See Available On
+                              </DialogTrigger>
 
-                                        <div className="flex flex-col gap-0 mt-0 pt-0">
-                                          <span className="font-semibold">
-                                            Price on:
-                                          </span>
-                                          <ul className="list-disc pl-6">
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                facility.name,
-                                              )
+                              {/* Alert Dialog Content */}
+                              <DialogContent className="max-w-sm  w-full">
+                                <div className="text-gray-600">
+                                  <p className="text-gray-600">
+                                    Available on:{' '}
+                                    <span className="font-semibold flex flex-col">
+                                      <span>
+                                        {' '}
+                                        <ul className="list-decimal pl-6 h-[400px] overflow-y-scroll">
+                                          {(() => {
+                                            const facilities = mapSeatToFacility(
+                                              searchResults[catalog_txt]
+                                                .no_seat,
+                                              searchResults[catalog_txt]
+                                                ?.no_seat,
+                                            )
+                                            return facilities.map(
+                                              (facility, index) => (
+                                                <li key={index}>
+                                                  {facility.name}
+                                                  <div className="flex flex-col gap-0 mt-0 pt-0">
+                                                    <span className="font-semibold">
+                                                      Price on:
+                                                    </span>
+                                                    <ul className="list-disc pl-6 w-[300px]">
+                                                      {(() => {
+                                                        const facilityId = getFacilityId(
+                                                          facility.name,
+                                                        )
 
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
+                                                        const priceData =
+                                                          facilityId ===
+                                                          'ps5-reguler'
+                                                            ? ps5RegulerData.prices
+                                                            : facilityId ===
+                                                              'ikuzo-racing-simulator'
+                                                            ? ikuzoRacingSimulatorData.prices
+                                                            : facilityId ===
+                                                              'ps4-reguler'
+                                                            ? ps4RegulerData.prices
+                                                            : facilityId ===
+                                                              'family-vip-room'
+                                                            ? familyVIPRoomData.prices
+                                                            : facilityId ===
+                                                              'lovebirds-vip-room'
+                                                            ? lovebirdsVIPRoomData.prices
+                                                            : facilityId ===
+                                                              'family-open-space'
+                                                            ? familyOpenSpaceData.prices
+                                                            : facilityId ===
+                                                              'squad-open-space'
+                                                            ? squadOpenSpaceData.prices
+                                                            : []
 
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <li
-                                                        key={index}
-                                                        className="font-normal"
-                                                      >
-                                                        {price.day} - IDR{' '}
-                                                        {price.price}
-                                                        /hour
-                                                      </li>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </ul>
-                                        </div>
-                                      </li>
-                                    ))
-                                  })()}
-                                </ul>
-                              </span>
-                              <Link
-                                href={'/reservation'}
-                                className="text-orange font-normal"
-                              >
-                                Reservation Now
-                              </Link>
-                            </span>
-                          </p>
+                                                        return priceData.length >
+                                                          0
+                                                          ? priceData.map(
+                                                              (
+                                                                price,
+                                                                index,
+                                                              ) => (
+                                                                <li
+                                                                  key={index}
+                                                                  className="font-normal"
+                                                                >
+                                                                  <span className=" block break-words">
+                                                                    {price.day}
+                                                                  </span>{' '}
+                                                                  - IDR{' '}
+                                                                  {price.price}
+                                                                  /hour
+                                                                </li>
+                                                              ),
+                                                            )
+                                                          : null
+                                                      })()}
+                                                    </ul>
+                                                  </div>
+                                                </li>
+                                              ),
+                                            )
+                                          })()}
+                                        </ul>
+                                      </span>
+                                      <Link
+                                        href={'/reservation'}
+                                        className="bg-orange text-white px-4 py-2 rounded-lg font-medium shadow-md hover:bg-orange/90 transition text-center mt-4"
+                                      >
+                                        Reservation Now
+                                      </Link>
+                                    </span>
+                                  </p>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                         </div>
                       ))}
                     </div>
