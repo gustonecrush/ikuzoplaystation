@@ -128,7 +128,7 @@ export default function Reservation() {
 
   const [dateClose, setDateClose] = React.useState([])
 
-  const getDateClosed = async (date) => {
+  const getDateClosed = async () => {
     try {
       const response = await axios.get(`${baseUrl}/dates`)
       if (response.status == 200) {
@@ -852,13 +852,31 @@ export default function Reservation() {
                             getTimeSelected(format(date, 'yyyy-MM-dd'))
                           }}
                           disabled={(date) => {
-                            const today = startOfDay(new Date()) // Removes time from today
-                            return dateClose.length !== 0
-                              ? date > addDays(today, 14) ||
-                                  date < today ||
-                                  (date >= new Date(dateClose[0]?.start_date) &&
-                                    date <= new Date(dateClose[0]?.end_date))
-                              : date > addDays(today, 14) || date < today
+                            const today = startOfDay(new Date()) // Normalize today's date
+                            const maxDate = addDays(today, 14) // Max selectable date
+                            const minDate = subDays(today, 1) // Min selectable date
+
+                            // Normalize the input date
+                            const checkDate = startOfDay(date)
+
+                            // Check if the date falls within any closed date range
+                            const isInClosedRange = dateClose.some(
+                              ({ start_date, end_date }) => {
+                                const startDate = startOfDay(
+                                  new Date(start_date),
+                                )
+                                const endDate = startOfDay(new Date(end_date))
+                                return (
+                                  checkDate >= startDate && checkDate <= endDate
+                                ) // Ensure start_date is included
+                              },
+                            )
+
+                            return (
+                              checkDate > maxDate ||
+                              checkDate < minDate ||
+                              isInClosedRange
+                            )
                           }}
                           initialFocus
                         />
