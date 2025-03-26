@@ -435,6 +435,31 @@ export default function Reservation() {
     setFamilyOpenSpaceData(dataFamilySpace.data)
   }
 
+  const [selectedCustomPrices, setSelectedCustomPrices] = React.useState(null)
+  const getPriceDataCustom = (facilityName) => {
+    const facilityId = getFacilityId(facilityName)
+
+    const facilityPriceMap = {
+      'ps5-reguler': ps5RegulerData['custom-prices'],
+      'ikuzo-racing-simulator': ikuzoRacingSimulatorData['custom-prices'],
+      'ps4-reguler': ps4RegulerData['custom-prices'],
+      'family-vip-room': familyVIPRoomData['custom-prices'],
+      'lovebirds-vip-room': lovebirdsVIPRoomData['custom-prices'],
+      'family-open-space': familyOpenSpaceData['custom-prices'],
+      'squad-open-space': squadOpenSpaceData['custom-prices'],
+    }
+
+    console.log('GET PRICE DATA CUSTOM', facilityPriceMap[facilityId] || [])
+    getPriceByDate(facilityPriceMap[facilityId] || [], selectedDate)
+    return facilityPriceMap[facilityId] || []
+  }
+
+  const getPriceByDate = (data, selectedDate) => {
+    const found = data.find((item) => item.date === selectedDate)
+    setSelectedCustomPrices(found ? found.price : null)
+    return found ? found.price : null
+  }
+
   const [privateSpaceData, setPrivateSpaceData] = React.useState(null)
   const [regularSpaceData, setRegularSpaceData] = React.useState(null)
   const [premiumSpaceData, setPremiumSpaceData] = React.useState(null)

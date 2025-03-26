@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import getDocument from '@/firebase/firestore/getData'
 import { getFacilityId, getSpaceCategory } from '@/utils/text'
+import { formatDateIndonesian } from '@/utils/date'
 
 export default function SwiperContainer2() {
   const [facilities, setFacilities] = React.useState([])
@@ -259,6 +260,35 @@ function DrawerInfoFacility({ facility }) {
                     ? priceData.map((price, index) => (
                         <span key={index}>
                           • {price.day} - IDR {price.price}/hour
+                        </span>
+                      ))
+                    : null
+                })()}
+                {(() => {
+                  const facilityId = getFacilityId(facility.name) // Get the facility ID
+                  const priceDataCustom =
+                    facilityId === 'ps5-reguler'
+                      ? ps5RegulerData['custom-prices']
+                      : facilityId === 'ikuzo-racing-simulator'
+                      ? ikuzoRacingSimulatorData['custom-prices']
+                      : facilityId === 'ps4-reguler'
+                      ? ps4RegulerData['custom-prices']
+                      : facilityId === 'family-vip-room'
+                      ? familyVIPRoomData['custom-prices']
+                      : facilityId === 'lovebirds-vip-room'
+                      ? lovebirdsVIPRoomData['custom-prices']
+                      : facilityId === 'family-open-space'
+                      ? familyOpenSpaceData['custom-prices']
+                      : facilityId === 'squad-open-space'
+                      ? squadOpenSpaceData['custom-prices']
+                      : []
+
+                  return priceDataCustom.length > 0
+                    ? priceDataCustom.map((price, index) => (
+                        <span key={index}>
+                          • {price.keterangan},{' '}
+                          {formatDateIndonesian(price.date)}- IDR {price.price}
+                          /hour
                         </span>
                       ))
                     : null

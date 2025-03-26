@@ -18,6 +18,7 @@ import {
   convertToStandardTime,
   extractHour,
   formatDate,
+  formatDateIndonesian,
   formatTimestampIndonesian,
   generateTimeArray,
   generateTimeArrayWithStep,
@@ -131,6 +132,31 @@ export default function Reservation() {
     setPs5RegulerData(dataPs5Reguler.data)
     setIkuzoRacingSimulatorData(dataIkuzoRacingSimulator.data)
     setFamilyOpenSpaceData(dataFamilySpace.data)
+  }
+
+  const [selectedCustomPrices, setSelectedCustomPrices] = React.useState(null)
+  const getPriceDataCustom = (facilityName) => {
+    const facilityId = getFacilityId(facilityName)
+
+    const facilityPriceMap = {
+      'ps5-reguler': ps5RegulerData['custom-prices'],
+      'ikuzo-racing-simulator': ikuzoRacingSimulatorData['custom-prices'],
+      'ps4-reguler': ps4RegulerData['custom-prices'],
+      'family-vip-room': familyVIPRoomData['custom-prices'],
+      'lovebirds-vip-room': lovebirdsVIPRoomData['custom-prices'],
+      'family-open-space': familyOpenSpaceData['custom-prices'],
+      'squad-open-space': squadOpenSpaceData['custom-prices'],
+    }
+
+    console.log('GET PRICE DATA CUSTOM', facilityPriceMap[facilityId] || [])
+    getPriceByDate(facilityPriceMap[facilityId] || [], selectedDate)
+    return facilityPriceMap[facilityId] || []
+  }
+
+  const getPriceByDate = (data, selectedDate) => {
+    const found = data.find((item) => item.date === selectedDate)
+    setSelectedCustomPrices(found ? found.price : null)
+    return found ? found.price : null
   }
 
   async function fetchDataContents() {
@@ -1000,6 +1026,9 @@ export default function Reservation() {
                                                 positions[6].name,
                                                 selectedDate,
                                               )
+                                              getPriceDataCustom(
+                                                positions[6].name,
+                                              )
                                             } else {
                                               setNamaPosisiReservasi(
                                                 positions[0].name,
@@ -1010,6 +1039,9 @@ export default function Reservation() {
                                               getPriceSetForToday(
                                                 positions[0].name,
                                                 selectedDate,
+                                              )
+                                              getPriceDataCustom(
+                                                positions[0].name,
                                               )
                                             }
 
@@ -1079,6 +1111,63 @@ export default function Reservation() {
                                                       <span key={index}>
                                                         • {price.day} - IDR{' '}
                                                         {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                number <= 4
+                                                  ? positions[6].name
+                                                  : positions[0].name,
+                                              ) // Get the facility ID
+                                              const priceDataCustom =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : []
+
+                                              return priceDataCustom.length > 0
+                                                ? priceDataCustom.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.keterangan},{' '}
+                                                        {formatDateIndonesian(
+                                                          price.date,
+                                                        )}
+                                                        - IDR {price.price}
+                                                        /hour
                                                       </span>
                                                     ),
                                                   )
@@ -1503,6 +1592,9 @@ export default function Reservation() {
                                               positions[1].name,
                                               selectedDate,
                                             )
+                                            getPriceDataCustom(
+                                              positions[1].name,
+                                            )
                                           }}
                                           style={{
                                             transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
@@ -1559,6 +1651,61 @@ export default function Reservation() {
                                                       <span key={index}>
                                                         • {price.day} - IDR{' '}
                                                         {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[1].name,
+                                              ) // Get the facility ID
+                                              const priceDataCustom =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : []
+
+                                              return priceDataCustom.length > 0
+                                                ? priceDataCustom.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.keterangan},{' '}
+                                                        {formatDateIndonesian(
+                                                          price.date,
+                                                        )}
+                                                        - IDR {price.price}
+                                                        /hour
                                                       </span>
                                                     ),
                                                   )
@@ -1974,6 +2121,9 @@ export default function Reservation() {
                                               selectedDate,
                                               number,
                                             )
+                                            getPriceDataCustom(
+                                              positions[0].name,
+                                            )
                                           }}
                                           style={{
                                             transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
@@ -2030,6 +2180,61 @@ export default function Reservation() {
                                                       <span key={index}>
                                                         • {price.day} - IDR{' '}
                                                         {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[0].name,
+                                              ) // Get the facility ID
+                                              const priceDataCustom =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : []
+
+                                              return priceDataCustom.length > 0
+                                                ? priceDataCustom.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.keterangan},{' '}
+                                                        {formatDateIndonesian(
+                                                          price.date,
+                                                        )}
+                                                        - IDR {price.price}
+                                                        /hour
                                                       </span>
                                                     ),
                                                   )
@@ -3413,6 +3618,9 @@ export default function Reservation() {
                                               selectedDate,
                                               number,
                                             )
+                                            getPriceDataCustom(
+                                              positions[3].name,
+                                            )
                                           }}
                                           style={{
                                             transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
@@ -3469,6 +3677,61 @@ export default function Reservation() {
                                                       <span key={index}>
                                                         • {price.day} - IDR{' '}
                                                         {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[3].name,
+                                              ) // Get the facility ID
+                                              const priceDataCustom =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : []
+
+                                              return priceDataCustom.length > 0
+                                                ? priceDataCustom.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.keterangan},{' '}
+                                                        {formatDateIndonesian(
+                                                          price.date,
+                                                        )}
+                                                        - IDR {price.price}
+                                                        /hour
                                                       </span>
                                                     ),
                                                   )
@@ -3885,6 +4148,9 @@ export default function Reservation() {
                                               selectedDate,
                                               number,
                                             )
+                                            getPriceDataCustom(
+                                              positions[2].name,
+                                            )
                                           }}
                                           style={{
                                             transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
@@ -3941,6 +4207,61 @@ export default function Reservation() {
                                                       <span key={index}>
                                                         • {price.day} - IDR{' '}
                                                         {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[2].name,
+                                              ) // Get the facility ID
+                                              const priceDataCustom =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : []
+
+                                              return priceDataCustom.length > 0
+                                                ? priceDataCustom.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.keterangan},{' '}
+                                                        {formatDateIndonesian(
+                                                          price.date,
+                                                        )}
+                                                        - IDR {price.price}
+                                                        /hour
                                                       </span>
                                                     ),
                                                   )
@@ -4358,6 +4679,9 @@ export default function Reservation() {
                                               selectedDate,
                                               number,
                                             )
+                                            getPriceDataCustom(
+                                              positions[4].name,
+                                            )
                                           }}
                                           style={{
                                             transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
@@ -4414,6 +4738,61 @@ export default function Reservation() {
                                                       <span key={index}>
                                                         • {price.day} - IDR{' '}
                                                         {price.price}/hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[4].name,
+                                              ) // Get the facility ID
+                                              const priceDataCustom =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : []
+
+                                              return priceDataCustom.length > 0
+                                                ? priceDataCustom.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.keterangan},{' '}
+                                                        {formatDateIndonesian(
+                                                          price.date,
+                                                        )}
+                                                        - IDR {price.price}
+                                                        /hour
                                                       </span>
                                                     ),
                                                   )
@@ -4828,6 +5207,9 @@ export default function Reservation() {
                                               selectedDate,
                                               number,
                                             )
+                                            getPriceDataCustom(
+                                              positions[5].name,
+                                            )
                                           }}
                                           style={{
                                             transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
@@ -4889,9 +5271,63 @@ export default function Reservation() {
                                                   )
                                                 : null
                                             })()}
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                positions[5].name,
+                                              ) // Get the facility ID
+                                              const priceDataCustom =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData[
+                                                      'custom-prices'
+                                                    ]
+                                                  : []
+
+                                              return priceDataCustom.length > 0
+                                                ? priceDataCustom.map(
+                                                    (price, index) => (
+                                                      <span key={index}>
+                                                        • {price.keterangan},{' '}
+                                                        {formatDateIndonesian(
+                                                          price.date,
+                                                        )}
+                                                        - IDR {price.price}
+                                                        /hour
+                                                      </span>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
                                           </DrawerDescription>
-                                        </DrawerHeader>
-                                        flex{' '}
+                                        </DrawerHeader>{' '}
                                         {drawerContent !== 'default' && (
                                           <>
                                             <input
@@ -5376,7 +5812,9 @@ export default function Reservation() {
                             {pricePackageDetermination(
                               posisiReservasi,
                               totalTime,
-                              parseInt(selectedPriceToday),
+                              selectedCustomPrices != null
+                                ? selectedCustomPrices
+                                : parseInt(selectedPriceToday),
                             )}
                           </p>
                         </div>
@@ -5416,7 +5854,9 @@ export default function Reservation() {
                   pricePackageDetermination(
                     posisiReservasi,
                     totalTime,
-                    parseInt(selectedPriceToday),
+                    selectedCustomPrices != null
+                      ? selectedCustomPrices
+                      : parseInt(selectedPriceToday),
                   ) + 4000
                 }
                 productName={`Reservation ${namaPosisiReservasi}`}
