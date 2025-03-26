@@ -12,6 +12,8 @@ import { IoArrowBack } from 'react-icons/io5'
 import getDocument from '@/firebase/firestore/getData'
 import LoaderHome from '@/app/components/LoaderHome'
 import SwiperContainerCatalogs from '@/app/components/SwiperContainerCatalogs'
+import { getFacilityId } from '@/utils/text'
+import { DrawerDescription } from '@/components/ui/drawer'
 
 const Page = () => {
   const [catalogTxt, setCatalogTxt] = useState('')
@@ -20,6 +22,52 @@ const Page = () => {
   const [isEmpty, setIsEmpty] = useState(false)
   const [isLoadingSearch, setIsLoadingSearch] = useState(false)
   const [catalogs, setCatalogs] = useState([])
+
+  const [familyVIPRoomData, setFamilyVIPRoomData] = useState(null)
+  const [lovebirdsVIPRoomData, setLovebirdsVIPRoomData] = useState(null)
+  const [familyOpenSpaceData, setFamilyOpenSpaceData] = useState(null)
+  const [squadOpenSpaceData, setSquadOpenSpaceData] = useState(null)
+  const [ps4RegulerData, setPs4RegulerData] = useState(null)
+  const [ps5RegulerData, setPs5RegulerData] = useState(null)
+  const [ikuzoRacingSimulatorData, setIkuzoRacingSimulatorData] = useState(null)
+
+  async function fetchDataPrices() {
+    const dataFamilyRoom = await getDocument(
+      'facility-setting-prices',
+      'family-vip-room',
+    )
+    const dataLovebirdsRoom = await getDocument(
+      'facility-setting-prices',
+      'lovebirds-vip-room',
+    )
+    const dataFamilySpace = await getDocument(
+      'facility-setting-prices',
+      'family-open-space',
+    )
+    const dataSquadOpenSpace = await getDocument(
+      'facility-setting-prices',
+      'squad-open-space',
+    )
+    const dataPs4Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps4-reguler',
+    )
+    const dataPs5Reguler = await getDocument(
+      'facility-setting-prices',
+      'ps5-reguler',
+    )
+    const dataIkuzoRacingSimulator = await getDocument(
+      'facility-setting-prices',
+      'ikuzo-racing-simulator',
+    )
+    setFamilyVIPRoomData(dataFamilyRoom.data)
+    setLovebirdsVIPRoomData(dataLovebirdsRoom.data)
+    setSquadOpenSpaceData(dataSquadOpenSpace.data)
+    setPs4RegulerData(dataPs4Reguler.data)
+    setPs5RegulerData(dataPs5Reguler.data)
+    setIkuzoRacingSimulatorData(dataIkuzoRacingSimulator.data)
+    setFamilyOpenSpaceData(dataFamilySpace.data)
+  }
 
   const [searchContent, setSearchContent] = useState(null)
 
@@ -87,6 +135,7 @@ const Page = () => {
 
     fetchDataContents()
     getAllDataCatalogs()
+    fetchDataPrices()
 
     window.addEventListener('scroll', handleScroll)
 
@@ -203,7 +252,14 @@ const Page = () => {
 
   return (
     <section className="px-5 py-10">
-      {searchContent != null ? (
+      {searchContent != null &&
+      familyVIPRoomData != null &&
+      familyOpenSpaceData != null &&
+      squadOpenSpaceData != null &&
+      lovebirdsVIPRoomData != null &&
+      ps4RegulerData != null &&
+      ps5RegulerData != null &&
+      ikuzoRacingSimulatorData != null ? (
         <>
           {' '}
           <Link
@@ -250,7 +306,7 @@ const Page = () => {
                 className={`${
                   catalogTxt == ''
                     ? 'h-full overflow-y-auto'
-                    : 'h-[450px] overflow-y-scroll'
+                    : 'h-[750px] overflow-y-scroll'
                 }`}
               >
                 {isLoadingSearch ? (
@@ -282,12 +338,61 @@ const Page = () => {
                                 <ul className="list-decimal pl-6">
                                   {(() => {
                                     const facilities = mapSeatToFacility(
-                                      searchResults[catalog_txt].no_seat,
+                                      searchResults[catalog_txt]?.no_seat,
                                     )
                                     return facilities.map((facility, index) => (
                                       <li key={index}>
-                                        {facility.name} (Price: IDR{' '}
-                                        {facility.price}/hour )
+                                        {facility.name}
+
+                                        <div className="flex flex-col gap-0 mt-0 pt-0">
+                                          <span className="font-semibold">
+                                            Price on:
+                                          </span>
+                                          <ul className="list-disc pl-6">
+                                            {(() => {
+                                              const facilityId = getFacilityId(
+                                                facility.name,
+                                              )
+
+                                              const priceData =
+                                                facilityId === 'ps5-reguler'
+                                                  ? ps5RegulerData.prices
+                                                  : facilityId ===
+                                                    'ikuzo-racing-simulator'
+                                                  ? ikuzoRacingSimulatorData.prices
+                                                  : facilityId === 'ps4-reguler'
+                                                  ? ps4RegulerData.prices
+                                                  : facilityId ===
+                                                    'family-vip-room'
+                                                  ? familyVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'lovebirds-vip-room'
+                                                  ? lovebirdsVIPRoomData.prices
+                                                  : facilityId ===
+                                                    'family-open-space'
+                                                  ? familyOpenSpaceData.prices
+                                                  : facilityId ===
+                                                    'squad-open-space'
+                                                  ? squadOpenSpaceData.prices
+                                                  : []
+
+                                              return priceData.length > 0
+                                                ? priceData.map(
+                                                    (price, index) => (
+                                                      <li
+                                                        key={index}
+                                                        className="font-normal"
+                                                      >
+                                                        {price.day} - IDR{' '}
+                                                        {price.price}
+                                                        /hour
+                                                      </li>
+                                                    ),
+                                                  )
+                                                : null
+                                            })()}
+                                          </ul>
+                                        </div>
                                       </li>
                                     ))
                                   })()}
