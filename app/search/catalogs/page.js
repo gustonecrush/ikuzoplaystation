@@ -11,6 +11,7 @@ import { HashLoader } from 'react-spinners'
 import { IoArrowBack } from 'react-icons/io5'
 import getDocument from '@/firebase/firestore/getData'
 import LoaderHome from '@/app/components/LoaderHome'
+import SwiperContainerCatalogs from '@/app/components/SwiperContainerCatalogs'
 
 const Page = () => {
   const [catalogTxt, setCatalogTxt] = useState('')
@@ -18,6 +19,7 @@ const Page = () => {
   const [scrolled, setScrolled] = useState(false)
   const [isEmpty, setIsEmpty] = useState(false)
   const [isLoadingSearch, setIsLoadingSearch] = useState(false)
+  const [catalogs, setCatalogs] = useState([])
 
   const [searchContent, setSearchContent] = useState(null)
 
@@ -25,6 +27,32 @@ const Page = () => {
     const dataContentSearch = await getDocument('search-id', 'search-id-doc')
     setSearchContent(dataContentSearch.data)
   }
+
+  const getAllDataCatalogs = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/catalogs`,
+      )
+
+      setCatalogs(response.data)
+      console.log(response)
+    } catch (error) {
+      console.error({ error })
+      if (error.code == 'ERR_NETWORK') {
+        Toast.fire({
+          icon: 'error',
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
+        })
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: `Internal server sedang error, coba lagi nanti!`,
+        })
+      }
+    }
+  }
+
+  console.log({ catalogs })
 
   const handleSearch = async () => {
     if (catalogTxt) {
@@ -58,6 +86,7 @@ const Page = () => {
     }
 
     fetchDataContents()
+    getAllDataCatalogs()
 
     window.addEventListener('scroll', handleScroll)
 
@@ -217,71 +246,85 @@ const Page = () => {
               )}
 
               {/* Display Results */}
-              <div className="h-[450px] overflow-y-scroll">
+              <div
+                className={`${
+                  catalogTxt == ''
+                    ? 'h-full overflow-y-auto'
+                    : 'h-[450px] overflow-y-scroll'
+                }`}
+              >
                 {isLoadingSearch ? (
                   <div className="flex items-center justify-center p-10 pt-20">
                     <HashLoader color="#FF6200" />
                   </div>
-                ) : searchResults != null &&
+                ) : catalogTxt != '' ? (
+                  searchResults != null &&
                   Object.keys(searchResults).length > 0 &&
                   !isEmpty ? (
-                  <div className="mt-4">
-                    {Object.keys(searchResults).map((catalog_txt, index) => (
-                      <div
-                        key={index}
-                        className="border-b border-b-gray-400 py-5"
-                      >
-                        <h3 className="text-xl font-bold">{catalog_txt}</h3>
-                        <img
-                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${searchResults[catalog_txt].catalog_img}`}
-                          alt={catalog_txt}
-                          className="w-[150px] object-cover mb-2"
-                        />
+                    <div className="mt-4">
+                      {Object.keys(searchResults).map((catalog_txt, index) => (
+                        <div
+                          key={index}
+                          className="border-b border-b-gray-400 py-5"
+                        >
+                          <h3 className="text-xl font-bold">{catalog_txt}</h3>
+                          <img
+                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${searchResults[catalog_txt].catalog_img}`}
+                            alt={catalog_txt}
+                            className="w-[150px] object-cover mb-2"
+                          />
 
-                        <p className="text-gray-600">
-                          Available on:{' '}
-                          <span className="font-semibold flex flex-col">
-                            <span>
-                              {' '}
-                              {(() => {
-                                const facilities = mapSeatToFacility(
-                                  searchResults[catalog_txt].no_seat,
-                                )
-                                return facilities.length > 1
-                                  ? facilities
-                                      .map(
-                                        (facility) =>
-                                          `${facility.name} (Capacity: ${facility.capacity}, Price: IDR ${facility.price})`,
-                                      )
-                                      .join(' and ')
-                                  : `${facilities[0].name} (Capacity: ${facilities[0].capacity}, Price: IDR ${facilities[0].price})`
-                              })()}
+                          <p className="text-gray-600">
+                            Available on:{' '}
+                            <span className="font-semibold flex flex-col">
+                              <span>
+                                {' '}
+                                <ul className="list-decimal pl-6">
+                                  {(() => {
+                                    const facilities = mapSeatToFacility(
+                                      searchResults[catalog_txt].no_seat,
+                                    )
+                                    return facilities.map((facility, index) => (
+                                      <li key={index}>
+                                        {facility.name} (Price: IDR{' '}
+                                        {facility.price}/hour )
+                                      </li>
+                                    ))
+                                  })()}
+                                </ul>
+                              </span>
+                              <Link
+                                href={'/reservation'}
+                                className="text-orange font-normal"
+                              >
+                                Reservation Now
+                              </Link>
                             </span>
-                            <Link
-                              href={'/reservation'}
-                              className="text-orange font-normal"
-                            >
-                              Reservation Now
-                            </Link>
-                          </span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="w-full mt-20 mb-8  flex items-center justify-center">
+                      <div className="flex flex-col gap-1 w-full items-center justify-center">
+                        <Image
+                          src={'/error.png'}
+                          width={0}
+                          height={0}
+                          className="w-[150px]"
+                          alt={'No content available'}
+                        />
+                        <p className="text-base font-normal text-gray-400">
+                          There is no any contents right now ikuzo!
                         </p>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="w-full mt-20 mb-8  flex items-center justify-center">
-                    <div className="flex flex-col gap-1 w-full items-center justify-center">
-                      <Image
-                        src={'/error.png'}
-                        width={0}
-                        height={0}
-                        className="w-[150px]"
-                        alt={'No content available'}
-                      />
-                      <p className="text-base font-normal text-gray-400">
-                        There is no any contents right now ikuzo!
-                      </p>
                     </div>
+                  )
+                ) : catalogs?.length > 0 ? (
+                  <SwiperContainerCatalogs games={catalogs} />
+                ) : (
+                  <div className="flex items-center justify-center p-10 pt-20">
+                    <HashLoader color="#FF6200" />
                   </div>
                 )}
               </div>
