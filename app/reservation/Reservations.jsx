@@ -1047,9 +1047,7 @@ export default function Reservation() {
                                               setNamaPosisiReservasi(
                                                 positions[6].name,
                                               )
-                                              setPricePerReserve(
-                                                positions[6].price,
-                                              )
+
                                               getPriceSetForToday(
                                                 positions[6].name,
                                                 selectedDate,
@@ -1061,9 +1059,7 @@ export default function Reservation() {
                                               setNamaPosisiReservasi(
                                                 positions[0].name,
                                               )
-                                              setPricePerReserve(
-                                                positions[0].price,
-                                              )
+
                                               getPriceSetForToday(
                                                 positions[0].name,
                                                 selectedDate,
@@ -1609,9 +1605,7 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[1].name,
                                             )
-                                            setPricePerReserve(
-                                              positions[1].price,
-                                            )
+
                                             fetchingAvailableReservation(
                                               selectedDate,
                                               number,
@@ -2138,9 +2132,7 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[0].name,
                                             )
-                                            setPricePerReserve(
-                                              positions[0].price,
-                                            )
+
                                             getPriceSetForToday(
                                               positions[0].name,
                                               selectedDate,
@@ -3635,9 +3627,7 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[3].name,
                                             )
-                                            setPricePerReserve(
-                                              positions[3].price,
-                                            )
+
                                             getPriceSetForToday(
                                               positions[3].name,
                                               selectedDate,
@@ -4165,9 +4155,7 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[2].name,
                                             )
-                                            setPricePerReserve(
-                                              positions[2].price,
-                                            )
+
                                             getPriceSetForToday(
                                               positions[2].name,
                                               selectedDate,
@@ -4696,9 +4684,7 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[4].name,
                                             )
-                                            setPricePerReserve(
-                                              positions[4].price,
-                                            )
+
                                             getPriceSetForToday(
                                               positions[4].name,
                                               selectedDate,
@@ -5224,9 +5210,7 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[5].name,
                                             )
-                                            setPricePerReserve(
-                                              positions[5].price,
-                                            )
+
                                             getPriceSetForToday(
                                               positions[5].name,
                                               selectedDate,
