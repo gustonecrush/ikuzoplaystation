@@ -1060,7 +1060,9 @@ export default function Reservation() {
                                               setNamaPosisiReservasi(
                                                 positions[6].name,
                                               )
-
+                                              setPricePerReserve(
+                                                positions[6].price,
+                                              )
                                               getPriceSetForToday(
                                                 positions[6].name,
                                                 selectedDate,
@@ -1072,7 +1074,9 @@ export default function Reservation() {
                                               setNamaPosisiReservasi(
                                                 positions[0].name,
                                               )
-
+                                              setPricePerReserve(
+                                                positions[0].price,
+                                              )
                                               getPriceSetForToday(
                                                 positions[0].name,
                                                 selectedDate,
@@ -1103,6 +1107,11 @@ export default function Reservation() {
                                               : positions[0].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
+                                            IDR{' '}
+                                            {number <= 4
+                                              ? positions[6].price
+                                              : positions[0].price}
+                                            /hour and can only accomodate{' '}
                                             {number <= 4
                                               ? positions[6].capacity
                                               : positions[0].capacity}{' '}
@@ -1438,7 +1447,9 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[1].name,
                                             )
-
+                                            setPricePerReserve(
+                                              positions[1].price,
+                                            )
                                             getPriceSetForToday(
                                               positions[1].name,
                                               selectedDate,
@@ -1466,7 +1477,8 @@ export default function Reservation() {
                                             {positions[1].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            Can only accomodate{' '}
+                                            IDR {positions[1].price}/hour and
+                                            can only accomodate{' '}
                                             {positions[1].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
@@ -1791,7 +1803,9 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[0].name,
                                             )
-
+                                            setPricePerReserve(
+                                              positions[0].price,
+                                            )
                                             getPriceSetForToday(
                                               positions[0].name,
                                               selectedDate,
@@ -1819,7 +1833,8 @@ export default function Reservation() {
                                             {positions[0].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            Can only accomodate{' '}
+                                            IDR {positions[0].price}/hour and
+                                            can only accomodate{' '}
                                             {positions[0].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
@@ -2897,7 +2912,9 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[3].name,
                                             )
-
+                                            setPricePerReserve(
+                                              positions[3].price,
+                                            )
                                             getPriceSetForToday(
                                               positions[3].name,
                                               selectedDate,
@@ -2925,7 +2942,8 @@ export default function Reservation() {
                                             {positions[3].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            Can only accommodate{' '}
+                                            IDR {positions[3].price}/hour and
+                                            can only accommodate{' '}
                                             {positions[3].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
@@ -3247,7 +3265,9 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[2].name,
                                             )
-
+                                            setPricePerReserve(
+                                              positions[2].price,
+                                            )
                                             getPriceSetForToday(
                                               positions[2].name,
                                               selectedDate,
@@ -3275,7 +3295,8 @@ export default function Reservation() {
                                             {positions[2].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            Can only accomodate{' '}
+                                            IDR {positions[2].price}/hour and
+                                            can only accomodate{' '}
                                             {positions[2].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
@@ -3599,7 +3620,9 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[4].name,
                                             )
-
+                                            setPricePerReserve(
+                                              positions[4].price,
+                                            )
                                             getPriceSetForToday(
                                               positions[4].name,
                                               selectedDate,
@@ -3627,7 +3650,8 @@ export default function Reservation() {
                                             {positions[4].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            Can only accomodate{' '}
+                                            IDR {positions[4].price}/hour and
+                                            can only accomodate{' '}
                                             {positions[4].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
@@ -3955,7 +3979,9 @@ export default function Reservation() {
                                             setNamaPosisiReservasi(
                                               positions[5].name,
                                             )
-
+                                            setPricePerReserve(
+                                              positions[5].price,
+                                            )
                                             getPriceSetForToday(
                                               positions[5].name,
                                               selectedDate,
@@ -3983,7 +4009,8 @@ export default function Reservation() {
                                             {positions[5].name}
                                           </DrawerTitle>
                                           <DrawerDescription>
-                                            Can only accommodate{' '}
+                                            IDR {positions[5].price}/hour and
+                                            can only accommodate{' '}
                                             {positions[5].capacity} person
                                             (position {number}).
                                           </DrawerDescription>
