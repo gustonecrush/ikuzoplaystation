@@ -4582,9 +4582,9 @@ export default function Reservation() {
                 Pastikan customer telah membayar kepada kasir dengan nominal
                 sebesar{' '}
                 <span className="font-bold text-orange text-lg">{`IDR ${
-                  totalTime * selectedCustomPrices != null
-                    ? selectedCustomPrices
-                    : parseInt(selectedPriceToday)
+                  selectedCustomPrices != null
+                    ? totalTime * selectedCustomPrices
+                    : totalTime * parseInt(selectedPriceToday)
                 }`}</span>{' '}
                 untuk waktu{' '}
                 <span className=" font-semibold">
