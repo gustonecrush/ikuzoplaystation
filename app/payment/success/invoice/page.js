@@ -9,7 +9,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import axios from 'axios'
 import { useEffect } from 'react'
-import { formatDateOnTheUI } from '@/utils/date'
+import { calculateTimeDifference, formatDateOnTheUI } from '@/utils/date'
 import Cookies from 'js-cookie'
 import LoaderHome from '@/app/components/LoaderHome'
 
@@ -222,10 +222,16 @@ const Invoice = () => {
                               {data.location} in Position {data.position}
                             </div>
                             <div className="mt-0.5 text-slate-500 sm:hidden">
-                              12 Hours
+                              {calculateTimeDifference(
+                                data.reserve_start_time,
+                                data.reserve_end_time,
+                              )}
+                              Hours
                             </div>
                             <div className="mt-0.5 text-slate-500 sm:hidden">
-                              08/02/2024 - 10.00 : 17.00 WIB
+                              {data.reserve_date} - {data.reserve_start_time} :{' '}
+                              {data.reserve_end_time}
+                              WIB
                             </div>
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-right text-slate-500 sm:table-cell">
