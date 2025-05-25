@@ -229,7 +229,8 @@ const Invoice = () => {
                               Hours
                             </div>
                             <div className="mt-0.5 text-slate-500 sm:hidden">
-                              {data.reserve_date} - {data.reserve_start_time} :{' '}
+                              {formatDateOnTheUI(data.reserve_date)} -{' '}
+                              {data.reserve_start_time} :{' '}
                               {data.reserve_end_time}
                               WIB
                             </div>
