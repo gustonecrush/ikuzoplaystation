@@ -335,9 +335,9 @@ export default function Reservation() {
         reserve_end_time: endTimeReservasi,
         status_reserve: 'settlement',
         price:
-          discountPrice != ''
-            ? discountPrice
-            : (totalTime * pricePerReserve).toString(),
+          selectedCustomPrices != null
+            ? totalTime * selectedCustomPrices
+            : totalTime * parseInt(selectedPriceToday),
         position: posisiReservasi,
       }
 
