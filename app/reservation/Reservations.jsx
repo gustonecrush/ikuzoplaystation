@@ -75,7 +75,7 @@ export default function Reservation() {
   const [nomorWhatsappReservasi, setNoWhatsappReservasi] = React.useState('')
   const [startTimeReservasi, setStartTimeReservasi] = React.useState('')
   const [endTimeReservasi, setEndTimeReservasi] = React.useState('')
-  const [totalTime, setTotalTime] = React.useState(null)
+  const [totalTime, setTotalTime] = React.useState(0)
   const [currentDate, setCurrentDate] = React.useState(getCurrentDate)
   const [maxDate, setMaxDate] = React.useState(getMaxDate)
   const [currentTime, setCurrentTime] = React.useState(getCurrentTime)
@@ -137,6 +137,8 @@ export default function Reservation() {
   const [selectedCustomPrices, setSelectedCustomPrices] = React.useState(null)
   const getPriceDataCustom = (facilityName) => {
     const facilityId = getFacilityId(facilityName)
+    console.error('FASILITAS NAME', facilityName)
+    console.error('FASILITAS ID', facilityId)
 
     const facilityPriceMap = {
       'ps5-reguler': ps5RegulerData['custom-prices'],
@@ -155,6 +157,7 @@ export default function Reservation() {
 
   const getPriceByDate = (data, selectedDate) => {
     const found = data.find((item) => item.date === selectedDate)
+    console.log('FOUND', found)
     setSelectedCustomPrices(found ? found.price : null)
     return found ? found.price : null
   }
@@ -500,7 +503,10 @@ export default function Reservation() {
 
   const getPriceSetForToday = (value, selectedDate) => {
     const today = getIndonesianDay(selectedDate)
+    console.log('TODAY', value)
+
     const valueConverted = getFacilityId(value)
+    console.log('TODAY', valueConverted)
     const prices =
       valueConverted === 'ps5-reguler'
         ? ps5RegulerData.prices
@@ -578,6 +584,7 @@ export default function Reservation() {
       startTimeReservasi,
       endTimeReservasi,
     )
+    console.log('GAP TIME', getTimeDIfferent)
     getDateClosed()
     setTotalTime(getTimeDIfferent)
 
@@ -688,6 +695,22 @@ export default function Reservation() {
     bookedSlots,
     timeSet != null ? extractHour(timeSet['end-time']) : 23,
   )
+
+  const fallbackPrice = parseInt(selectedPriceToday)
+  console.log({ fallbackPrice })
+  const actualPrice = fallbackPrice
+  console.log({ actualPrice })
+  console.log({ selectedCustomPrices })
+
+  const finalPrice = pricePackageDetermination(
+    posisiReservasi,
+    totalTime,
+    actualPrice,
+  )
+  console.log({ finalPrice })
+
+  // fallback if any part returns NaN
+  const safePrice = isNaN(finalPrice) ? 0 : finalPrice + 4000
 
   return (
     <>
@@ -5878,15 +5901,7 @@ export default function Reservation() {
             <div className="flex flex-col gap-1 w-full mt-5">
               <Checkout
                 id={idReservasi}
-                price={
-                  pricePackageDetermination(
-                    posisiReservasi,
-                    totalTime,
-                    selectedCustomPrices != null
-                      ? selectedCustomPrices
-                      : parseInt(selectedPriceToday),
-                  ) + 4000
-                }
+                price={safePrice}
                 productName={`Reservation ${namaPosisiReservasi}`}
                 detailCustomer={{
                   name: namaReservasi,

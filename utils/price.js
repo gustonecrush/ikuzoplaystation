@@ -1,6 +1,8 @@
 import { getFacilityId } from './text'
 
 export const pricePackageDetermination = (position, totalTime, price) => {
+  console.log('TOTAL TIME', totalTime)
+  console.log('PRICE TIME', price)
   return totalTime * price
 }
 

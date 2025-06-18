@@ -730,6 +730,22 @@ export default function Reservation() {
     timeSet != null ? extractHour(timeSet['end-time']) : 23,
   )
 
+  const fallbackPrice = parseInt(selectedPriceToday)
+  console.log({ fallbackPrice })
+  const actualPrice =
+    selectedCustomPrices != null ? selectedCustomPrices : fallbackPrice
+  console.log({ actualPrice })
+
+  const finalPrice = pricePackageDetermination(
+    posisiReservasi,
+    totalTime,
+    actualPrice,
+  )
+  console.log({ finalPrice })
+
+  // fallback if any part returns NaN
+  const safePrice = isNaN(finalPrice) ? 0 : finalPrice + 4000
+
   return (
     <>
       {regularSpaceData == null ||
@@ -4516,15 +4532,7 @@ export default function Reservation() {
               {selectedPay == 'non-cash' && (
                 <Checkout
                   id={idReservasi}
-                  price={
-                    pricePackageDetermination(
-                      posisiReservasi,
-                      totalTime,
-                      selectedCustomPrices != null
-                        ? selectedCustomPrices
-                        : parseInt(selectedPriceToday),
-                    ) + 4000
-                  }
+                  price={safePrice}
                   productName={`Reservation ${namaPosisiReservasi}`}
                   detailCustomer={{
                     name: namaReservasi,
