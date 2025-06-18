@@ -732,8 +732,7 @@ export default function Reservation() {
 
   const fallbackPrice = parseInt(selectedPriceToday)
   console.log({ fallbackPrice })
-  const actualPrice =
-    selectedCustomPrices != null ? selectedCustomPrices : fallbackPrice
+  const actualPrice = fallbackPrice
   console.log({ actualPrice })
 
   const finalPrice = pricePackageDetermination(
