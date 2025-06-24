@@ -549,9 +549,11 @@ export default function Reservation() {
 
     foundPrice.length === 1
       ? setSelectedPriceToday(foundPrice[0]['price'])
-      : setSelectedPriceToday('')
+      : setSelectedPriceToday(foundPrice[0]['price'])
 
-    return foundPrice.length === 1 ? foundPrice[0]['price'] : ''
+    return foundPrice.length === 1
+      ? foundPrice[0]['price']
+      : foundPrice[0]['price']
   }
 
   const getTimeSetForTodayAgain = (value, selectedDate) => {

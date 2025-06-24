@@ -503,10 +503,7 @@ export default function Reservation() {
 
   const getPriceSetForToday = (value, selectedDate) => {
     const today = getIndonesianDay(selectedDate)
-    console.log('TODAY', value)
-
     const valueConverted = getFacilityId(value)
-    console.log('TODAY', valueConverted)
     const prices =
       valueConverted === 'ps5-reguler'
         ? ps5RegulerData.prices
@@ -535,9 +532,11 @@ export default function Reservation() {
 
     foundPrice.length === 1
       ? setSelectedPriceToday(foundPrice[0]['price'])
-      : setSelectedPriceToday('')
+      : setSelectedPriceToday(foundPrice[0]['price'])
 
-    return foundPrice.length === 1 ? foundPrice[0]['price'] : ''
+    return foundPrice.length === 1
+      ? foundPrice[0]['price']
+      : foundPrice[0]['price']
   }
 
   console.log({ getPriceSetForToday })
