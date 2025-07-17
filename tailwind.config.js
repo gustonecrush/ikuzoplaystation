@@ -20,6 +20,7 @@ module.exports = {
       fontFamily: {
         montserrat: ['var(--font-montserrat)', 'sans-serif'],
         plusSansJakarta: ['var(--font-plusSansJakarta)', 'sans-serif'],
+        dynaPuff: ['var(--font-dynaPuff)', 'sans-serif'],
       },
       colors: {
         orange: '#FF6200',
