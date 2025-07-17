@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Marquee from 'react-fast-marquee'
 import Link from 'next/link'
 import getDocument from '@/firebase/firestore/getData'
+import { cn } from '@/lib/utils'
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
@@ -73,22 +74,34 @@ const Navbar = () => {
               />
             </Link>
 
-            <Link
-              href={'/search/catalogs'}
-              className="flex justify-between items-center px-3 relative md:w-fit w-full border border-orange rounded-full py-2"
-            >
-              <span
-                className={`${
-                  scrolled ? 'text-orange' : 'text-gray-300'
-                } text-sm`}
+            <div className="flex items-center gap-3 w-fit">
+              <Link
+                href="/search/catalogs"
+                className="flex justify-between items-center px-3 relative md:w-fit w-full border border-orange rounded-full py-2"
               >
-                {searchContent['search-btn-txt']}
-              </span>
-              <span>
-                {' '}
-                <FiSearch className="text-orange text-2xl cursor-pointer" />
-              </span>
-            </Link>
+                <span
+                  className={`${
+                    scrolled ? 'text-orange' : 'text-gray-300'
+                  } text-sm`}
+                >
+                  {searchContent['search-btn-txt']}
+                </span>
+                <span>
+                  <FiSearch className="text-orange text-2xl cursor-pointer" />
+                </span>
+              </Link>
+
+              {/* <Link
+                href="/membership"
+                className={cn(
+                  'inline-flex items-center justify-center rounded-md text-sm text-center font-medium',
+                  'bg-orange hover:bg-orange',
+                  'h-10 px-4 py-2 transition-colors rounded-full text-white',
+                )}
+              >
+                Access Membership
+              </Link> */}
+            </div>
           </div>
         </nav>
       )}

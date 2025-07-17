@@ -13,6 +13,7 @@ import Hero from './Hero'
 import axios from 'axios'
 import LoaderHome from './LoaderHome'
 import getDocument from '@/firebase/firestore/getData'
+import { IoPersonCircleOutline } from 'react-icons/io5'
 
 export default function Home() {
   const [sectionsUpdate, setSectionsUpdate] = React.useState([])
@@ -112,12 +113,22 @@ export default function Home() {
 
 function CTAButton() {
   return (
-    <Link
-      href={'/reservation'}
-      className="fixed bottom-5 right-5 z-[100] h-16 w-16 bg-orange rounded-full p-4 flex items-center justify-center"
-    >
-      <IoLogoGameControllerB className="text-white text-4xl w-10 " />
-    </Link>
+    <div className="flex gap-2 flex-col fixed bottom-5 right-5 z-[100]">
+      <Link
+        href={'/reservation'}
+        title={'Lakukan Reservasi'}
+        className=" h-16 w-16 bg-orange rounded-full p-4 flex items-center justify-center"
+      >
+        <IoLogoGameControllerB className="text-white text-4xl w-10 " />
+      </Link>
+      <Link
+        href="/membership"
+        title={'Join Membership'}
+        className=" h-16 w-16 bg-orange text-primary-foreground rounded-full p-4 flex items-center justify-center shadow-lg hover:bg-orange transition-colors"
+      >
+        <IoPersonCircleOutline className="text-white text-4xl w-10" />
+      </Link>
+    </div>
   )
 }
 
