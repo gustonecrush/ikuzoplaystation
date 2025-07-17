@@ -27,11 +27,7 @@ export default function LoginPage() {
     formData.append('password', form.password)
 
     try {
-      const res = await axios.post(`${base_url}/api/customer/login`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      const res = await axios.post(`${base_url}/api/customer/login`, formData)
 
       Toast.fire({
         icon: 'success',
@@ -49,7 +45,7 @@ export default function LoginPage() {
       const msg =
         err?.response?.data?.message ||
         'Gagal login. Periksa kembali akun Anda.'
-
+      console.log({ err })
       Toast.fire({
         icon: 'error',
         title: 'Oopsss!',
@@ -73,31 +69,33 @@ export default function LoginPage() {
           Masuk Member IKUZO
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6 text-white">
+        <form onSubmit={handleSubmit} className="space-y-6 text-orange">
           {/* Username */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Username
             </label>
             <input
               type="text"
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange"
               required
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Password
             </label>
             <div className="relative w-full">
               <input
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
-                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white"
+                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange"
                 required
               />
               <button

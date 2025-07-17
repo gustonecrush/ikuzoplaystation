@@ -5,6 +5,7 @@ import axios from 'axios'
 import { apiBaseUrl } from '@/utils/urls'
 import Toast from '@/app/components/Toast'
 import { useRouter } from 'next/navigation'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function JoinMembershipPage() {
   const [form, setForm] = useState({
@@ -54,11 +55,11 @@ export default function JoinMembershipPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const err = validatePassword(form.password)
-    if (err) {
-      setPasswordError(err)
-      return
-    }
+    // const err = validatePassword(form.password)
+    // if (err) {
+    //   setPasswordError(err)
+    //   return
+    // }
 
     setSubmitting(true)
 
@@ -115,6 +116,11 @@ export default function JoinMembershipPage() {
     }
   }
 
+  const [showPassword, setShowPassword] = useState(false)
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev)
+  }
+
   return (
     <section className="min-h-screen px-6 py-12 max-w-xl mx-auto font-plusSansJakarta flex items-center justify-center bg-gradient-to-br from-[rgb(246,205,164)] via-[#f7a54e] to-[#ff6a00]0">
       <div className="w-full rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg p-8">
@@ -124,11 +130,11 @@ export default function JoinMembershipPage() {
         </h1>
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 text-white placeholder:text-gray-400"
+          className="space-y-6 text-orange placeholder:text-gray-400"
         >
           {/* Phone Number */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Nomor Telepon
             </label>
             <input
@@ -143,14 +149,14 @@ export default function JoinMembershipPage() {
                   ...(sameAsPhone ? { whatsapp_number: val } : {}),
                 }))
               }}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white placeholder:text-gray-400"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange placeholder:text-gray-400"
               placeholder="628xxxxxxxxxx"
             />
           </div>
 
           {/* WhatsApp Number */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Nomor WhatsApp
             </label>
             <input
@@ -162,7 +168,7 @@ export default function JoinMembershipPage() {
                   whatsapp_number: e.target.value.replace(/\D/g, ''),
                 })
               }
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white placeholder:text-gray-400"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange placeholder:text-gray-400"
               placeholder="628xxxxxxxxxx"
               disabled={sameAsPhone}
             />
@@ -187,49 +193,49 @@ export default function JoinMembershipPage() {
 
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Nama Lengkap
             </label>
             <input
               type="text"
               value={form.full_name}
               onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-gray-400 placeholder-white/70"
             />
           </div>
 
           {/* Username */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Username
             </label>
             <input
               type="text"
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-gray-400 placeholder-white/70"
             />
           </div>
 
           {/* Birth Date */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Tanggal Lahir
             </label>
             <input
               type="date"
               value={form.birth_date}
               onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-gray-400 placeholder-white/70"
             />
           </div>
 
           {/* Awareness Source */}
           <div>
-            <label className="block text-sm font-medium mb-2 text-orange">
+            <label className="block text-sm font-semibold mb-2 text-orange">
               Dari mana kamu tahu IKUZO?
             </label>
-            <div className="flex flex-wrap gap-3 text-white placeholder:text-gray-400/90">
+            <div className="flex flex-wrap gap-3 text-orange placeholder:text-gray-400/90">
               {awarenessOptions.map((opt) => (
                 <label key={opt} className="flex items-center gap-2 text-sm">
                   <input
@@ -250,28 +256,38 @@ export default function JoinMembershipPage() {
                   setForm({ ...form, other_awareness: e.target.value })
                 }
                 placeholder="Tulis sumber lainnya di sini..."
-                className="mt-4 w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
+                className="mt-4 w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-neutral-100 placeholder-white/70"
               />
             )}
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-orange">
+            <label className="block text-sm font-semibold mb-1 text-orange">
               Password
             </label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => {
-                setForm({ ...form, password: e.target.value })
-                setPasswordError(validatePassword(e.target.value))
-              }}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
-            />
-            {passwordError && (
-              <p className="text-red-600 text-sm mt-1">{passwordError}</p>
-            )}
+            <div className="relative w-full">
+              <input
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange"
+                required
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Submit */}
