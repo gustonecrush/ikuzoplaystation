@@ -8,12 +8,13 @@ function MembershipPage() {
   const isMember = false
 
   return (
-    <section className="min-h-screen font-plusSansJakarta bg-gradient-to-br from-[rgb(246,205,164)] via-[#f9a143] to-[#ff6a00] text-[#111827] px-6 py-14">
+    <section className="min-h-screen font-plusSansJakarta bg-gradient-to-br from-[rgb(246,205,164)] via-[#f7a54e] to-[#ff6a00] text-[#111827] px-6 py-14">
       <div className="max-w-4xl mx-auto space-y-1 text-center">
         <div className="p-[2px] rounded-2xl  shadow-lg hover:shadow-2xl transition hover:scale-[1.02] ">
           <div className="flex flex-col p-6 mx-auto max-w-screen-xl text-center text-gray-900 rounded-[14px] bg-white/10 backdrop-blur-md dark:text-white">
-            <h1 className="text-5xl  font-extrabold text-orange drop-shadow-sm animate-fade-in font-dynaPuff">
-              🚀 IKUZO Membership
+            <h1 className="text-5xl  font-extrabold text-orange drop-shadow-sm animate-fade-in ">
+              🚀 <br />
+              IKUZO MEMBERSHIP
             </h1>
             <p className="text-base text-neutral-100 max-w-xl mx-auto animate-fade-in delay-100 mt-4">
               Pilih paket terbaik dan nikmati berbagai keuntungan saat bermain
