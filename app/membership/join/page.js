@@ -122,7 +122,10 @@ export default function JoinMembershipPage() {
           🚀 <br />
           JOIN IKUZO MEMBERSHIP
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-6 text-white">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 text-white placeholder:text-gray-400"
+        >
           {/* Phone Number */}
           <div>
             <label className="block text-sm font-medium mb-1 text-orange">
@@ -140,7 +143,7 @@ export default function JoinMembershipPage() {
                   ...(sameAsPhone ? { whatsapp_number: val } : {}),
                 }))
               }}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white placeholder:text-gray-400"
               placeholder="628xxxxxxxxxx"
             />
           </div>
@@ -159,7 +162,7 @@ export default function JoinMembershipPage() {
                   whatsapp_number: e.target.value.replace(/\D/g, ''),
                 })
               }
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white placeholder:text-gray-400"
               placeholder="628xxxxxxxxxx"
               disabled={sameAsPhone}
             />
@@ -191,7 +194,7 @@ export default function JoinMembershipPage() {
               type="text"
               value={form.full_name}
               onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
             />
           </div>
 
@@ -204,7 +207,7 @@ export default function JoinMembershipPage() {
               type="text"
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
             />
           </div>
 
@@ -217,7 +220,7 @@ export default function JoinMembershipPage() {
               type="date"
               value={form.birth_date}
               onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
             />
           </div>
 
@@ -226,7 +229,7 @@ export default function JoinMembershipPage() {
             <label className="block text-sm font-medium mb-2 text-orange">
               Dari mana kamu tahu IKUZO?
             </label>
-            <div className="flex flex-wrap gap-3 text-white/90">
+            <div className="flex flex-wrap gap-3 text-white placeholder:text-gray-400/90">
               {awarenessOptions.map((opt) => (
                 <label key={opt} className="flex items-center gap-2 text-sm">
                   <input
@@ -247,7 +250,7 @@ export default function JoinMembershipPage() {
                   setForm({ ...form, other_awareness: e.target.value })
                 }
                 placeholder="Tulis sumber lainnya di sini..."
-                className="mt-4 w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+                className="mt-4 w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
               />
             )}
           </div>
@@ -264,7 +267,7 @@ export default function JoinMembershipPage() {
                 setForm({ ...form, password: e.target.value })
                 setPasswordError(validatePassword(e.target.value))
               }}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder:text-gray-400 placeholder-white/70"
             />
             {passwordError && (
               <p className="text-red-600 text-sm mt-1">{passwordError}</p>
@@ -276,7 +279,7 @@ export default function JoinMembershipPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 justify-center px-7 py-3 rounded-full bg-orange hover:bg-orange text-white font-semibold text-lg shadow-md transition-transform hover:scale-105 w-full"
+              className="inline-flex items-center gap-2 justify-center px-7 py-3 rounded-full bg-orange hover:bg-orange text-white placeholder:text-gray-400 font-semibold text-lg shadow-md transition-transform hover:scale-105 w-full"
             >
               {submitting ? 'Mendaftar...' : 'Join Sekarang'}
             </button>
