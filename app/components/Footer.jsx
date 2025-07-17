@@ -33,7 +33,7 @@ export const Footer = () => {
   console.log({ footerContent })
 
   return (
-    <div className="px-4 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 pt-8 bg-orange rounded-t-xl">
+    <div className="px-4 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 pt-8 bg-orange rounded-t-xl mb-16">
       {footerContent == null ? (
         <></>
       ) : (

@@ -112,21 +112,54 @@ export default function Home() {
 }
 
 function CTAButton() {
+  const [scrolled, setScrolled] = React.useState(false)
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <div className="flex gap-2 flex-col fixed bottom-5 right-5 z-[100]">
+    <div
+      className={`fixed left-0 right-0 mx-auto w-full z-[100] flex flex-row justify-center gap-3 px-4 py-3 transition-all duration-300 rounded-tl-2xl rounded-tr-2xl ${
+        scrolled ? 'bottom-0 bg-white shadow-md pt-5 pb-3' : 'bottom-5 '
+      }`}
+    >
       <Link
-        href={'/reservation'}
-        title={'Lakukan Reservasi'}
-        className=" h-16 w-16 bg-orange rounded-full p-4 flex items-center justify-center"
+        href="/reservation"
+        title="Reserve Now"
+        className={`flex items-center gap-3 px-5 py-3 bg-orange-500 hover:bg-orange-600  rounded-full shadow-lg transition-all duration-200 ease-in-out hover:scale-105 group ${
+          scrolled
+            ? 'text-white bg-orange hover:bg-orange'
+            : 'border border-orange  text-orange hover:bg-orange'
+        }`}
       >
-        <IoLogoGameControllerB className="text-white text-4xl w-10 " />
+        <span
+          className={`font-normal ${scrolled ? 'text-white ' : 'text-white'}`}
+        >
+          Reserve Now
+        </span>
+        <IoLogoGameControllerB className="text-2xl group-hover:text-white" />
       </Link>
       <Link
         href="/membership"
-        title={'Join Membership'}
-        className=" h-16 w-16 bg-orange text-primary-foreground rounded-full p-4 flex items-center justify-center shadow-lg hover:bg-orange transition-colors"
+        title="Join Member"
+        className={`flex items-center gap-3 px-5 py-3 bg-orange-500 hover:bg-orange-600  rounded-full shadow-lg transition-all duration-200 ease-in-out hover:scale-105 group ${
+          scrolled
+            ? 'text-white bg-orange hover:bg-orange'
+            : 'border border-orange  text-orange hover:bg-orange '
+        }`}
       >
-        <IoPersonCircleOutline className="text-white text-4xl w-10" />
+        <span
+          className={`font-normal ${scrolled ? 'text-white ' : 'text-white '}`}
+        >
+          Join Member
+        </span>
+        <IoPersonCircleOutline className="text-2xl group-hover:text-white" />
       </Link>
     </div>
   )
