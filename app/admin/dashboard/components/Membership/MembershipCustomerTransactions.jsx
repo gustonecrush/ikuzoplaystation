@@ -52,7 +52,7 @@ import { Badge } from '@/components/ui/badge'
 import { TiTimes } from 'react-icons/ti'
 import MembershipCheck from './MembershipCheck'
 
-function MembershipCustomers() {
+function MembershipCustomerTransactions() {
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
 
@@ -118,7 +118,73 @@ function MembershipCustomers() {
       ),
     },
     {
-      accessorKey: 'full_name',
+      id: 'phone_number', // beri id manual untuk filter
+      accessorFn: (row) => row.customer.phone_number,
+      header: () => (
+        <Button
+          variant="ghost"
+          className="w-[70px] text-center  items-center justify-center gap-2 hidden"
+        >
+          No <Bs123 className="h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="w-full text-center hidden ">
+          {row.original.customer.phone_number}
+        </div>
+      ),
+    },
+    // {
+    //   accessorKey: 'id',
+    //   header: () => (
+    //     <Button
+    //       variant="ghost"
+    //       className="w-[150px] text-center flex items-center justify-center gap-2"
+    //     >
+    //       Action <MdManageAccounts className="h-4 w-4" />
+    //     </Button>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="w-full flex items-center justify-center gap-1">
+    //       <Button
+    //         onClick={() => handleOpenUpdate(row.getValue('id'))}
+    //         variant="outline"
+    //         className="border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs text-yellow-500"
+    //       >
+    //         <FiEdit3 className="h-4 w-4" /> Edit
+    //       </Button>
+    //       <AlertDialog>
+    //         <AlertDialogTrigger asChild>
+    //           <Button
+    //             variant="outline"
+    //             className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs hover:text-white text-red-500"
+    //           >
+    //             <AiOutlineDelete className="h-4 w-4" /> Delete
+    //           </Button>
+    //         </AlertDialogTrigger>
+    //         <AlertDialogContent>
+    //           <AlertDialogHeader>
+    //             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+    //             <AlertDialogDescription>
+    //               This will permanently delete the membership data.
+    //             </AlertDialogDescription>
+    //           </AlertDialogHeader>
+    //           <AlertDialogFooter>
+    //             <AlertDialogCancel>Cancel</AlertDialogCancel>
+    //             <AlertDialogAction
+    //               className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs hover:text-white text-red-500"
+    //               onClick={() => handleDeleteMembershipTier(row.getValue('id'))}
+    //             >
+    //               Continue
+    //             </AlertDialogAction>
+    //           </AlertDialogFooter>
+    //         </AlertDialogContent>
+    //       </AlertDialog>
+    //     </div>
+    //   ),
+    // },
+    {
+      accessorKey: 'customer.full_name',
       header: () => (
         <Button
           variant="ghost"
@@ -131,88 +197,181 @@ function MembershipCustomers() {
         <div className="w-full text-center">
           <button
             onClick={() => {
-              setSelectedCustomer(row.original)
+              setSelectedCustomer(row.original.customer)
               setIsCustomerDialogOpen(true)
             }}
-            className="hover:underline font-semibold"
+            className=" hover:underline font-semibold"
           >
-            {row.original.full_name}
+            {row.original.customer.full_name}
           </button>
         </div>
       ),
     },
+
     {
-      accessorKey: 'phone_number',
+      accessorKey: 'membership_tier.full_name',
       header: () => (
         <Button
           variant="ghost"
           className="w-[150px] text-center flex items-center justify-center gap-2"
         >
-          Phone Number <Bs123 className="h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div className="w-full text-center">{row.original.phone_number}</div>
-      ),
-    },
-    {
-      accessorKey: 'whatsapp_number',
-      header: () => (
-        <Button
-          variant="ghost"
-          className="w-[150px] text-center flex items-center justify-center gap-2"
-        >
-          WhatsApp <Bs123 className="h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div className="w-full text-center">{row.original.whatsapp_number}</div>
-      ),
-    },
-    {
-      accessorKey: 'username',
-      header: () => (
-        <Button
-          variant="ghost"
-          className="w-[150px] text-center flex items-center justify-center gap-2"
-        >
-          Username <Bs123 className="h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div className="w-full text-center">{row.original.username}</div>
-      ),
-    },
-    {
-      accessorKey: 'birth_date',
-      header: () => (
-        <Button
-          variant="ghost"
-          className="w-[150px] text-center flex items-center justify-center gap-2"
-        >
-          Birth Date <HiOutlineCalendar className="h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div className="w-full text-center">{row.original.birth_date}</div>
-      ),
-    },
-    {
-      accessorKey: 'awareness_source',
-      header: () => (
-        <Button
-          variant="ghost"
-          className="w-[200px] text-center flex items-center justify-center gap-2"
-        >
-          Awareness Source <RiGiftLine className="h-4 w-4" />
+          Membership <MdPriceCheck className="h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="w-full text-center">
-          {row.original.awareness_source}
+          <button
+            onClick={() => {
+              setSelectedMembership(row.original.membership_tier)
+              setIsMembershipDialogOpen(true)
+            }}
+            className="hover:underline font-semibold"
+          >
+            {row.original.membership_tier.icon}
+            {row.original.membership_tier.full_name}
+          </button>
         </div>
       ),
     },
+
+    {
+      accessorKey: 'status_payment',
+      header: () => (
+        <Button
+          variant="ghost"
+          className="w-[180px] text-center flex items-center justify-center gap-2"
+        >
+          Status Payment <MdOutlineAccessTime className="h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="w-full text-center capitalize flex items-center justify-center">
+          <Badge
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+              row.getValue('status_payment') === 'settlement'
+                ? 'border-green-500 bg-green-500 text-green-600'
+                : row.getValue('status_payment') === 'pending'
+                ? 'border-yellow-500 bg-yellow-500 text-yellow-500'
+                : 'border-red-500 bg-red-500 text-red-500'
+            }`}
+          >
+            {row.getValue('status_payment') === 'settlement' && <MdPaid />}
+            {row.getValue('status_payment') === 'pending' && (
+              <MdOutlineAccessTimeFilled />
+            )}
+            {row.getValue('status_payment') !== 'pending' &&
+              row.getValue('status_payment') !== 'settlement' && <TiTimes />}
+            {row.getValue('status_payment') === 'settlement'
+              ? 'paid'
+              : row.getValue('status_payment')}
+          </Badge>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'status_tier',
+      header: () => (
+        <Button
+          variant="ghost"
+          className="w-[150px] text-center flex items-center justify-center gap-2"
+        >
+          Status Tier <MdOutlineAccessTime className="h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="w-full text-center capitalize flex items-center justify-center">
+          <Badge
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+              row.getValue('status_tier') === 'Active'
+                ? 'border-green-500 bg-green-500 text-green-600'
+                : 'border-red-500 bg-red-500 text-red-500'
+            }`}
+          >
+            {row.getValue('status_tier') === 'Active' ? (
+              <MdCheckCircle />
+            ) : (
+              <TiTimes />
+            )}
+            {row.getValue('status_tier')}
+          </Badge>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'status_birthday_treat',
+      header: () => (
+        <Button
+          variant="ghost"
+          className="w-[150px] text-center flex items-center justify-center gap-2"
+        >
+          Birthday Treat <RiGiftLine className="h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="w-full text-center capitalize">
+          {row.getValue('status_birthday_treat')}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'start_periode',
+      header: () => (
+        <Button
+          variant="ghost"
+          className="w-[150px] text-center flex items-center justify-center gap-2"
+        >
+          Start Period <HiOutlineCalendar className="h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="w-full text-center">
+          {new Date(row.getValue('start_periode')).toLocaleDateString('id-ID')}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'end_periode',
+      header: () => (
+        <Button
+          variant="ghost"
+          className="w-[150px] text-center flex items-center justify-center gap-2"
+        >
+          End Period <HiOutlineCalendar className="h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="w-full text-center">
+          {new Date(row.getValue('end_periode')).toLocaleDateString('id-ID')}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'kuota_weekly',
+      header: () => (
+        <Button
+          variant="ghost"
+          className="w-[150px] text-center flex items-center justify-center gap-2"
+        >
+          Kuota Weekly <Bs123 className="h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="w-full text-center">{row.getValue('kuota_weekly')}</div>
+      ),
+    },
+    // {
+    //   accessorKey: 'membership_count',
+    //   header: () => (
+    //     <Button variant="ghost" className="w-[150px] text-center flex items-center justify-center gap-2">
+    //       Membership Count <Bs123 className="h-4 w-4" />
+    //     </Button>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="w-full text-center">
+    //       {row.getValue('membership_count')}
+    //     </div>
+    //   ),
+    // },
     {
       accessorKey: 'created_at',
       header: () => (
@@ -274,25 +433,26 @@ function MembershipCustomers() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
 
-  const getAllDataMembershipCustomers = async () => {
+  const getAllDataMembershipCustomerTransactions = async () => {
     setIsLoading(true)
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/customers`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/customer-memberships`,
       )
-      const jsonData = response.data
-      setData(jsonData.data) // <== make sure it's .data.data
+      const jsonData = await response.data
+      setData(jsonData)
+      console.log({ jsonData })
     } catch (error) {
       console.error({ error })
       if (error.code === 'ERR_NETWORK') {
         Toast.fire({
           icon: 'error',
-          title: `Data tidak dapat ditampilkan. Cek jaringan Anda!`,
+          title: `Data tidak dapat ditampilkan. Koneksi anda terputus, cek jaringan anda!`,
         })
       } else {
         Toast.fire({
           icon: 'error',
-          title: `Server error, coba lagi nanti!`,
+          title: `Internal server sedang error, coba lagi nanti!`,
         })
       }
     } finally {
@@ -349,7 +509,7 @@ function MembershipCustomers() {
         title: `Membership Tier berhasil ditambahkan!`,
       })
 
-      getAllDataMembershipCustomers()
+      getAllDataMembershipCustomerTransactions()
       setOpenAddNewTier(false)
       clearData()
       setIsUploading(false)
@@ -401,7 +561,7 @@ function MembershipCustomers() {
         title: `Data membership tiers berhasil diupdate!`,
       })
 
-      getAllDataMembershipCustomers()
+      getAllDataMembershipCustomerTransactions()
       clearData()
       setOpenUpdate(false)
       setOpenAddNewTier(false)
@@ -441,7 +601,7 @@ function MembershipCustomers() {
         title: `Data membership tier berhasil dihapus!`,
       })
 
-      getAllDataMembershipCustomers()
+      getAllDataMembershipCustomerTransactions()
       setIdSelected('')
     } catch (error) {
       setIdSelected('')
@@ -462,7 +622,7 @@ function MembershipCustomers() {
   }
 
   React.useEffect(() => {
-    getAllDataMembershipCustomers()
+    getAllDataMembershipCustomerTransactions()
   }, [])
 
   return (
@@ -594,16 +754,15 @@ function MembershipCustomers() {
           <div className="w-full">
             <div className="flex items-center justify-between py-4">
               <Input
-                placeholder="Cari Member based on Username.."
-                value={table.getColumn('username')?.getFilterValue() ?? ''}
+                placeholder="Cari Member based on Nama.."
+                value={table.getColumn('full_name')?.getFilterValue() ?? ''}
                 onChange={(event) =>
                   table
-                    .getColumn('username')
+                    .getColumn('full_name')
                     ?.setFilterValue(event.target.value)
                 }
                 className="max-w-sm"
               />
-              <MembershipCheck />
             </div>
 
             {isLoading ? (
@@ -779,4 +938,4 @@ function MembershipCustomers() {
   )
 }
 
-export default MembershipCustomers
+export default MembershipCustomerTransactions

@@ -7,23 +7,30 @@ import { Fade } from 'react-awesome-reveal'
 import Layout from '../components/Layout'
 import MembershipTiers from '../components/Membership/MembershipTiers'
 import MembershipCustomers from '../components/Membership/MembershipCustomers'
+import MembershipCustomerTransactions from '../components/Membership/MembershipCustomerTransactions'
 
 function page() {
   const features = [
     {
-      id: 'memberships',
-      name: 'Membership Customers',
+      id: 'customers',
+      name: 'Customers',
       desc: 'Checking memberships',
       img: '/membership.png',
     },
     {
+      id: 'memberships',
+      name: 'Transactions',
+      desc: 'Checking transactions',
+      img: '/payment.png',
+    },
+    {
       id: 'tiers',
-      name: 'Membership Tiers',
+      name: 'Tiers',
       desc: 'Custom membership tiers',
       img: '/tier.png',
     },
   ]
-  const [selectedFeature, setSelectedFeature] = React.useState('operationals')
+  const [selectedFeature, setSelectedFeature] = React.useState('customers')
 
   return (
     <Layout>
@@ -86,7 +93,10 @@ function page() {
             </div>
           </div>
 
-          {selectedFeature == 'memberships' && <MembershipCustomers />}
+          {selectedFeature == 'customers' && <MembershipCustomers />}
+          {selectedFeature == 'memberships' && (
+            <MembershipCustomerTransactions />
+          )}
 
           {selectedFeature == 'tiers' && <MembershipTiers />}
         </>
