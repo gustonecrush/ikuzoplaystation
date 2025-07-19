@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   IoGameController,
   IoLaptopSharp,
@@ -14,6 +14,7 @@ import { BsStars } from 'react-icons/bs'
 
 export default function Sidebar() {
   const router = useRouter()
+  const pathname = usePathname()
 
   const handleLogout = () => {
     console.log('Logging out...')
@@ -24,7 +25,6 @@ export default function Sidebar() {
     {
       href: '/admin/dashboard/reservations',
       icon: <IoGameController className="text-4xl" />,
-      active: true,
     },
     {
       href: '/admin/dashboard/contents',
@@ -67,7 +67,7 @@ export default function Sidebar() {
 
       <nav className="relative flex flex-col py-4 items-center">
         {navItems.map((item, idx) => {
-          const isActive = item.active
+          const isActive = item.href && pathname === item.href
           const isLogout = item.isLogout
 
           return (
@@ -80,9 +80,13 @@ export default function Sidebar() {
                   item.onClick()
                 }
               }}
-              className={`w-16 h-16 p-4 flex items-center justify-center rounded-2xl mb-4 ${
-                isActive ? 'bg-yellow-100 text-orange' : 'border text-gray-400'
-              } ${isLogout ? 'mt-10' : ''}`}
+              className={`w-16 h-16 p-4 flex items-center justify-center rounded-2xl mb-4 transition-colors duration-200 ${
+                isLogout
+                  ? 'mt-10'
+                  : isActive
+                  ? 'bg-yellow-100 text-orange'
+                  : 'border text-gray-400 hover:bg-gray-100'
+              }`}
             >
               {item.icon}
             </a>
