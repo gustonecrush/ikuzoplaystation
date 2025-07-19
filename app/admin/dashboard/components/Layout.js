@@ -14,6 +14,7 @@ import {
   IoLogOut,
   IoTime,
 } from 'react-icons/io5'
+import Sidebar from '@/app/components/Admin/Sidebar'
 
 function Layout({ children }) {
   const router = useRouter()
@@ -54,56 +55,7 @@ function Layout({ children }) {
   }
   return (
     <main className="flex w-full h-screen rounded-3xl">
-      <section className="flex h-full flex-col w-2/12 pt-8 bg-white shadow-md rounded-l-3xl">
-        <div className="mx-auto p-4  rounded-2xl text-white">
-          <Image
-            src={'/logo-orange.png'}
-            alt="Ikuzo Playstation Logo"
-            width={0}
-            height={0}
-            className="w-[150px]"
-          />
-        </div>
-        <nav className="relative flex flex-col py-4 items-center">
-          <a
-            href="/admin/dashboard/reservations"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoGameController className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/contents"
-            className="relative w-16 h-16 p-4 flex items-center justify-center bg-yellow-100 text-orange rounded-2xl mb-4 "
-          >
-            <IoLaptopSharp className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/times"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoTime className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/catalogs"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoBook className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/dates"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoCalendarClear className="text-4xl" />
-          </a>
-          <a
-            href="#"
-            onClick={() => handleLogout()}
-            className="w-16 h-16 p-4 mt-10 border text-gray-400 rounded-2xl"
-          >
-            <IoLogOut className="text-4xl" />
-          </a>
-        </nav>
-      </section>
+      <Sidebar />
       <section className="flex flex-col pt-3 w-10/12 bg-white h-full overflow-y-scroll">
         {children}
       </section>

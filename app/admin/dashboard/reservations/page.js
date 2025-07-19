@@ -118,6 +118,8 @@ import {
 import { Statistics } from '@/app/components'
 import { Calendar } from '@/components/ui/calendar'
 import { addDays, subDays } from 'date-fns'
+import Sidebar from '@/app/components/Admin/Sidebar'
+import MembershipCheck from '../components/Membership/MembershipCheck'
 
 function page() {
   const [data, setData] = React.useState([])
@@ -594,12 +596,13 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_reserve') == 'settlement'
-              ? 'border-green-500 bg-green-500 text-green-600'
-              : row.getValue('status_reserve') == 'pending'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+              row.getValue('status_reserve') == 'settlement'
+                ? 'border-green-500 bg-green-500 text-green-600'
+                : row.getValue('status_reserve') == 'pending'
                 ? 'border-yellow-500 bg-yellow-500 text-yellow-500'
                 : 'border-red-500 bg-red-500 text-red-500'
-              }`}
+            }`}
           >
             {' '}
             {row.getValue('status_reserve') == 'settlement' && <MdPaid />}
@@ -633,12 +636,13 @@ function page() {
       cell: ({ row }) => (
         <div className="flex w-full items-center justify-center text-center">
           <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${row.getValue('status_payment') == 'done'
-              ? 'border-blue-500 bg-blue-500 text-blue-600'
-              : row.getValue('status_payment') == 'not playing'
+            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+              row.getValue('status_payment') == 'done'
+                ? 'border-blue-500 bg-blue-500 text-blue-600'
+                : row.getValue('status_payment') == 'not playing'
                 ? 'border-purple-400 bg-purple-500 text-purple-600'
                 : 'border-gray-500 bg-gray-500 text-gray-700'
-              }`}
+            }`}
           >
             {' '}
             {row.getValue('status_payment') == 'playing' && (
@@ -853,11 +857,11 @@ function page() {
 
   React.useEffect(() => {
     if (selectedTypeSeat) {
-      setColumnFilters([{ id: 'location', value: selectedTypeSeat }]);
+      setColumnFilters([{ id: 'location', value: selectedTypeSeat }])
     } else {
-      setColumnFilters([]);
+      setColumnFilters([])
     }
-  }, [selectedTypeSeat]);
+  }, [selectedTypeSeat])
 
   const table = useReactTable({
     data,
@@ -1074,18 +1078,16 @@ function page() {
   const disableTimes =
     reserves.length > 0
       ? reserves
-        .map((reserve) => {
-          if (reserve.reserve_end_time) {
-            const [hour, minute, second] = reserve.reserve_end_time.split(':')
-            const formattedTime = `${hour}:${minute}`
-            return formattedTime
-          }
-          return null
-        })
-        .filter((time) => time !== null)
+          .map((reserve) => {
+            if (reserve.reserve_end_time) {
+              const [hour, minute, second] = reserve.reserve_end_time.split(':')
+              const formattedTime = `${hour}:${minute}`
+              return formattedTime
+            }
+            return null
+          })
+          .filter((time) => time !== null)
       : []
-
-
 
   React.useEffect(() => {
     getAllDataReservations()
@@ -1095,56 +1097,7 @@ function page() {
 
   return (
     <main className="flex w-full h-screen rounded-3xl">
-      <section className="flex h-full flex-col w-2/12 pt-8 bg-white shadow-md rounded-l-3xl">
-        <div className="mx-auto p-4  rounded-2xl text-white">
-          <Image
-            src={'/logo-orange.png'}
-            alt="Ikuzo Playstation Logo"
-            width={0}
-            height={0}
-            className="w-[150px]"
-          />
-        </div>
-        <nav className="relative flex flex-col py-4 items-center">
-          <a
-            href="/admin/dashboard/reservations"
-            className="relative w-16 h-16 p-4 bg-yellow-100 flex items-center justify-center text-orange rounded-2xl mb-4"
-          >
-            <IoGameController className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/contents"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoLaptopSharp className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/times"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoTime className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/catalogs"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoBook className="text-4xl" />
-          </a>
-          <a
-            href="/admin/dashboard/dates"
-            className="w-16 h-16 p-4 border text-gray-400 flex items-center justify-center rounded-2xl mb-4"
-          >
-            <IoCalendarClear className="text-4xl" />
-          </a>
-          <a
-            href="#"
-            onClick={() => handleLogout()}
-            className="w-16 h-16 p-4 mt-10 border text-gray-400 rounded-2xl"
-          >
-            <IoLogOut className="text-4xl" />
-          </a>
-        </nav>
-      </section>
+      <Sidebar />
       <section className="flex flex-col pt-3 w-10/12 bg-white h-full overflow-y-scroll">
         {openCreateReservationForm ? (
           <Reservation />
@@ -1189,8 +1142,64 @@ function page() {
                         }
                         className="max-w-sm"
                       />
-                      <div className="flex gap-1">
+                      <MembershipCheck />
+                    </div>
+                    <div className="w-full flex items-center justify between gap-10">
+                      <Select
+                        value={selectedTypeSeat}
+                        onValueChange={(value) => setSelectedTypeSeat(value)}
+                        required
+                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4"
+                      >
+                        <SelectTrigger className="py-5 px-3 text-base mb-2 -mt-2 text-black">
+                          <SelectValue
+                            className="text-sm text-black placeholder:text-black"
+                            placeholder="Filter by Fasilitas"
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup className="">
+                            <SelectLabel className="text-sm">
+                              Fasilitas
+                            </SelectLabel>
 
+                            <SelectItem className="text-sm" value="PS5 Reguler">
+                              PS5 Reguler
+                            </SelectItem>
+                            <SelectItem className="text-sm" value="PS4 Reguler">
+                              PS4 Reguler
+                            </SelectItem>
+                            <SelectItem className="text-sm" value="Simulator">
+                              Simulator
+                            </SelectItem>
+                            <SelectItem
+                              className="text-sm"
+                              value="Family Open Space"
+                            >
+                              Family Open Space
+                            </SelectItem>
+                            <SelectItem
+                              className="text-sm"
+                              value="Squad Open Space"
+                            >
+                              Squad Open Space
+                            </SelectItem>
+                            <SelectItem
+                              className="text-sm"
+                              value="Family VIP Room"
+                            >
+                              Family VIP Room
+                            </SelectItem>
+                            <SelectItem
+                              className="text-sm"
+                              value="LoveBirds VIP Room"
+                            >
+                              LoveBirds VIP Room
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex gap-1">
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" className="ml-auto">
@@ -1329,55 +1338,6 @@ function page() {
                         </Button>
                       </div>
                     </div>
-
-                    <Select
-                      value={selectedTypeSeat}
-                      onValueChange={(value) => setSelectedTypeSeat(value)}
-                      required
-                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4"
-                    >
-                      <SelectTrigger className="py-5 px-3 text-base mb-2 -mt-2 text-black">
-                        <SelectValue
-                          className="text-sm text-black placeholder:text-black"
-                          placeholder="Filter by Fasilitas"
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup className="">
-                          <SelectLabel className="text-sm">
-                            Fasilitas
-                          </SelectLabel>
-
-                          <SelectItem
-                            className="text-sm"
-                            value="PS5 Reguler"
-                          >
-                            PS5 Reguler
-                          </SelectItem>
-                          <SelectItem
-                            className="text-sm"
-                            value="PS4 Reguler"
-                          >
-                            PS4 Reguler
-                          </SelectItem>
-                          <SelectItem className="text-sm" value="Simulator">
-                            Simulator
-                          </SelectItem>
-                          <SelectItem className="text-sm" value="Family Open Space">
-                            Family Open Space
-                          </SelectItem>
-                          <SelectItem className="text-sm" value="Squad Open Space">
-                            Squad Open Space
-                          </SelectItem>
-                          <SelectItem className="text-sm" value="Family VIP Room">
-                            Family VIP Room
-                          </SelectItem>
-                          <SelectItem className="text-sm" value="LoveBirds VIP Room">
-                            LoveBirds VIP Room
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
                   </div>
 
                   {isLoading ? (
@@ -1453,31 +1413,37 @@ function page() {
                             <SelectLabel className="text-sm">
                               Fasilitas
                             </SelectLabel>
-                            <SelectItem
-                              className="text-sm"
-                              value="PS5 Reguler"
-                            >
+                            <SelectItem className="text-sm" value="PS5 Reguler">
                               PS5 Reguler
                             </SelectItem>
-                            <SelectItem
-                              className="text-sm"
-                              value="PS4 Reguler"
-                            >
+                            <SelectItem className="text-sm" value="PS4 Reguler">
                               PS4 Reguler
                             </SelectItem>
                             <SelectItem className="text-sm" value="Simulator">
                               Simulator
                             </SelectItem>
-                            <SelectItem className="text-sm" value="Family Open Space">
+                            <SelectItem
+                              className="text-sm"
+                              value="Family Open Space"
+                            >
                               Family Open Space
                             </SelectItem>
-                            <SelectItem className="text-sm" value="Squad Open Space">
+                            <SelectItem
+                              className="text-sm"
+                              value="Squad Open Space"
+                            >
                               Squad Open Space
                             </SelectItem>
-                            <SelectItem className="text-sm" value="Family VIP Room">
+                            <SelectItem
+                              className="text-sm"
+                              value="Family VIP Room"
+                            >
                               Family VIP Room
                             </SelectItem>
-                            <SelectItem className="text-sm" value="LoveBirds VIP Room">
+                            <SelectItem
+                              className="text-sm"
+                              value="LoveBirds VIP Room"
+                            >
                               LoveBirds VIP Room
                             </SelectItem>
                           </SelectGroup>
@@ -1527,7 +1493,6 @@ function page() {
                                 <SelectItem className="text-sm" value="3">
                                   3
                                 </SelectItem>
-
                               </>
                             )}
                             {typeSeatPlaying == 'Simulator' && (
@@ -1640,10 +1605,7 @@ function page() {
                             <SelectItem className="text-sm" value="playing">
                               Playing
                             </SelectItem>
-                            <SelectItem
-                              className="text-sm"
-                              value="not playing"
-                            >
+                            <SelectItem className="text-sm" value="not playing">
                               Not Playing
                             </SelectItem>
                             <SelectItem className="text-sm" value="done">
