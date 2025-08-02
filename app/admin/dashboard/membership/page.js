@@ -8,6 +8,7 @@ import Layout from '../components/Layout'
 import MembershipTiers from '../components/Membership/MembershipTiers'
 import MembershipCustomers from '../components/Membership/MembershipCustomers'
 import MembershipCustomerTransactions from '../components/Membership/MembershipCustomerTransactions'
+import MembershipWeeklyReport from '../components/Membership/MembershipWeeklyReport'
 
 function page() {
   const features = [
@@ -56,7 +57,7 @@ function page() {
               </div>
             </Fade>
 
-            <div className="flex flex-row gap-4 w-full">
+            <div className="flex flex-row gap-4 w-full ">
               {features.map((feature, index) => (
                 <div
                   key={index}
@@ -64,11 +65,11 @@ function page() {
                     setSelectedFeature(feature.id)
                     fetchContents()
                   }}
-                  className={`flex w-full hover:scale-110 duration-1000 cursor-pointer items-center px-2 py-3 justify-center ${
+                  className={`flex w-full hover:scale-110 duration-1000 cursor-pointer items-center px-4 py-3 justify-center ${
                     selectedFeature == feature.id
                       ? 'bg-orange bg-opacity-5'
                       : 'bg-white'
-                  } rounded-lg shadow-md`}
+                  } rounded-2xl  shadow-md`}
                 >
                   <div className="flex flex-row items-center gap-3 justify-center">
                     <Image
@@ -76,14 +77,16 @@ function page() {
                       alt={'Content Games'}
                       width={0}
                       height={0}
-                      className="w-[55px] py-4"
+                      className="w-[47px] py-4"
                     />
 
                     <div className="flex flex-col justify-start items-start">
                       <h1 className="text-lg font-semibold leading-none">
                         {feature.name}
                       </h1>
-                      <p className={`text-base font-normal text-gray-400`}>
+                      <p
+                        className={`text-sm font-normal leading-none text-gray-400`}
+                      >
                         {feature.desc}
                       </p>
                     </div>
@@ -93,7 +96,11 @@ function page() {
             </div>
           </div>
 
-          {selectedFeature == 'customers' && <MembershipCustomers />}
+          {selectedFeature == 'customers' && (
+            <>
+              <MembershipCustomers />
+            </>
+          )}
           {selectedFeature == 'memberships' && (
             <MembershipCustomerTransactions />
           )}
