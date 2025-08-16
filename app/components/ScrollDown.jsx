@@ -6,7 +6,7 @@ const ScrollDown = () => {
   return (
     <Link
       href={'#reserve'}
-      className="container  z-50 relative w-full  scroll-smooth mt-10 left-[38.5%] md:left-[47%]"
+      className="container  z-50 relative w-full  scroll-smooth  left-[38.5%] md:left-[47%]"
     >
       <div className="chevron"></div>
       <div className="chevron"></div>

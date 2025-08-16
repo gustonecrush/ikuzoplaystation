@@ -48,7 +48,7 @@ function Hero({ children }) {
         (content, index) =>
           index == 0 && (
             <FadeContainer key={index}>
-              <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col gap-4 w-full px-3 items-center justify-center md:-mt-5">
+              <div className="absolute top-[55%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col gap-4 w-full px-3 items-center justify-center md:-mt-5">
                 <Image
                   src="/logo-orange.png"
                   alt="Ikuzo Playstation's Logo"

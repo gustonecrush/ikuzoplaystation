@@ -67,6 +67,10 @@ import getDocument from '@/firebase/firestore/getData'
 import { capitalizeAndFormat, getFacilityId } from '@/utils/text'
 import { MdOutlineUpdate } from 'react-icons/md'
 
+import { useFetchPositions } from '@/hooks/useFetchPositions'
+import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
+
 export default function Reservation() {
   // RESERVATION STATE DATA
   const [continueTapped, setContinueTapped] = React.useState(false)
@@ -220,27 +224,16 @@ export default function Reservation() {
     }
   }
 
-  const [positions, setPositions] = useState([])
+  const {
+    positions,
+    isLoading: isLoadingPositions,
+    error,
+    fetchPositions,
+  } = useFetchPositions()
 
-  const getAllPositions = async () => {
-    try {
-      const response = await axios.get(`${baseUrl}/content-facilities`)
-      if (response.status == 200) {
-        const jsonData = await response.data
-
-        setPositions(jsonData.data)
-
-        console.log({ jsonData })
-
-        setIsLoading(false)
-      } else {
-        setIsLoading(false)
-        throw new Error('Failed to fetch data')
-      }
-    } catch (error) {
-      setIsLoading(false)
-    }
-  }
+  React.useEffect(() => {
+    fetchPositions()
+  }, [fetchPositions])
 
   const [customTimeSelected, setCustomTimeSelected] = React.useState([])
   const [dateClose, setDateClose] = React.useState([])
@@ -425,9 +418,6 @@ export default function Reservation() {
     }
   }
 
-  console.log({ catalogs })
-  console.log({ latestUpdatedAt })
-
   const [
     selectedReservationPlace,
     setSelectedReservationPlace,
@@ -494,8 +484,6 @@ export default function Reservation() {
       item['time-day'].split(',').includes(today),
     )
 
-    console.log({ foundItem })
-
     return foundItem.length === 1 ? foundItem[0]['time-set'] : null
   }
 
@@ -521,14 +509,10 @@ export default function Reservation() {
         ? squadOpenSpaceData.prices
         : []
 
-    console.log({ value, today, prices })
-
     // Find time-set where today's day exists
     const foundPrice = prices.filter((item) =>
       item['day'].split(',').includes(today),
     )
-
-    console.log({ foundPrice })
 
     foundPrice.length === 1
       ? setSelectedPriceToday(foundPrice[0]['price'])
@@ -538,9 +522,6 @@ export default function Reservation() {
       ? foundPrice[0]['price']
       : foundPrice[0]['price']
   }
-
-  console.log({ getPriceSetForToday })
-  console.log({ selectedPriceToday })
 
   const getTimeSetForTodayAgain = (value, selectedDate) => {
     const today = getIndonesianDay(selectedDate) // Get today's day
@@ -554,21 +535,13 @@ export default function Reservation() {
         ? premiumSpaceData.times
         : []
 
-    console.log({ value, today, times })
-
     // Find time-set where today's day exists
     const foundItem = times.filter((item) =>
       item['time-day'].split(',').includes(today),
     )
 
-    console.log({ foundItem })
-
     return foundItem.length === 1 ? foundItem[0]['time-set'] : null
   }
-
-  console.log({ regularSpaceData })
-  console.log({ premiumSpaceData })
-  console.log({ privateSpaceData })
 
   useEffect(() => {
     fetchDataTimes()
@@ -583,7 +556,6 @@ export default function Reservation() {
       startTimeReservasi,
       endTimeReservasi,
     )
-    console.log('GAP TIME', getTimeDIfferent)
     getDateClosed()
     setTotalTime(getTimeDIfferent)
 
@@ -642,7 +614,6 @@ export default function Reservation() {
       }
     }
 
-    getAllPositions()
     fetchDataContents()
     fetchDataPrices()
 
@@ -661,8 +632,6 @@ export default function Reservation() {
     selectedReservationPlace,
     selectedDate,
   )
-
-  console.log({ timeSet })
 
   const fallbackTimeArray = [
     {
@@ -696,17 +665,13 @@ export default function Reservation() {
   )
 
   const fallbackPrice = parseInt(selectedPriceToday)
-  console.log({ fallbackPrice })
   const actualPrice = fallbackPrice
-  console.log({ actualPrice })
-  console.log({ selectedCustomPrices })
 
   const finalPrice = pricePackageDetermination(
     posisiReservasi,
     totalTime,
     actualPrice,
   )
-  console.log({ finalPrice })
 
   // fallback if any part returns NaN
   const safePrice = isNaN(finalPrice) ? 0 : finalPrice + 4000

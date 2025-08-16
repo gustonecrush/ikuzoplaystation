@@ -75,6 +75,7 @@ import { IoMdBook } from 'react-icons/io'
 import getDocument from '@/firebase/firestore/getData'
 import LoaderHome from '@/app/components/LoaderHome'
 import { capitalizeAndFormat, getFacilityId } from '@/utils/text'
+import { useFetchPositions } from '@/hooks/useFetchPositions'
 
 export default function Reservation() {
   const [drawerContent, setDrawerContent] = useState('default')
@@ -179,26 +180,16 @@ export default function Reservation() {
     }
   }
 
-  const [positions, setPositions] = useState([])
+  const {
+    positions,
+    isLoading: isLoadingPositions,
+    error,
+    fetchPositions,
+  } = useFetchPositions()
 
-  const getAllPositions = async () => {
-    try {
-      const response = await axios.get(`${baseUrl}/content-facilities`)
-      if (response.status == 200) {
-        setPositions(response.data.data)
-        console.log('ALL POSITION : ', response.data.data)
-
-        setIsLoading(false)
-      } else {
-        setIsLoading(false)
-        console.log({ response })
-        throw new Error('Failed to fetch data')
-      }
-    } catch (error) {
-      console.log(error)
-      setIsLoading(false)
-    }
-  }
+  React.useEffect(() => {
+    fetchPositions()
+  }, [fetchPositions])
 
   const [customTimeSelected, setCustomTimeSelected] = React.useState([])
 

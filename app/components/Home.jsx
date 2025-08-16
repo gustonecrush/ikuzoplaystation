@@ -10,15 +10,11 @@ import Link from 'next/link'
 import { IoLogoGameControllerB } from 'react-icons/io'
 import Content from './Content'
 import Hero from './Hero'
-import axios from 'axios'
 import LoaderHome from './LoaderHome'
 import getDocument from '@/firebase/firestore/getData'
-import { IoPersonCircleOutline } from 'react-icons/io5'
+import { useFetchSections } from '@/hooks/useFetchSections'
 
 export default function Home() {
-  const [sectionsUpdate, setSectionsUpdate] = React.useState([])
-  const [isLoading, setIsLoading] = React.useState(false)
-
   const [searchContent, setSearchContent] = React.useState(null)
 
   async function fetchDataContents() {
@@ -26,27 +22,13 @@ export default function Home() {
     setSearchContent(dataContentSearch.data)
   }
 
-  const fetchSections = async () => {
-    setIsLoading(true)
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/sections`,
-      )
-      if (response.status == 200) {
-        const jsonData = await response.data
-        setSectionsUpdate(jsonData.data)
-        setIsLoading(false)
-      } else {
-        setIsLoading(true)
-        throw new Error('Failed to fetch data')
-      }
-    } catch (error) {
-      setIsLoading(true)
-    }
-  }
+  const { sections, isLoading, error, fetchSections } = useFetchSections()
 
   React.useEffect(() => {
     fetchSections()
+  }, [fetchSections])
+
+  React.useEffect(() => {
     fetchDataContents()
   }, [])
 
@@ -67,11 +49,11 @@ export default function Home() {
             <BounceContainer>
               <div className="flex flex-col gap-2 px-3">
                 <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
-                  {isLoading ? '' : sectionsUpdate[0]?.title}
+                  {isLoading ? '' : sections[0]?.title}
                 </h1>
                 <p
                   dangerouslySetInnerHTML={{
-                    __html: sectionsUpdate && sectionsUpdate[0]?.description,
+                    __html: sections && sections[0]?.description,
                   }}
                   className="text-gray-400 font-normal text-center prose-base"
                 ></p>
@@ -85,11 +67,11 @@ export default function Home() {
             <BounceContainer>
               <div className="flex flex-col gap-2 px-3">
                 <h1 className="text-orange font-extrabold uppercase font-montserrat text-4xl text-center">
-                  {isLoading ? '' : sectionsUpdate[1]?.title}
+                  {isLoading ? '' : sections[1]?.title}
                 </h1>
                 <p
                   dangerouslySetInnerHTML={{
-                    __html: sectionsUpdate && sectionsUpdate[1]?.description,
+                    __html: sections && sections[1]?.description,
                   }}
                   className="text-gray-400 font-normal text-center prose-base"
                 ></p>
@@ -130,9 +112,9 @@ function CTAButton() {
       }`}
     >
       <Link
-        href="/reservation"
+        href="/reservation/options"
         title="Reserve Now"
-        className={`flex items-center gap-3 px-5 py-3 bg-orange-500 hover:bg-orange-600  rounded-full shadow-lg transition-all duration-200 ease-in-out hover:scale-105 group ${
+        className={`flex hover:animate-pulse duration-750 items-center gap-3 px-5 py-3 bg-orange-500 hover:bg-orange-600  rounded-full shadow-lg transition-all justify-center w-full duration-200 ease-in-out hover:scale-105 group ${
           scrolled
             ? 'text-white bg-orange hover:bg-orange'
             : 'border border-orange  text-orange hover:bg-orange'
@@ -144,22 +126,6 @@ function CTAButton() {
           Reserve Now
         </span>
         <IoLogoGameControllerB className="text-2xl group-hover:text-white" />
-      </Link>
-      <Link
-        href="/membership"
-        title="Join Member"
-        className={`flex items-center gap-3 px-5 py-3 bg-orange-500 hover:bg-orange-600  rounded-full shadow-lg transition-all duration-200 ease-in-out hover:scale-105 group ${
-          scrolled
-            ? 'text-white bg-orange hover:bg-orange'
-            : 'border border-orange  text-orange hover:bg-orange '
-        }`}
-      >
-        <span
-          className={`font-normal ${scrolled ? 'text-white ' : 'text-white '}`}
-        >
-          Join Member
-        </span>
-        <IoPersonCircleOutline className="text-2xl group-hover:text-white" />
       </Link>
     </div>
   )
