@@ -63,36 +63,37 @@ const MembershipCheckout = ({ tier, user }) => {
   return (
     <>
       <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
-        <AlertDialogContent className="w-[90%] md:w-3/4 rounded-lg">
+        <AlertDialogContent className="w-[90%] md:w-3/4 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Konfirmasi Pembayaran Keanggotaan
+            <AlertDialogTitle className="text-white text-xl leading-none font-semibold drop-shadow">
+              Konfirmasi <br />
+              Pembayaran Membership
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-white/70 text-sm">
               Pastikan data berikut sudah benar sebelum melanjutkan pembayaran.
             </AlertDialogDescription>
 
             {/* ✅ Payment Summary */}
-            <div className="bg-muted rounded-md p-4 mt-4 space-y-2 text-sm">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 mt-4 space-y-2 text-sm text-white shadow-inner">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Nama:</span>
+                <span className="text-white/70">Nama:</span>
                 <span className="font-medium">{user.full_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Nomor HP:</span>
+                <span className="text-white/70">Nomor HP:</span>
                 <span className="font-medium">{user.phone_number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Keanggotaan:</span>
+                <span className="text-white/70">Keanggotaan:</span>
                 <span className="font-medium">{tier.full_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Harga:</span>
+                <span className="text-white/70">Harga:</span>
                 <span className="font-medium">
                   Rp {Number(tier.price).toLocaleString('id-ID')}
                 </span>
               </div>
-              <div className="border-t border-border pt-2 flex justify-between font-semibold">
+              <div className="border-t border-white/30 pt-2 flex justify-between font-semibold">
                 <span>Total Bayar:</span>
                 <span>Rp {Number(tier.price).toLocaleString('id-ID')}</span>
               </div>
@@ -100,9 +101,11 @@ const MembershipCheckout = ({ tier, user }) => {
           </AlertDialogHeader>
 
           <AlertDialogFooter className="pt-4">
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl bg-white/10 border border-white/30 text-white hover:bg-white/20 transition">
+              Batal
+            </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-orange hover:bg-orange"
+              className="rounded-xl bg-orange/80 hover:bg-orange text-white shadow-md"
               onClick={() => handleCheckout()}
             >
               Lanjut Bayar
