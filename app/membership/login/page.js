@@ -78,8 +78,8 @@ export default function LoginPage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-md rounded-2xl shadow-2xl p-8 flex flex-col gap-6 items-center bg-white/20 backdrop-blur-2xl border border-white/30"
         >
-          <h1 className="text-3xl leading-none font-bold text-white drop-shadow-md text-center">
-            Masuk Member <span className="text-[#FF6200]">IKUZO</span>
+          <h1 className="text-2xl leading-none font-bold text-white drop-shadow-md text-center">
+            Login Member <span className="text-[#FF6200] font-semibold">IKUZO PLAYSTATION</span>
           </h1>
 
           <form onSubmit={handleSubmit} className="w-full space-y-6">

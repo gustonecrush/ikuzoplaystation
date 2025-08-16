@@ -6,6 +6,9 @@ import { apiBaseUrl } from '@/utils/urls'
 import Toast from '@/app/components/Toast'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Video } from '@/app/components/Home'
+import Navbar from '@/app/components/Navbar'
 
 export default function JoinMembershipPage() {
   const [form, setForm] = useState({
@@ -20,10 +23,9 @@ export default function JoinMembershipPage() {
   })
 
   const router = useRouter()
-
   const [sameAsPhone, setSameAsPhone] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [passwordError, setPasswordError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const awarenessOptions = [
     'Teman',
@@ -33,7 +35,6 @@ export default function JoinMembershipPage() {
     'Datang Langsung',
     'Lainnya',
   ]
-
   const isOtherSelected = form.awareness_source.includes('Lainnya')
 
   const handleCheckboxChange = (value) => {
@@ -45,22 +46,8 @@ export default function JoinMembershipPage() {
     })
   }
 
-  const validatePassword = (password) => {
-    if (password.length < 6) return 'Minimal 6 karakter'
-    if (!/\d/.test(password)) return 'Harus mengandung angka'
-    if (!/[a-zA-Z]/.test(password)) return 'Harus mengandung huruf'
-    return ''
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    // const err = validatePassword(form.password)
-    // if (err) {
-    //   setPasswordError(err)
-    //   return
-    // }
-
     setSubmitting(true)
 
     const formData = new FormData()
@@ -83,15 +70,9 @@ export default function JoinMembershipPage() {
     }
 
     try {
-      const res = await axios.post(
-        `${apiBaseUrl}/customer/register`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        },
-      )
+      await axios.post(`${apiBaseUrl}/customer/register`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
 
       Toast.fire({
         icon: 'success',
@@ -105,202 +86,210 @@ export default function JoinMembershipPage() {
     } catch (err) {
       const msg =
         err?.response?.data?.message || 'Terjadi kesalahan saat mendaftar'
-
-      Toast.fire({
-        icon: 'error',
-        title: 'Oopsss!',
-        text: msg,
-      })
+      Toast.fire({ icon: 'error', title: 'Oopsss!', text: msg })
     } finally {
       setSubmitting(false)
     }
   }
 
-  const [showPassword, setShowPassword] = useState(false)
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev)
-  }
-
   return (
-    <section className="min-h-screen px-6 py-12 max-w-xl mx-auto font-plusSansJakarta flex items-center justify-center bg-gradient-to-br from-[rgb(246,205,164)] via-[#f7a54e] to-[#ff6a00]0">
-      <div className="w-full rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-8 text-orange text-center">
-          🚀 <br />
-          JOIN IKUZO MEMBERSHIP
-        </h1>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 text-orange placeholder:text-gray-400"
+    <section className="flex flex-col h-full w-full relative overflow-x-hidden">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Video background */}
+      <div className="absolute inset-0 -z-10">
+        <Video />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+
+      {/* Form container */}
+      <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange/40 to-black/60 backdrop-blur-2xl w-full p-6 pt-36 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-2xl rounded-2xl shadow-2xl p-8 flex flex-col gap-6 items-center bg-white/20 backdrop-blur-2xl border border-white/30"
         >
-          {/* Phone Number */}
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-orange">
-              Nomor Telepon
-            </label>
-            <input
-              type="text"
-              value={form.phone_number}
-              onChange={(e) => {
-                let val = e.target.value.replace(/\D/g, '')
-                if (!val.startsWith('62')) val = '62' + val
-                setForm((prev) => ({
-                  ...prev,
-                  phone_number: val,
-                  ...(sameAsPhone ? { whatsapp_number: val } : {}),
-                }))
-              }}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange placeholder:text-gray-400"
-              placeholder="628xxxxxxxxxx"
-            />
-          </div>
+          <h1 className="text-3xl leading-none font-bold text-white drop-shadow-md text-center">
+            🚀 JOIN <span className="text-[#FF6200]">IKUZO</span> MEMBERSHIP
+          </h1>
 
-          {/* WhatsApp Number */}
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-orange">
-              Nomor WhatsApp
-            </label>
-            <input
-              type="text"
-              value={form.whatsapp_number}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  whatsapp_number: e.target.value.replace(/\D/g, ''),
-                })
-              }
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange placeholder:text-gray-400"
-              placeholder="628xxxxxxxxxx"
-              disabled={sameAsPhone}
-            />
-            <label className="flex items-center gap-2 mt-2 text-sm">
+          <form onSubmit={handleSubmit} className="w-full space-y-6 text-white">
+            {/* Phone Number */}
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Nomor Telepon
+              </label>
               <input
-                type="checkbox"
-                checked={sameAsPhone}
-                onChange={() => {
-                  const checked = !sameAsPhone
-                  setSameAsPhone(checked)
-                  if (checked) {
-                    setForm((prev) => ({
-                      ...prev,
-                      whatsapp_number: prev.phone_number,
-                    }))
-                  }
+                type="text"
+                value={form.phone_number}
+                onChange={(e) => {
+                  let val = e.target.value.replace(/\D/g, '')
+                  if (!val.startsWith('62')) val = '62' + val
+                  setForm((prev) => ({
+                    ...prev,
+                    phone_number: val,
+                    ...(sameAsPhone ? { whatsapp_number: val } : {}),
+                  }))
                 }}
+                placeholder="628xxxxxxxxxx"
+                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white focus:outline-none focus:ring-2 focus:ring-[#FF6200]"
               />
-              Sama dengan nomor telepon
-            </label>
-          </div>
-
-          {/* Full Name */}
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-orange">
-              Nama Lengkap
-            </label>
-            <input
-              type="text"
-              value={form.full_name}
-              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-gray-400 placeholder-white/70"
-            />
-          </div>
-
-          {/* Username */}
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-orange">
-              Username
-            </label>
-            <input
-              type="text"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-gray-400 placeholder-white/70"
-            />
-          </div>
-
-          {/* Birth Date */}
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-orange">
-              Tanggal Lahir
-            </label>
-            <input
-              type="date"
-              value={form.birth_date}
-              onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-              className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-gray-400 placeholder-white/70"
-            />
-          </div>
-
-          {/* Awareness Source */}
-          <div>
-            <label className="block text-sm font-semibold mb-2 text-orange">
-              Dari mana kamu tahu IKUZO?
-            </label>
-            <div className="flex flex-wrap gap-3 text-orange placeholder:text-gray-400/90">
-              {awarenessOptions.map((opt) => (
-                <label key={opt} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={form.awareness_source.includes(opt)}
-                    onChange={() => handleCheckboxChange(opt)}
-                  />
-                  {opt}
-                </label>
-              ))}
             </div>
 
-            {/* Conditionally show textarea for 'Lainnya' */}
-            {isOtherSelected && (
-              <textarea
-                value={form.other_awareness}
-                onChange={(e) =>
-                  setForm({ ...form, other_awareness: e.target.value })
-                }
-                placeholder="Tulis sumber lainnya di sini..."
-                className="mt-4 w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-orange placeholder:text-neutral-100 placeholder-white/70"
-              />
-            )}
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-orange">
-              Password
-            </label>
-            <div className="relative w-full">
+            {/* WhatsApp Number */}
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Nomor WhatsApp
+              </label>
               <input
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter your password"
-                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-orange"
-                required
+                type="text"
+                value={form.whatsapp_number}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    whatsapp_number: e.target.value.replace(/\D/g, ''),
+                  })
+                }
+                placeholder="628xxxxxxxxxx"
+                disabled={sameAsPhone}
+                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white disabled:opacity-70"
               />
+              <label className="flex items-center gap-2 mt-2 text-sm text-white/80">
+                <input
+                  type="checkbox"
+                  checked={sameAsPhone}
+                  onChange={() => {
+                    const checked = !sameAsPhone
+                    setSameAsPhone(checked)
+                    if (checked) {
+                      setForm((prev) => ({
+                        ...prev,
+                        whatsapp_number: prev.phone_number,
+                      }))
+                    }
+                  }}
+                />
+                Sama dengan nomor telepon
+              </label>
+            </div>
+
+            {/* Full Name */}
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Nama Lengkap
+              </label>
+              <input
+                type="text"
+                value={form.full_name}
+                onChange={(e) =>
+                  setForm({ ...form, full_name: e.target.value })
+                }
+                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+              />
+            </div>
+
+            {/* Username */}
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Username
+              </label>
+              <input
+                type="text"
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+              />
+            </div>
+
+            {/* Birth Date */}
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Tanggal Lahir
+              </label>
+              <input
+                type="date"
+                value={form.birth_date}
+                onChange={(e) =>
+                  setForm({ ...form, birth_date: e.target.value })
+                }
+                className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+              />
+            </div>
+
+            {/* Awareness */}
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                Dari mana kamu tahu IKUZO?
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {awarenessOptions.map((opt) => (
+                  <label key={opt} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={form.awareness_source.includes(opt)}
+                      onChange={() => handleCheckboxChange(opt)}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+              {isOtherSelected && (
+                <textarea
+                  value={form.other_awareness}
+                  onChange={(e) =>
+                    setForm({ ...form, other_awareness: e.target.value })
+                  }
+                  placeholder="Tulis sumber lainnya di sini..."
+                  className="mt-4 w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+                />
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-semibold mb-1">
+                Password
+              </label>
+              <div className="relative w-full">
+                <input
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="pt-2">
               <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                tabIndex={-1}
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-[#FF6200] hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition disabled:opacity-50"
               >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
+                {submitting ? 'Mendaftar...' : 'Join Sekarang'}
               </button>
             </div>
-          </div>
-
-          {/* Submit */}
-          <div className="text-center">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="inline-flex items-center gap-2 justify-center px-7 py-3 rounded-full bg-orange hover:bg-orange text-white placeholder:text-gray-400 font-semibold text-lg shadow-md transition-transform hover:scale-105 w-full"
-            >
-              {submitting ? 'Mendaftar...' : 'Join Sekarang'}
-            </button>
-          </div>
-        </form>
+          </form>
+        </motion.div>
       </div>
     </section>
   )
