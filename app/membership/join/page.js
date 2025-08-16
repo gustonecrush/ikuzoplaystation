@@ -289,6 +289,16 @@ export default function JoinMembershipPage() {
               </button>
             </div>
           </form>
+
+          <p className="text-sm text-center mt-2 text-white/80">
+            Sudah join member?{' '}
+            <a
+              href="/membership/login"
+              className="text-[#FF6200] font-medium hover:underline"
+            >
+              Login Sekarang
+            </a>
+          </p>
         </motion.div>
       </div>
     </section>
