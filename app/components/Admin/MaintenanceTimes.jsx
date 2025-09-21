@@ -3,7 +3,6 @@
 import React from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 
 import {
   AlertDialog,
@@ -23,13 +22,6 @@ import Toast from '@/app/components/Toast'
 import Cookies from 'js-cookie'
 
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select'
-import {
   Card,
   CardHeader,
   CardTitle,
@@ -39,15 +31,17 @@ import {
 import Loading from '@/app/admin/dashboard/components/loading'
 import { Badge } from '@/components/ui/badge'
 import { Gamepad2, Monitor, Trash2 } from 'lucide-react'
+import {
+  FACILITIES_MAPPING,
+  getFacilityName,
+  SPACE_MAPPING,
+} from '@/utils/facilites'
 
 function MaintenanceTimes() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
-
-  const [seatFilter, setSeatFilter] = React.useState('')
-  const [catalogTxtFilter, setCatalogTxtFilter] = React.useState('')
 
   const [open, setOpen] = React.useState(false)
   const [idSelected, setIdSelected] = React.useState('')
@@ -86,25 +80,6 @@ function MaintenanceTimes() {
         })
       }
     }
-  }
-
-  const facilityMapping = {
-    'PS4 Reguler': [1, 2, 3, 4],
-    'Ikuzo Racing Simulator': [6, 7],
-    'PS5 Reguler': [5, 8],
-    'Squad Open Space': [13, 14, 15, 16],
-    'Family Open Space': [17],
-    'Family VIP Room': [18, 19],
-    'LoveBirds VIP Room': [20, 21, 22],
-  }
-
-  const getFacilityName = (seatNumber) => {
-    for (const [facility, seats] of Object.entries(facilityMapping)) {
-      if (seats.includes(seatNumber)) {
-        return facility
-      }
-    }
-    return 'Unknown Facility'
   }
 
   const getAllDataMaintenances = async () => {
@@ -208,11 +183,7 @@ function MaintenanceTimes() {
   }, [])
 
   const [selectedSpace, setSelectedSpace] = React.useState('')
-  const seatMap = {
-    'Regular Space': [1, 2, 3, 4, 5, 6, 7, 8],
-    'Premium Space': [13, 14, 15, 16, 17],
-    'Private Space': [18, 19, 20, 21, 22],
-  }
+
   const [checkedSeats, setCheckedSeats] = React.useState([])
   const handleSeatChange = (seat) => {
     setCheckedSeats(
@@ -322,12 +293,12 @@ function MaintenanceTimes() {
                   </select>
                 </label>
 
-                {selectedSpace && seatMap[selectedSpace] && (
+                {selectedSpace && SPACE_MAPPING[selectedSpace] && (
                   <div>
                     <label className="text-black" htmlFor="nama">
                       No Seat
                     </label>
-                    {seatMap[selectedSpace].map((seat) => {
+                    {SPACE_MAPPING[selectedSpace].map((seat) => {
                       const facilityName = getFacilityName(seat) // Dapatkan nama fasilitas
                       const isChecked = checkedSeats.includes(seat)
                       return (

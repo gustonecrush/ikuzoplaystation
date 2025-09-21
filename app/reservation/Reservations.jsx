@@ -13,15 +13,12 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
   calculateTimeDifference,
-  convertToDate,
-  convertToExtendedTime,
   convertToStandardTime,
   extractHour,
   formatDate,
   formatDateIndonesian,
   formatTimestampIndonesian,
   generateTimeArray,
-  generateTimeArrayWithStep,
   generateTimeArrayWithStepUser,
   getCurrentDate,
   getCurrentTime,
@@ -68,10 +65,17 @@ import { capitalizeAndFormat, getFacilityId } from '@/utils/text'
 import { MdOutlineUpdate } from 'react-icons/md'
 
 import { useFetchPositions } from '@/hooks/useFetchPositions'
-import { useRouter } from 'next/navigation'
-import Cookies from 'js-cookie'
+import { useFetchDataMaintenances } from '@/hooks/useFetchDataMaintenance'
 
 export default function Reservation() {
+  const {
+    data: dataMaintenance,
+    isLoading: isLoadingMaintenance,
+    getAllDataMaintenances,
+  } = useFetchDataMaintenances()
+
+  console.log({ dataMaintenance })
+
   // RESERVATION STATE DATA
   const [continueTapped, setContinueTapped] = React.useState(false)
   const [idReservasi, setIdReservasi] = React.useState(generateRandomString)
@@ -141,8 +145,6 @@ export default function Reservation() {
   const [selectedCustomPrices, setSelectedCustomPrices] = React.useState(null)
   const getPriceDataCustom = (facilityName) => {
     const facilityId = getFacilityId(facilityName)
-    console.error('FASILITAS NAME', facilityName)
-    console.error('FASILITAS ID', facilityId)
 
     const facilityPriceMap = {
       'ps5-reguler': ps5RegulerData['custom-prices'],
@@ -154,14 +156,12 @@ export default function Reservation() {
       'squad-open-space': squadOpenSpaceData['custom-prices'],
     }
 
-    console.log('GET PRICE DATA CUSTOM', facilityPriceMap[facilityId] || [])
     getPriceByDate(facilityPriceMap[facilityId] || [], selectedDate)
     return facilityPriceMap[facilityId] || []
   }
 
   const getPriceByDate = (data, selectedDate) => {
     const found = data.find((item) => item.date === selectedDate)
-    console.log('FOUND', found)
     setSelectedCustomPrices(found ? found.price : null)
     return found ? found.price : null
   }
@@ -245,7 +245,6 @@ export default function Reservation() {
         const jsonData = await response.data
 
         setDateClose(jsonData.data)
-        console.log('DATE CLOSE', jsonData.data)
       } else {
         throw new Error('Failed to fetch data')
       }
@@ -259,8 +258,6 @@ export default function Reservation() {
       const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
-
-        console.log({ jsonData })
 
         if (jsonData.data.length > 0) {
           setCustomTimeSelected(jsonData.data)
@@ -477,8 +474,6 @@ export default function Reservation() {
         ? premiumSpaceData.times
         : []
 
-    console.log({ value, today, times })
-
     // Find time-set where today's day exists
     const foundItem = times.filter((item) =>
       item['time-day'].split(',').includes(today),
@@ -545,6 +540,7 @@ export default function Reservation() {
 
   useEffect(() => {
     fetchDataTimes()
+    getAllDataMaintenances()
 
     const snapScript = 'https://app.midtrans.com/snap/snap.js'
     const clientKey = process.env.NEXT_PUBLIC_CLIENT
@@ -560,39 +556,6 @@ export default function Reservation() {
     setTotalTime(getTimeDIfferent)
 
     document.body.appendChild(script)
-
-    const image = imageRef.current
-    let isDragging = false
-    let prevPosition = { x: 0, y: 0 }
-    const handleMouseDown = (e) => {
-      isDragging = false
-      prevPosition = getEventPosition(e)
-    }
-
-    const handleMouseMove = (e) => {
-      if (!isDragging) return
-      const currentPosition = getEventPosition(e)
-      const deltaX = currentPosition.x - prevPosition.x
-      const deltaY = currentPosition.y - prevPosition.y
-      prevPosition = currentPosition
-      setPosition((position) => ({
-        x: position.x + deltaX,
-        y: position.y + deltaY,
-      }))
-    }
-
-    const getEventPosition = (e) => {
-      if (e.touches && e.touches.length) {
-        return {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-        }
-      }
-      return {
-        x: e.clientX,
-        y: e.clientY,
-      }
-    }
 
     const getAllReservationWithoutState = async () => {
       try {
@@ -688,7 +651,8 @@ export default function Reservation() {
       lovebirdsVIPRoomData == null ||
       ps4RegulerData == null ||
       ps5RegulerData == null ||
-      ikuzoRacingSimulatorData == null ? (
+      ikuzoRacingSimulatorData == null ||
+      isLoadingMaintenance ? (
         <div className=" z-[999999] w-full h-full absolute top-50">
           <LoaderHome />
         </div>
@@ -1016,6 +980,10 @@ export default function Reservation() {
                                 }}
                               >
                                 {[1, 2, 3, 4, 5].map((number) => {
+                                  const isSeatInMaintenance = dataMaintenance.find(
+                                    (s) => s.no_seat === number,
+                                  )
+
                                   return (
                                     <Drawer
                                       onClose={(e) => {
@@ -1261,7 +1229,8 @@ export default function Reservation() {
                                               />
                                             </div>
 
-                                            {reserves.length > 0 ? (
+                                            {reserves.length &&
+                                            !isSeatInMaintenance > 0 ? (
                                               <>
                                                 <Fade className="">
                                                   <div className="flex gap-1 w-full my-2">
@@ -1306,123 +1275,127 @@ export default function Reservation() {
                                               </>
                                             ) : null}
 
-                                            <Fade className="">
-                                              <div className="flex gap-1 w-full mt-2 mb-3">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Start Time
-                                                  </label>
-                                                  <Select
-                                                    value={startTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setStartTimeReservasi(
-                                                        value,
-                                                      )
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Mulai
-                                                        </SelectLabel>
-                                                        {generatedTimes.map(
-                                                          (time, index) => (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          ),
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    End Time
-                                                  </label>
-                                                  <Select
-                                                    value={endTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setEndTimeReservasi(value)
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Berakhir
-                                                        </SelectLabel>
-                                                        {startTimeReservasi !=
-                                                          '' &&
-                                                        timeArray.length !=
-                                                          0 ? (
-                                                          timeArray.map(
-                                                            (time, index) => {
-                                                              const isDisabled = disableTimes.includes(
-                                                                time,
-                                                              )
+                                            {!isSeatInMaintenance && (
+                                              <Fade className="">
+                                                <div className="flex gap-1 w-full mt-2 mb-3">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Start Time
+                                                    </label>
+                                                    <Select
+                                                      value={startTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setStartTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Mulai
+                                                          </SelectLabel>
+                                                          {generatedTimes.map(
+                                                            (time, index) => (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            ),
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      End Time
+                                                    </label>
+                                                    <Select
+                                                      value={endTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setEndTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Berakhir
+                                                          </SelectLabel>
+                                                          {startTimeReservasi !=
+                                                            '' &&
+                                                          timeArray.length !=
+                                                            0 ? (
+                                                            timeArray.map(
+                                                              (time, index) => {
+                                                                const isDisabled = disableTimes.includes(
+                                                                  time,
+                                                                )
 
-                                                              return (
-                                                                <SelectItem
-                                                                  key={index}
-                                                                  value={time}
-                                                                  className={
-                                                                    'text-sm'
-                                                                  }
-                                                                  disabled={
-                                                                    isDisabled
-                                                                  }
-                                                                >
-                                                                  {time}
-                                                                </SelectItem>
-                                                              )
-                                                            },
-                                                          )
-                                                        ) : (
-                                                          <SelectItem
-                                                            value={'00.00'}
-                                                          >
-                                                            <p className="text-gray-500">
-                                                              Waktu yang kamu
-                                                              pilih <br />
-                                                              sudah terisi.
-                                                              Silakan <br />
-                                                              pilih waktu
-                                                              bermain <br />
-                                                              di jam yang lain
-                                                            </p>
-                                                          </SelectItem>
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
+                                                                return (
+                                                                  <SelectItem
+                                                                    key={index}
+                                                                    value={time}
+                                                                    className={
+                                                                      'text-sm'
+                                                                    }
+                                                                    disabled={
+                                                                      isDisabled
+                                                                    }
+                                                                  >
+                                                                    {time}
+                                                                  </SelectItem>
+                                                                )
+                                                              },
+                                                            )
+                                                          ) : (
+                                                            <SelectItem
+                                                              value={'00.00'}
+                                                            >
+                                                              <p className="text-gray-500">
+                                                                Waktu yang kamu
+                                                                pilih <br />
+                                                                sudah terisi.
+                                                                Silakan <br />
+                                                                pilih waktu
+                                                                bermain <br />
+                                                                di jam yang lain
+                                                              </p>
+                                                            </SelectItem>
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </Fade>
+                                              </Fade>
+                                            )}
                                           </div>
                                         ) : catalogs.length > 0 ? (
                                           <div
@@ -1528,14 +1501,18 @@ export default function Reservation() {
                                         {drawerContent === 'default' ? (
                                           <div className="flex flex-col gap-2 px-5 mt-3">
                                             {timeSet != null ? (
-                                              <DrawerClose asChild>
-                                                <Button
-                                                  variant="outline"
-                                                  className={`bg-orange text-white border-orange py-5`}
-                                                >
-                                                  Continue
-                                                </Button>
-                                              </DrawerClose>
+                                              isSeatInMaintenance ? (
+                                                <></>
+                                              ) : (
+                                                <DrawerClose asChild>
+                                                  <Button
+                                                    variant="outline"
+                                                    className={`bg-orange text-white border-orange py-5`}
+                                                  >
+                                                    Continue
+                                                  </Button>
+                                                </DrawerClose>
+                                              )
                                             ) : (
                                               <></>
                                             )}
@@ -1579,6 +1556,9 @@ export default function Reservation() {
                                 }}
                               >
                                 {[6, 7].map((number) => {
+                                  const isSeatInMaintenance = dataMaintenance.find(
+                                    (s) => s.no_seat === number,
+                                  )
                                   return (
                                     <Drawer
                                       onClose={(e) => {
@@ -1790,7 +1770,8 @@ export default function Reservation() {
                                                 }}
                                               />
                                             </div>
-                                            {reserves.length > 0 ? (
+                                            {reserves.length &&
+                                            !isSeatInMaintenance > 0 ? (
                                               <>
                                                 <Fade>
                                                   <div className="flex gap-1 w-full my-2">
@@ -1834,124 +1815,127 @@ export default function Reservation() {
                                                 </Fade>
                                               </>
                                             ) : null}
+                                            {!isSeatInMaintenance && (
+                                              <Fade>
+                                                <div className="flex gap-1 w-full mt-2 mb-3">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Start Time
+                                                    </label>
+                                                    <Select
+                                                      value={startTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setStartTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Mulai
+                                                          </SelectLabel>
+                                                          {generatedTimes.map(
+                                                            (time, index) => (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            ),
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      End Time
+                                                    </label>
+                                                    <Select
+                                                      value={endTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setEndTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Berakhir
+                                                          </SelectLabel>
+                                                          {startTimeReservasi !=
+                                                            '' &&
+                                                          timeArray.length !=
+                                                            0 ? (
+                                                            timeArray.map(
+                                                              (time, index) => {
+                                                                const isDisabled = disableTimes.includes(
+                                                                  time,
+                                                                )
 
-                                            <Fade>
-                                              <div className="flex gap-1 w-full mt-2 mb-3">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Start Time
-                                                  </label>
-                                                  <Select
-                                                    value={startTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setStartTimeReservasi(
-                                                        value,
-                                                      )
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Mulai
-                                                        </SelectLabel>
-                                                        {generatedTimes.map(
-                                                          (time, index) => (
+                                                                return (
+                                                                  <SelectItem
+                                                                    key={index}
+                                                                    value={time}
+                                                                    className={
+                                                                      'text-sm'
+                                                                    }
+                                                                    disabled={
+                                                                      isDisabled
+                                                                    }
+                                                                  >
+                                                                    {time}
+                                                                  </SelectItem>
+                                                                )
+                                                              },
+                                                            )
+                                                          ) : (
                                                             <SelectItem
-                                                              key={index}
-                                                              value={time}
+                                                              value={'00.00'}
                                                             >
-                                                              {time}
+                                                              <p className="text-gray-500">
+                                                                Waktu yang kamu
+                                                                pilih <br />
+                                                                sudah terisi.
+                                                                Silakan <br />
+                                                                pilih waktu
+                                                                bermain <br />
+                                                                di jam yang lain
+                                                              </p>
                                                             </SelectItem>
-                                                          ),
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
                                                 </div>
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    End Time
-                                                  </label>
-                                                  <Select
-                                                    value={endTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setEndTimeReservasi(value)
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Berakhir
-                                                        </SelectLabel>
-                                                        {startTimeReservasi !=
-                                                          '' &&
-                                                        timeArray.length !=
-                                                          0 ? (
-                                                          timeArray.map(
-                                                            (time, index) => {
-                                                              const isDisabled = disableTimes.includes(
-                                                                time,
-                                                              )
-
-                                                              return (
-                                                                <SelectItem
-                                                                  key={index}
-                                                                  value={time}
-                                                                  className={
-                                                                    'text-sm'
-                                                                  }
-                                                                  disabled={
-                                                                    isDisabled
-                                                                  }
-                                                                >
-                                                                  {time}
-                                                                </SelectItem>
-                                                              )
-                                                            },
-                                                          )
-                                                        ) : (
-                                                          <SelectItem
-                                                            value={'00.00'}
-                                                          >
-                                                            <p className="text-gray-500">
-                                                              Waktu yang kamu
-                                                              pilih <br />
-                                                              sudah terisi.
-                                                              Silakan <br />
-                                                              pilih waktu
-                                                              bermain <br />
-                                                              di jam yang lain
-                                                            </p>
-                                                          </SelectItem>
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                              </div>
-                                            </Fade>
+                                              </Fade>
+                                            )}
                                           </div>
                                         ) : catalogs.length > 0 ? (
                                           <div
@@ -2058,6 +2042,8 @@ export default function Reservation() {
                                           <div className="flex flex-col gap-2 px-5 mt-2">
                                             {timeSet == null ? (
                                               <></>
+                                            ) : isSeatInMaintenance ? (
+                                              <></>
                                             ) : (
                                               <DrawerClose asChild>
                                                 <Button
@@ -2108,6 +2094,9 @@ export default function Reservation() {
                                 }}
                               >
                                 {[8].map((number) => {
+                                  const isSeatInMaintenance = dataMaintenance.find(
+                                    (s) => s.no_seat === number,
+                                  )
                                   return (
                                     <Drawer
                                       onClose={(e) => {
@@ -2319,7 +2308,8 @@ export default function Reservation() {
                                                 }}
                                               />
                                             </div>
-                                            {reserves.length > 0 ? (
+                                            {reserves.length &&
+                                            !isSeatInMaintenance > 0 ? (
                                               <>
                                                 <Fade>
                                                   <div className="flex gap-1 w-full my-2">
@@ -2364,123 +2354,127 @@ export default function Reservation() {
                                               </>
                                             ) : null}
 
-                                            <Fade>
-                                              <div className="flex gap-1 w-full mt-2 mb-3">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Start Time
-                                                  </label>
-                                                  <Select
-                                                    value={startTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setStartTimeReservasi(
-                                                        value,
-                                                      )
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Mulai
-                                                        </SelectLabel>
-                                                        {generatedTimes.map(
-                                                          (time, index) => (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          ),
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    End Time
-                                                  </label>
-                                                  <Select
-                                                    value={endTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setEndTimeReservasi(value)
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Berakhir
-                                                        </SelectLabel>
-                                                        {startTimeReservasi !=
-                                                          '' &&
-                                                        timeArray.length !=
-                                                          0 ? (
-                                                          timeArray.map(
-                                                            (time, index) => {
-                                                              const isDisabled = disableTimes.includes(
-                                                                time,
-                                                              )
+                                            {!isSeatInMaintenance && (
+                                              <Fade>
+                                                <div className="flex gap-1 w-full mt-2 mb-3">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Start Time
+                                                    </label>
+                                                    <Select
+                                                      value={startTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setStartTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Mulai
+                                                          </SelectLabel>
+                                                          {generatedTimes.map(
+                                                            (time, index) => (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            ),
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      End Time
+                                                    </label>
+                                                    <Select
+                                                      value={endTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setEndTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Berakhir
+                                                          </SelectLabel>
+                                                          {startTimeReservasi !=
+                                                            '' &&
+                                                          timeArray.length !=
+                                                            0 ? (
+                                                            timeArray.map(
+                                                              (time, index) => {
+                                                                const isDisabled = disableTimes.includes(
+                                                                  time,
+                                                                )
 
-                                                              return (
-                                                                <SelectItem
-                                                                  key={index}
-                                                                  value={time}
-                                                                  className={
-                                                                    'text-sm'
-                                                                  }
-                                                                  disabled={
-                                                                    isDisabled
-                                                                  }
-                                                                >
-                                                                  {time}
-                                                                </SelectItem>
-                                                              )
-                                                            },
-                                                          )
-                                                        ) : (
-                                                          <SelectItem
-                                                            value={'00.00'}
-                                                          >
-                                                            <p className="text-gray-500">
-                                                              Waktu yang kamu
-                                                              pilih <br />
-                                                              sudah terisi.
-                                                              Silakan <br />
-                                                              pilih waktu
-                                                              bermain <br />
-                                                              di jam yang lain
-                                                            </p>
-                                                          </SelectItem>
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
+                                                                return (
+                                                                  <SelectItem
+                                                                    key={index}
+                                                                    value={time}
+                                                                    className={
+                                                                      'text-sm'
+                                                                    }
+                                                                    disabled={
+                                                                      isDisabled
+                                                                    }
+                                                                  >
+                                                                    {time}
+                                                                  </SelectItem>
+                                                                )
+                                                              },
+                                                            )
+                                                          ) : (
+                                                            <SelectItem
+                                                              value={'00.00'}
+                                                            >
+                                                              <p className="text-gray-500">
+                                                                Waktu yang kamu
+                                                                pilih <br />
+                                                                sudah terisi.
+                                                                Silakan <br />
+                                                                pilih waktu
+                                                                bermain <br />
+                                                                di jam yang lain
+                                                              </p>
+                                                            </SelectItem>
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </Fade>
+                                              </Fade>
+                                            )}
                                           </div>
                                         ) : catalogs.length > 0 ? (
                                           <div
@@ -2586,6 +2580,8 @@ export default function Reservation() {
                                         {drawerContent === 'default' ? (
                                           <div className="flex flex-col gap-2 px-5 mt-2">
                                             {timeSet == null ? (
+                                              <></>
+                                            ) : isSeatInMaintenance ? (
                                               <></>
                                             ) : (
                                               <DrawerClose asChild>
@@ -3603,6 +3599,10 @@ export default function Reservation() {
                                 }}
                               >
                                 {[13, 14, 15, 16].map((number) => {
+                                  const isSeatInMaintenance = dataMaintenance.find(
+                                    (s) => s.no_seat === number,
+                                  )
+
                                   return (
                                     <Drawer
                                       onClose={(e) => {
@@ -3817,7 +3817,8 @@ export default function Reservation() {
                                                 }}
                                               />
                                             </div>
-                                            {reserves.length > 0 ? (
+                                            {reserves.length &&
+                                            !isSeatInMaintenance > 0 ? (
                                               <>
                                                 <Fade>
                                                   <div className="flex gap-1 w-full my-2">
@@ -3862,123 +3863,127 @@ export default function Reservation() {
                                               </>
                                             ) : null}
 
-                                            <Fade>
-                                              <div className="flex gap-1 w-full mt-2 mb-3">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Start Time
-                                                  </label>
-                                                  <Select
-                                                    value={startTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setStartTimeReservasi(
-                                                        value,
-                                                      )
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Mulai
-                                                        </SelectLabel>
-                                                        {generatedTimes.map(
-                                                          (time, index) => (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          ),
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    End Time
-                                                  </label>
-                                                  <Select
-                                                    value={endTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setEndTimeReservasi(value)
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Berakhir
-                                                        </SelectLabel>
-                                                        {startTimeReservasi !=
-                                                          '' &&
-                                                        timeArray.length !=
-                                                          0 ? (
-                                                          timeArray.map(
-                                                            (time, index) => {
-                                                              const isDisabled = disableTimes.includes(
-                                                                time,
-                                                              )
+                                            {!isSeatInMaintenance && (
+                                              <Fade>
+                                                <div className="flex gap-1 w-full mt-2 mb-3">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Start Time
+                                                    </label>
+                                                    <Select
+                                                      value={startTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setStartTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Mulai
+                                                          </SelectLabel>
+                                                          {generatedTimes.map(
+                                                            (time, index) => (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            ),
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      End Time
+                                                    </label>
+                                                    <Select
+                                                      value={endTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setEndTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Berakhir
+                                                          </SelectLabel>
+                                                          {startTimeReservasi !=
+                                                            '' &&
+                                                          timeArray.length !=
+                                                            0 ? (
+                                                            timeArray.map(
+                                                              (time, index) => {
+                                                                const isDisabled = disableTimes.includes(
+                                                                  time,
+                                                                )
 
-                                                              return (
-                                                                <SelectItem
-                                                                  key={index}
-                                                                  value={time}
-                                                                  className={
-                                                                    'text-sm'
-                                                                  }
-                                                                  disabled={
-                                                                    isDisabled
-                                                                  }
-                                                                >
-                                                                  {time}
-                                                                </SelectItem>
-                                                              )
-                                                            },
-                                                          )
-                                                        ) : (
-                                                          <SelectItem
-                                                            value={'00.00'}
-                                                          >
-                                                            <p className="text-gray-500">
-                                                              Waktu yang kamu
-                                                              pilih <br />
-                                                              sudah terisi.
-                                                              Silakan <br />
-                                                              pilih waktu
-                                                              bermain <br />
-                                                              di jam yang lain
-                                                            </p>
-                                                          </SelectItem>
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
+                                                                return (
+                                                                  <SelectItem
+                                                                    key={index}
+                                                                    value={time}
+                                                                    className={
+                                                                      'text-sm'
+                                                                    }
+                                                                    disabled={
+                                                                      isDisabled
+                                                                    }
+                                                                  >
+                                                                    {time}
+                                                                  </SelectItem>
+                                                                )
+                                                              },
+                                                            )
+                                                          ) : (
+                                                            <SelectItem
+                                                              value={'00.00'}
+                                                            >
+                                                              <p className="text-gray-500">
+                                                                Waktu yang kamu
+                                                                pilih <br />
+                                                                sudah terisi.
+                                                                Silakan <br />
+                                                                pilih waktu
+                                                                bermain <br />
+                                                                di jam yang lain
+                                                              </p>
+                                                            </SelectItem>
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </Fade>
+                                              </Fade>
+                                            )}
                                           </div>
                                         ) : catalogs.length > 0 ? (
                                           <div
@@ -4086,6 +4091,8 @@ export default function Reservation() {
                                             <div className="flex flex-col gap-2 px-2 mt-2">
                                               {timeSet == null ? (
                                                 <></>
+                                              ) : isSeatInMaintenance ? (
+                                                <></>
                                               ) : (
                                                 <DrawerClose asChild>
                                                   <Button
@@ -4123,6 +4130,7 @@ export default function Reservation() {
                                   )
                                 })}
                               </div>
+
                               <div
                                 className={`flex flex-row w-auto bottom-12 gap-16 absolute left-[46%] md:bottom-20  z-50 gap-[${
                                   8 + scale * 10
@@ -4135,6 +4143,9 @@ export default function Reservation() {
                                 }}
                               >
                                 {[17].map((number) => {
+                                  const isSeatInMaintenance = dataMaintenance.find(
+                                    (s) => s.no_seat === number,
+                                  )
                                   return (
                                     <Drawer
                                       key={number}
@@ -4346,7 +4357,8 @@ export default function Reservation() {
                                                 }}
                                               />
                                             </div>
-                                            {reserves.length > 0 ? (
+                                            {reserves.length &&
+                                            !isSeatInMaintenance > 0 ? (
                                               <>
                                                 <Fade>
                                                   <div className="flex gap-1 w-full my-2">
@@ -4390,123 +4402,128 @@ export default function Reservation() {
                                                 </Fade>
                                               </>
                                             ) : null}
-                                            <Fade>
-                                              <div className="flex gap-1 w-full mt-2 mb-3">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Start Time
-                                                  </label>
-                                                  <Select
-                                                    value={startTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setStartTimeReservasi(
-                                                        value,
-                                                      )
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Mulai
-                                                        </SelectLabel>
-                                                        {generatedTimes.map(
-                                                          (time, index) => (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          ),
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    End Time
-                                                  </label>
-                                                  <Select
-                                                    value={endTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setEndTimeReservasi(value)
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Berakhir
-                                                        </SelectLabel>
-                                                        {startTimeReservasi !=
-                                                          '' &&
-                                                        timeArray.length !=
-                                                          0 ? (
-                                                          timeArray.map(
-                                                            (time, index) => {
-                                                              const isDisabled = disableTimes.includes(
-                                                                time,
-                                                              )
 
-                                                              return (
-                                                                <SelectItem
-                                                                  key={index}
-                                                                  value={time}
-                                                                  className={
-                                                                    'text-sm'
-                                                                  }
-                                                                  disabled={
-                                                                    isDisabled
-                                                                  }
-                                                                >
-                                                                  {time}
-                                                                </SelectItem>
-                                                              )
-                                                            },
-                                                          )
-                                                        ) : (
-                                                          <SelectItem
-                                                            value={'00.00'}
-                                                          >
-                                                            <p className="text-gray-500">
-                                                              Waktu yang kamu
-                                                              pilih <br />
-                                                              sudah terisi.
-                                                              Silakan <br />
-                                                              pilih waktu
-                                                              bermain <br />
-                                                              di jam yang lain
-                                                            </p>
-                                                          </SelectItem>
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
+                                            {!isSeatInMaintenance && (
+                                              <Fade>
+                                                <div className="flex gap-1 w-full mt-2 mb-3">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Start Time
+                                                    </label>
+                                                    <Select
+                                                      value={startTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setStartTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Mulai
+                                                          </SelectLabel>
+                                                          {generatedTimes.map(
+                                                            (time, index) => (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            ),
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      End Time
+                                                    </label>
+                                                    <Select
+                                                      value={endTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setEndTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Berakhir
+                                                          </SelectLabel>
+                                                          {startTimeReservasi !=
+                                                            '' &&
+                                                          timeArray.length !=
+                                                            0 ? (
+                                                            timeArray.map(
+                                                              (time, index) => {
+                                                                const isDisabled = disableTimes.includes(
+                                                                  time,
+                                                                )
+
+                                                                return (
+                                                                  <SelectItem
+                                                                    key={index}
+                                                                    value={time}
+                                                                    className={
+                                                                      'text-sm'
+                                                                    }
+                                                                    disabled={
+                                                                      isDisabled
+                                                                    }
+                                                                  >
+                                                                    {time}
+                                                                  </SelectItem>
+                                                                )
+                                                              },
+                                                            )
+                                                          ) : (
+                                                            <SelectItem
+                                                              value={'00.00'}
+                                                            >
+                                                              <p className="text-gray-500">
+                                                                Waktu yang kamu
+                                                                pilih <br />
+                                                                sudah terisi.
+                                                                Silakan <br />
+                                                                pilih waktu
+                                                                bermain <br />
+                                                                di jam yang lain
+                                                              </p>
+                                                            </SelectItem>
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </Fade>
+                                              </Fade>
+                                            )}
                                           </div>
                                         ) : catalogs.length > 0 ? (
                                           <div
@@ -4613,6 +4630,8 @@ export default function Reservation() {
                                             <DrawerClose asChild>
                                               {timeSet == null ? (
                                                 <></>
+                                              ) : isSeatInMaintenance ? (
+                                                <></>
                                               ) : (
                                                 <Button
                                                   variant="outline"
@@ -4666,6 +4685,9 @@ export default function Reservation() {
                                 }}
                               >
                                 {[18, 19].map((number) => {
+                                  const isSeatInMaintenance = dataMaintenance.find(
+                                    (s) => s.no_seat === number,
+                                  )
                                   return (
                                     <Drawer
                                       key={number}
@@ -4877,7 +4899,8 @@ export default function Reservation() {
                                                 }}
                                               />
                                             </div>
-                                            {reserves.length > 0 ? (
+                                            {reserves.length &&
+                                            !isSeatInMaintenance > 0 ? (
                                               <>
                                                 <Fade>
                                                   <div className="flex gap-1 w-full my-2">
@@ -4921,123 +4944,127 @@ export default function Reservation() {
                                                 </Fade>
                                               </>
                                             ) : null}
-                                            <Fade>
-                                              <div className="flex gap-1 w-full mt-2 mb-3">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Start Time
-                                                  </label>
-                                                  <Select
-                                                    value={startTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setStartTimeReservasi(
-                                                        value,
-                                                      )
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Mulai
-                                                        </SelectLabel>
-                                                        {generatedTimes.map(
-                                                          (time, index) => (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          ),
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    End Time
-                                                  </label>
-                                                  <Select
-                                                    value={endTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setEndTimeReservasi(value)
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Berakhir
-                                                        </SelectLabel>
-                                                        {startTimeReservasi !=
-                                                          '' &&
-                                                        timeArray.length !=
-                                                          0 ? (
-                                                          timeArray.map(
-                                                            (time, index) => {
-                                                              const isDisabled = disableTimes.includes(
-                                                                time,
-                                                              )
+                                            {!isSeatInMaintenance && (
+                                              <Fade>
+                                                <div className="flex gap-1 w-full mt-2 mb-3">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Start Time
+                                                    </label>
+                                                    <Select
+                                                      value={startTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setStartTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Mulai
+                                                          </SelectLabel>
+                                                          {generatedTimes.map(
+                                                            (time, index) => (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            ),
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      End Time
+                                                    </label>
+                                                    <Select
+                                                      value={endTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setEndTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Berakhir
+                                                          </SelectLabel>
+                                                          {startTimeReservasi !=
+                                                            '' &&
+                                                          timeArray.length !=
+                                                            0 ? (
+                                                            timeArray.map(
+                                                              (time, index) => {
+                                                                const isDisabled = disableTimes.includes(
+                                                                  time,
+                                                                )
 
-                                                              return (
-                                                                <SelectItem
-                                                                  key={index}
-                                                                  value={time}
-                                                                  className={
-                                                                    'text-sm'
-                                                                  }
-                                                                  disabled={
-                                                                    isDisabled
-                                                                  }
-                                                                >
-                                                                  {time}
-                                                                </SelectItem>
-                                                              )
-                                                            },
-                                                          )
-                                                        ) : (
-                                                          <SelectItem
-                                                            value={'00.00'}
-                                                          >
-                                                            <p className="text-gray-500">
-                                                              Waktu yang kamu
-                                                              pilih <br />
-                                                              sudah terisi.
-                                                              Silakan <br />
-                                                              pilih waktu
-                                                              bermain <br />
-                                                              di jam yang lain
-                                                            </p>
-                                                          </SelectItem>
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
+                                                                return (
+                                                                  <SelectItem
+                                                                    key={index}
+                                                                    value={time}
+                                                                    className={
+                                                                      'text-sm'
+                                                                    }
+                                                                    disabled={
+                                                                      isDisabled
+                                                                    }
+                                                                  >
+                                                                    {time}
+                                                                  </SelectItem>
+                                                                )
+                                                              },
+                                                            )
+                                                          ) : (
+                                                            <SelectItem
+                                                              value={'00.00'}
+                                                            >
+                                                              <p className="text-gray-500">
+                                                                Waktu yang kamu
+                                                                pilih <br />
+                                                                sudah terisi.
+                                                                Silakan <br />
+                                                                pilih waktu
+                                                                bermain <br />
+                                                                di jam yang lain
+                                                              </p>
+                                                            </SelectItem>
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </Fade>
+                                              </Fade>
+                                            )}
                                           </div>
                                         ) : catalogs.length > 0 ? (
                                           <div
@@ -5143,6 +5170,8 @@ export default function Reservation() {
                                           <div className="flex flex-col gap-2 px-5 my-2">
                                             {timeSet == null ? (
                                               <></>
+                                            ) : isSeatInMaintenance ? (
+                                              <></>
                                             ) : (
                                               <DrawerClose asChild>
                                                 <Button
@@ -5192,6 +5221,9 @@ export default function Reservation() {
                                 }}
                               >
                                 {[20, 21, 22].map((number) => {
+                                  const isSeatInMaintenance = dataMaintenance.find(
+                                    (s) => s.no_seat === number,
+                                  )
                                   return (
                                     <Drawer
                                       onClose={(e) => {
@@ -5405,7 +5437,8 @@ export default function Reservation() {
                                                 }}
                                               />
                                             </div>
-                                            {reserves.length > 0 ? (
+                                            {reserves.length &&
+                                            !isSeatInMaintenance > 0 ? (
                                               <>
                                                 <Fade>
                                                   <div className="flex gap-1 w-full my-2">
@@ -5450,123 +5483,127 @@ export default function Reservation() {
                                               </>
                                             ) : null}
 
-                                            <Fade>
-                                              <div className="flex gap-1 w-full mt-2 mb-3">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Start Time
-                                                  </label>
-                                                  <Select
-                                                    value={startTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setStartTimeReservasi(
-                                                        value,
-                                                      )
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Mulai
-                                                        </SelectLabel>
-                                                        {generatedTimes.map(
-                                                          (time, index) => (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          ),
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
-                                                </div>
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    End Time
-                                                  </label>
-                                                  <Select
-                                                    value={endTimeReservasi}
-                                                    onValueChange={(value) =>
-                                                      setEndTimeReservasi(value)
-                                                    }
-                                                    required
-                                                    className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                                  >
-                                                    <SelectTrigger className="py-5 px-3 text-sm">
-                                                      <SelectValue
-                                                        className="text-base"
-                                                        placeholder="00.00"
-                                                      />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                      <SelectGroup>
-                                                        <SelectLabel className="text-sm">
-                                                          Pilih Waktu Berakhir
-                                                        </SelectLabel>
-                                                        {startTimeReservasi !=
-                                                          '' &&
-                                                        timeArray.length !=
-                                                          0 ? (
-                                                          timeArray.map(
-                                                            (time, index) => {
-                                                              const isDisabled = disableTimes.includes(
-                                                                time,
-                                                              )
+                                            {!isSeatInMaintenance && (
+                                              <Fade>
+                                                <div className="flex gap-1 w-full mt-2 mb-3">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Start Time
+                                                    </label>
+                                                    <Select
+                                                      value={startTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setStartTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Mulai
+                                                          </SelectLabel>
+                                                          {generatedTimes.map(
+                                                            (time, index) => (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            ),
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      End Time
+                                                    </label>
+                                                    <Select
+                                                      value={endTimeReservasi}
+                                                      onValueChange={(value) =>
+                                                        setEndTimeReservasi(
+                                                          value,
+                                                        )
+                                                      }
+                                                      required
+                                                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                    >
+                                                      <SelectTrigger className="py-5 px-3 text-sm">
+                                                        <SelectValue
+                                                          className="text-base"
+                                                          placeholder="00.00"
+                                                        />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        <SelectGroup>
+                                                          <SelectLabel className="text-sm">
+                                                            Pilih Waktu Berakhir
+                                                          </SelectLabel>
+                                                          {startTimeReservasi !=
+                                                            '' &&
+                                                          timeArray.length !=
+                                                            0 ? (
+                                                            timeArray.map(
+                                                              (time, index) => {
+                                                                const isDisabled = disableTimes.includes(
+                                                                  time,
+                                                                )
 
-                                                              return (
-                                                                <SelectItem
-                                                                  key={index}
-                                                                  value={time}
-                                                                  className={
-                                                                    'text-sm'
-                                                                  }
-                                                                  disabled={
-                                                                    isDisabled
-                                                                  }
-                                                                >
-                                                                  {time}
-                                                                </SelectItem>
-                                                              )
-                                                            },
-                                                          )
-                                                        ) : (
-                                                          <SelectItem
-                                                            value={'00.00'}
-                                                          >
-                                                            <p className="text-gray-500">
-                                                              Waktu yang kamu
-                                                              pilih <br />
-                                                              sudah terisi.
-                                                              Silakan <br />
-                                                              pilih waktu
-                                                              bermain <br />
-                                                              di jam yang lain
-                                                            </p>
-                                                          </SelectItem>
-                                                        )}
-                                                      </SelectGroup>
-                                                    </SelectContent>
-                                                  </Select>
+                                                                return (
+                                                                  <SelectItem
+                                                                    key={index}
+                                                                    value={time}
+                                                                    className={
+                                                                      'text-sm'
+                                                                    }
+                                                                    disabled={
+                                                                      isDisabled
+                                                                    }
+                                                                  >
+                                                                    {time}
+                                                                  </SelectItem>
+                                                                )
+                                                              },
+                                                            )
+                                                          ) : (
+                                                            <SelectItem
+                                                              value={'00.00'}
+                                                            >
+                                                              <p className="text-gray-500">
+                                                                Waktu yang kamu
+                                                                pilih <br />
+                                                                sudah terisi.
+                                                                Silakan <br />
+                                                                pilih waktu
+                                                                bermain <br />
+                                                                di jam yang lain
+                                                              </p>
+                                                            </SelectItem>
+                                                          )}
+                                                        </SelectGroup>
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </Fade>
+                                              </Fade>
+                                            )}
                                           </div>
                                         ) : catalogs.length > 0 ? (
                                           <div
@@ -5672,6 +5709,8 @@ export default function Reservation() {
                                           {drawerContent === 'default' ? (
                                             <div className="flex flex-col gap-2 px-2 mt-2">
                                               {timeSet == null ? (
+                                                <></>
+                                              ) : isSeatInMaintenance ? (
                                                 <></>
                                               ) : (
                                                 <DrawerClose asChild>

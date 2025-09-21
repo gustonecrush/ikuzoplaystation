@@ -24,9 +24,6 @@ import * as XLSX from 'xlsx'
 import { saveAs } from 'file-saver'
 
 import {
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -65,8 +62,6 @@ import {
 import { IoMdAdd } from 'react-icons/io'
 import axios from 'axios'
 
-import { ColumnDef } from '@tanstack/react-table'
-
 import { MdPaid } from 'react-icons/md'
 import { MdOutlineAccessTimeFilled } from 'react-icons/md'
 import { TiTimes } from 'react-icons/ti'
@@ -98,7 +93,6 @@ import {
   IoMoveOutline,
   IoTime,
 } from 'react-icons/io5'
-import { Cross2Icon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 import {
   convertToDate,
@@ -110,19 +104,24 @@ import {
   getMaxDate,
 } from '@/utils/date'
 
-import {
-  IoGameController,
-  IoLaptopSharp,
-  IoCalendarClear,
-} from 'react-icons/io5'
 import { Statistics } from '@/app/components'
 import { Calendar } from '@/components/ui/calendar'
 import { addDays, subDays } from 'date-fns'
 import Sidebar from '@/app/components/Admin/Sidebar'
 import MembershipCheck from '../components/Membership/MembershipCheck'
+import { useFetchDataMaintenances } from '@/hooks/useFetchDataMaintenance'
 
 function page() {
+  const {
+    data: dataMaintenance,
+    isLoading: isLoadingMaintenance,
+    getAllDataMaintenances,
+  } = useFetchDataMaintenances()
+
+  console.log({ dataMaintenance })
+
   const [data, setData] = React.useState([])
+
   const [isHide, setIsHide] = React.useState(false)
   const hideSuccessPayment = () => {
     const filteredData = data.filter(
@@ -139,17 +138,14 @@ function page() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}`,
       )
-      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
 
         setReservesPosition(jsonData)
-        console.log(response.data)
 
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -185,7 +181,6 @@ function page() {
       const response = await axios.delete(`${baseUrl}/reservations/${id}`)
       if (response.status == 200) {
         const jsonData = await response.data
-        console.log({ jsonData })
       } else {
         console.error({ error })
         throw new Error('Failed to fetch data')
@@ -234,7 +229,6 @@ function page() {
   const getTimeSelected = async (date) => {
     try {
       const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
-      console.log(`${baseUrl}/times?selected_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
 
@@ -243,10 +237,7 @@ function page() {
         } else {
           setCustomTimeSelected([])
         }
-
-        console.log({ customTimeSelected })
       } else {
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -260,9 +251,7 @@ function page() {
   const timeArray = generateTimeArrayWithStep(startTimeReservasi, bookedSlots)
 
   const fetchingAvailableReservation = async (date, position) => {
-    console.log('fetching')
     getAllReservation(date, position)
-    console.log('fetching', reserves)
   }
 
   const handleGetReservationById = async (id) => {
@@ -285,13 +274,10 @@ function page() {
           jsonData[0].reserve_date,
           jsonData[0].position,
         )
-        console.log({ jsonData })
         setIsLoading(false)
         setOpenFormMoveCustomer(!openFormMoveCustomer)
-        console.log({ startTimeReservasi })
       } else {
         setIsLoading(false)
-        console.error({ error })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -325,10 +311,7 @@ function page() {
         const jsonData = await response.data
 
         setDateClose(jsonData.data)
-
-        console.log({ customTimeSelected })
       } else {
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -349,9 +332,7 @@ function page() {
       )
       if (response.status == 200) {
         const jsonData = await response.data
-        console.log({ jsonData })
       } else {
-        console.error({ error })
         throw new Error('Failed to fetch data')
       }
 
@@ -398,9 +379,7 @@ function page() {
       )
       if (response.status == 200) {
         const jsonData = await response.data
-        console.log({ jsonData })
       } else {
-        console.error({ error })
         throw new Error('Failed to fetch data')
       }
 
@@ -901,7 +880,6 @@ function page() {
           icon: 'success',
           title: `Berhasil logout dari dashboard!`,
         })
-        console.log({ response })
 
         router.replace('/admin/login')
       } else {
@@ -909,7 +887,6 @@ function page() {
           icon: 'error',
           title: `Gagal logout dari dashboard!`,
         })
-        console.log({ response })
       }
     } catch (error) {
       Toast.fire({
@@ -923,7 +900,6 @@ function page() {
   const [date, setDate] = React.useState(
     Cookies.get('selectedDate') ? Cookies.get('selectedDate') : new Date(),
   )
-  console.log('DATE', date)
 
   const getAllDataReservations = async (
     date = Cookies.get('selectedDate')
@@ -938,11 +914,9 @@ function page() {
       if (response.status == 200) {
         const jsonData = await response.data
         setData(jsonData)
-        console.log({ jsonData })
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.error({ error })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -985,11 +959,9 @@ function page() {
       if (response.status == 200) {
         const jsonData = await response.data
         setTotal(jsonData)
-        console.log({ jsonData })
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.error({ error })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -1003,7 +975,6 @@ function page() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
-      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
 
@@ -1013,12 +984,10 @@ function page() {
           endTime: reserve.reserve_end_time,
         }))
         setBookedSlots(slots)
-        console.log(response.data)
 
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -1041,13 +1010,11 @@ function page() {
         const jsonData = await response.data
 
         setReservationExport(jsonData)
-        console.log(response.data)
 
         setIsLoading(false)
         exportToExcel(jsonData)
       } else {
         setIsLoading(false)
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
@@ -1059,9 +1026,6 @@ function page() {
       setIsLoading(false)
     }
   }
-
-  console.log({ dateStartExport })
-  console.log({ dateEndExport })
 
   const [
     openCreateReservationForm,
