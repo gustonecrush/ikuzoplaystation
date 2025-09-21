@@ -8,10 +8,9 @@ import TableReservations from '@/app/components/TableReservations'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-import { FiEdit3 } from 'react-icons/fi'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { ArrowUpDown } from 'lucide-react'
-import { IoIosInformationCircle, IoMdImages } from 'react-icons/io'
+import { IoMdImages } from 'react-icons/io'
 
 import {
   getCoreRowModel,
@@ -20,14 +19,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-
-import { Calendar } from '@/components/ui/calendar'
 
 import {
   AlertDialog,
@@ -44,18 +35,14 @@ import {
 import { IoMdAdd } from 'react-icons/io'
 import axios from 'axios'
 
-import { HiCalendar } from 'react-icons/hi'
-import { addDays, subDays } from 'date-fns'
 import { AiFillEdit } from 'react-icons/ai'
 import Toast from '@/app/components/Toast'
 import Loading from '../components/loading'
 import { Fade } from 'react-awesome-reveal'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
-import { IoBook, IoCalendarClear, IoLogOut, IoTime } from 'react-icons/io5'
-import { formatDateOnTheUI, getCurrentDate, getMaxDate } from '@/utils/date'
+import { getCurrentDate, getMaxDate } from '@/utils/date'
 
-import { IoGameController, IoLaptopSharp } from 'react-icons/io5'
 import { MdOutlineChair } from 'react-icons/md'
 
 import {
@@ -70,17 +57,12 @@ import Sidebar from '@/app/components/Admin/Sidebar'
 function page() {
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
-  const [statusPlaying, setStatusPlaying] = React.useState('')
 
   const [seatFilter, setSeatFilter] = React.useState('')
   const [catalogTxtFilter, setCatalogTxtFilter] = React.useState('')
 
-  const [date, setDate] = React.useState(null)
   const [selectedDate, setSelectedDate] = React.useState('')
-  const [date2, setDate2] = React.useState(null)
   const [selectedDate2, setSelectedDate2] = React.useState('')
-  const [currentDate, setCurrentDate] = React.useState(getCurrentDate)
-  const [maxDate, setMaxDate] = React.useState(getMaxDate)
 
   const [open, setOpen] = React.useState(false)
   const [openUpdate, setOpenUpdate] = React.useState(false)
@@ -320,43 +302,9 @@ function page() {
     },
   })
 
-  console.log('Column Filters:', columnFilters)
   const router = useRouter()
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
-
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post(`${baseUrl}/logout`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (response.status == 200) {
-        Cookies.remove('token')
-        Toast.fire({
-          icon: 'success',
-          title: `Berhasil logout dari dashboard!`,
-        })
-        console.log({ response })
-
-        router.replace('/admin/login')
-      } else {
-        Toast.fire({
-          icon: 'error',
-          title: `Gagal logout dari dashboard!`,
-        })
-        console.log({ response })
-      }
-    } catch (error) {
-      Toast.fire({
-        icon: 'error',
-        title: `Gagal logout dari dashboard!`,
-      })
-      console.error({ error })
-    }
-  }
 
   const facilityMapping = {
     'PS4 Reguler': [1, 2, 3, 4],
@@ -376,8 +324,6 @@ function page() {
     }
     return 'Unknown Facility' // Jika nomor kursi tidak ditemukan
   }
-
-  console.log(data)
 
   const getAllDataCatalogs = async () => {
     setIsLoading(true)
@@ -415,7 +361,6 @@ function page() {
     }
   }
 
-  const [noSeat, setNoSeat] = React.useState(null)
   const [catalogTxt, setCatalogTxt] = React.useState('')
   const [catalogImg, setCatalogImg] = React.useState(null)
 
@@ -505,8 +450,6 @@ function page() {
           : [...prevSeats, seat], // Tambahkan jika dicentang
     )
   }
-
-  console.log({ checkedSeats })
 
   return (
     <main className="flex w-full h-screen rounded-3xl">

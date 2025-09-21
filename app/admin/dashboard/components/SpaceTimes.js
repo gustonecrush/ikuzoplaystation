@@ -2,16 +2,11 @@
 
 import React from 'react'
 
-// shadcn ui components
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 import Toast from '@/app/components/Toast'
 import { HashLoader } from 'react-spinners'
 import getDocument from '@/firebase/firestore/getData'
-import updateData from '@/firebase/firestore/updateData'
-import { Textarea } from '@/components/ui/textarea'
-import { TbEdit } from 'react-icons/tb'
 import { doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore'
 import firebaseApp from '@/firebase/config'
 import addData from '@/firebase/firestore/addData'
@@ -335,19 +330,19 @@ function SpaceTimes() {
   }
 
   return (
-    <section className={`w-full flex flex-col gap-5 -mt-12`}>
+    <section className={`w-full flex flex-col gap-5`}>
       {isLoading ||
       privateSpaceData == null ||
       premiumSpaceData == null ||
       allSpaceTimeData == null ||
       formData == null ||
       regularSpaceData == null ? (
-        <div className="flex items-center justify-center p-10">
+        <div className="flex items-center justify-center p-32">
           <HashLoader color="#FF6200" />
         </div>
       ) : (
         <>
-          <div className="w-full mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
+          <div className="w-full mx-auto p-5 bg-white shadow-lg rounded-lg">
             {/* Add New Data Section */}
             <button
               onClick={() => setIsAdding(!isAdding)}

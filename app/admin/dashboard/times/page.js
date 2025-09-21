@@ -7,7 +7,6 @@ import TableReservations from '@/app/components/TableReservations'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 
 import { FiEdit3 } from 'react-icons/fi'
 import { AiOutlineDelete } from 'react-icons/ai'
@@ -29,16 +28,6 @@ import {
 } from '@/components/ui/popover'
 
 import { Calendar } from '@/components/ui/calendar'
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 import {
   AlertDialog,
@@ -65,24 +54,22 @@ import Loading from '../components/loading'
 import { Fade } from 'react-awesome-reveal'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
-import { IoBook, IoCalendarClear, IoLogOut, IoTime } from 'react-icons/io5'
 import { formatDateOnTheUI, getCurrentDate, getMaxDate } from '@/utils/date'
 
-import { IoGameController, IoLaptopSharp } from 'react-icons/io5'
 import SpaceTimes from '../components/SpaceTimes'
 import Sidebar from '@/app/components/Admin/Sidebar'
+import MaintenanceTimes from '@/app/components/Admin/MaintenanceTimes'
+import { FEATURE_TIMES } from '@/constans/features'
 
 function page() {
   const [data, setData] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
-  const [statusPlaying, setStatusPlaying] = React.useState('')
 
   const [date, setDate] = React.useState(null)
   const [selectedDate, setSelectedDate] = React.useState('')
   const [currentDate, setCurrentDate] = React.useState(getCurrentDate)
   const [maxDate, setMaxDate] = React.useState(getMaxDate)
 
-  const [open, setOpen] = React.useState(false)
   const [openUpdate, setOpenUpdate] = React.useState(false)
   const [idSelected, setIdSelected] = React.useState('')
 
@@ -111,7 +98,7 @@ function page() {
         title: `Setting waktu berhasil dihapus!`,
       })
 
-      getAllDataReservations()
+      getAllDataTimes()
       setIdSelected('')
     } catch (error) {
       console.error({ error })
@@ -170,7 +157,7 @@ function page() {
         title: `Setting waktu berhasil ditambahkan!`,
       })
 
-      getAllDataReservations()
+      getAllDataTimes()
       setOpenCreateReservationForm(false)
       clearFormCustomTime()
     } catch (error) {
@@ -223,7 +210,7 @@ function page() {
         title: `Setting waktu berhasil diupdate!`,
       })
 
-      getAllDataReservations()
+      getAllDataTimes()
       clearFormCustomTime()
       setOpenUpdate(false)
       setOpenCreateReservationForm(false)
@@ -408,44 +395,10 @@ function page() {
     },
   })
 
-  const router = useRouter()
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   const token = Cookies.get('token')
 
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post(`${baseUrl}/logout`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (response.status == 200) {
-        Cookies.remove('token')
-        Toast.fire({
-          icon: 'success',
-          title: `Berhasil logout dari dashboard!`,
-        })
-        console.log({ response })
-
-        router.replace('/admin/login')
-      } else {
-        Toast.fire({
-          icon: 'error',
-          title: `Gagal logout dari dashboard!`,
-        })
-        console.log({ response })
-      }
-    } catch (error) {
-      Toast.fire({
-        icon: 'error',
-        title: `Gagal logout dari dashboard!`,
-      })
-      console.error({ error })
-    }
-  }
-
-  const getAllDataReservations = async () => {
+  const getAllDataTimes = async () => {
     setIsLoading(true)
     try {
       const response = await axios.get(
@@ -483,279 +436,260 @@ function page() {
     setOpenCreateReservationForm,
   ] = React.useState(false)
 
-  const features = [
-    {
-      id: 'operationals',
-      name: 'Operationals',
-      desc: "Setup Operational's Times",
-      img: '/game.png',
-    },
-    {
-      id: 'spaces',
-      name: 'Spaces',
-      desc: "Setup Space's Times",
-      img: '/sofa.png',
-    },
-  ]
   const [selectedFeature, setSelectedFeature] = React.useState('operationals')
 
   React.useEffect(() => {
-    getAllDataReservations()
+    getAllDataTimes()
   }, [])
 
   return (
     <main className="flex w-full h-screen rounded-3xl">
       <Sidebar />
-      <section className="flex flex-col pt-3 w-10/12 bg-white h-full overflow-y-scroll">
-        <>
-          <div className=" w-fit py-5 px-7 text-black bg-white rounded-lg  flex flex-row gap-3 items-center">
-            <Fade>
-              <Image
-                src={'/checkout.png'}
-                width={0}
-                height={0}
-                alt={'Reservation'}
-                className="w-20"
-              />
-            </Fade>
+      <section className="flex flex-col pt-3  w-10/12 bg-white h-full overflow-y-scroll ">
+        <div className=" w-fit py-5 px-7 text-black bg-white rounded-lg  flex flex-row gap-3 items-center">
+          <Fade>
+            <Image
+              src={'/checkout.png'}
+              width={0}
+              height={0}
+              alt={'Reservation'}
+              className="w-20"
+            />
+          </Fade>
 
-            <Fade>
-              <div className="flex flex-col">
-                <h1 className="text-4xl font-semibold">Open/Close Time</h1>
-                <p className="text-base font-normal text-gray-400">
-                  Atur waktu buka dan tutup Ikuzo Playstation pada hari tertentu
-                </p>
-              </div>
-            </Fade>
-
-            <div className="flex flex-row gap-4 w-full">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  onClick={(e) => {
-                    setSelectedFeature(feature.id)
-                    fetchContents()
-                  }}
-                  className={`flex w-full hover:scale-110 duration-1000 cursor-pointer items-center px-2 py-3 justify-center ${
-                    selectedFeature == feature.id
-                      ? 'bg-orange bg-opacity-5'
-                      : 'bg-white'
-                  } rounded-lg shadow-md`}
-                >
-                  <div className="flex flex-row items-center gap-3 justify-center">
-                    <Image
-                      src={feature.img}
-                      alt={'Content Games'}
-                      width={0}
-                      height={0}
-                      className="w-[70px]"
-                    />
-
-                    <div className="flex flex-col justify-start items-start">
-                      <h1 className="text-lg font-semibold leading-none">
-                        {feature.name}
-                      </h1>
-                      <p className={`text-base font-normal text-gray-400`}>
-                        {feature.desc}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          <Fade>
+            <div className="flex flex-col">
+              <h1 className="text-4xl font-semibold">
+                Schedule, Time, and Status Settings
+              </h1>
+              <p className="text-base font-normal text-gray-400">
+                Atur Waktu atau Status Operasional, Fasilitas, dan Maintenance
+              </p>
             </div>
-          </div>
+          </Fade>
+        </div>
 
-          {selectedFeature == 'operationals' && (
-            <section className="gap-3 px-5 ml-8 bg-white shadow-md rounded-lg mt-5 ">
-              <Card extra="mt-6 p-5 text-base">
-                <div className="w-full">
-                  <div className="flex items-center justify-between py-4">
-                    <Input
-                      placeholder="Cari Tanggal..."
-                      value={table.getColumn('date')?.getFilterValue() ?? ''}
-                      onChange={(event) =>
-                        table
-                          .getColumn('date')
-                          ?.setFilterValue(event.target.value)
+        <section className="flex ml-3 gap-4 w-full py-5 ">
+          {FEATURE_TIMES.map((feature, index) => (
+            <div
+              key={index}
+              onClick={(e) => {
+                setSelectedFeature(feature.id)
+                fetchContents()
+              }}
+              className={`flex w-full hover:scale-110 duration-1000 cursor-pointer items-center px-2 py-3 justify-center  ${
+                selectedFeature == feature.id
+                  ? 'bg-orange bg-opacity-5'
+                  : 'bg-white'
+              } rounded-lg shadow-md`}
+            >
+              <div className="flex flex-row items-center gap-3 justify-center">
+                <Image
+                  src={feature.img}
+                  alt={'Content Games'}
+                  width={0}
+                  height={0}
+                  className="w-[60px]"
+                />
+
+                <div className="flex flex-col justify-start items-start">
+                  <h1 className="text-lg font-semibold leading-none">
+                    {feature.name}
+                  </h1>
+                  <p
+                    className={`text-sm leading-none font-normal text-gray-400`}
+                  >
+                    {feature.desc}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {selectedFeature == 'operationals' && (
+          <section className="gap-3  bg-white shadow-md rounded-lg mt-5 ">
+            <Card extra="mt-6 p-5 text-base">
+              <div className="w-full">
+                <div className="flex items-center justify-between py-4">
+                  <Input
+                    placeholder="Cari Tanggal..."
+                    value={table.getColumn('date')?.getFilterValue() ?? ''}
+                    onChange={(event) =>
+                      table
+                        .getColumn('date')
+                        ?.setFilterValue(event.target.value)
+                    }
+                    className="max-w-sm"
+                  />
+                  <div className="flex gap-1">
+                    <Button
+                      onClick={(e) =>
+                        setOpenCreateReservationForm(!openCreateReservationForm)
                       }
-                      className="max-w-sm"
-                    />
-                    <div className="flex gap-1">
-                      <Button
-                        onClick={(e) =>
-                          setOpenCreateReservationForm(
-                            !openCreateReservationForm,
-                          )
-                        }
-                        variant="outline"
-                        className="ml-auto"
-                      >
-                        Setting Waktu <IoMdAdd className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {isLoading ? (
-                    <div className="flex h-[300px] w-full flex-col items-center justify-center py-20">
-                      <Loading />
-                    </div>
-                  ) : (
-                    <TableReservations
-                      isLoading={isLoading}
-                      columns={columns}
-                      table={table}
-                      type={'short'}
-                    />
-                  )}
-
-                  <div className="flex items-center justify-end space-x-2 py-4">
-                    <div className="text-muted-foreground flex-1 text-sm">
-                      {table.getFilteredSelectedRowModel().rows.length} of{' '}
-                      {table.getFilteredRowModel().rows.length} row(s) selected.
-                    </div>
-                    <div className="space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                      >
-                        Next
-                      </Button>
-                    </div>
+                      variant="outline"
+                      className="ml-auto"
+                    >
+                      Setting Waktu <IoMdAdd className="ml-2 h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </Card>
 
-              <AlertDialog
-                className="bg-black/20"
-                open={openCreateReservationForm}
-              >
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Setting Waktu</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Setting waktu buka dan tutup Ikuzo Playstation pada
-                      tanggal tertentu
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <fieldset>
-                    <form className="flex flex-col gap-2">
-                      {!openUpdate && (
-                        <div>
-                          <label className="text-black" htmlFor="nama">
-                            Tanggal Reservasi
-                          </label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <input
-                                type="text"
-                                value={selectedDate}
-                                onChange={(e) =>
-                                  setSelectedDate(e.target.value)
-                                }
-                                name="tanggal_reservasi"
-                                id="tanggal_reservasi"
-                                placeholder="Pilih tanggal reservasi"
-                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                                min={currentDate}
-                                max={maxDate}
-                                required
-                              />
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-full p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={date}
-                                onSelect={(date) => {
-                                  setDate(date)
-                                  const nextDay = addDays(date, 1)
-                                  setSelectedDate(
-                                    nextDay.toISOString().split('T')[0],
-                                  )
-                                }}
-                                disabled={(date) =>
-                                  date > new addDays(new Date(), 15) ||
-                                  date < subDays(new Date(), 1)
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                      )}
+                {isLoading ? (
+                  <div className="flex h-[300px] w-full flex-col items-center justify-center py-20">
+                    <Loading />
+                  </div>
+                ) : (
+                  <TableReservations
+                    isLoading={isLoading}
+                    columns={columns}
+                    table={table}
+                    type={'short'}
+                  />
+                )}
 
-                      <div className="flex flex-row gap-2 w-full">
-                        <div>
-                          <label className="text-black" htmlFor="nama">
-                            Waktu Buka
-                          </label>
-                          <input
-                            type="number"
-                            value={openTime}
-                            onChange={(e) => setOpenTime(e.target.value)}
-                            name="tanggal_reservasi"
-                            id="tanggal_reservasi"
-                            placeholder="Waktu buka..."
-                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="text-black" htmlFor="nama">
-                            Waktu Tutup
-                          </label>
-                          <input
-                            type="number"
-                            value={closeTime}
-                            onChange={(e) => setCloseTime(e.target.value)}
-                            name="tanggal_reservasi"
-                            id="tanggal_reservasi"
-                            placeholder="Waktu tutup..."
-                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                            required
-                          />
-                        </div>
+                <div className="flex items-center justify-end space-x-2 py-4">
+                  <div className="text-muted-foreground flex-1 text-sm">
+                    {table.getFilteredSelectedRowModel().rows.length} of{' '}
+                    {table.getFilteredRowModel().rows.length} row(s) selected.
+                  </div>
+                  <div className="space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => table.previousPage()}
+                      disabled={!table.getCanPreviousPage()}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => table.nextPage()}
+                      disabled={!table.getCanNextPage()}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <AlertDialog
+              className="bg-black/20"
+              open={openCreateReservationForm}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Setting Waktu</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Setting waktu buka dan tutup Ikuzo Playstation pada tanggal
+                    tertentu
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <fieldset>
+                  <form className="flex flex-col gap-2">
+                    {!openUpdate && (
+                      <div>
+                        <label className="text-black" htmlFor="nama">
+                          Tanggal Reservasi
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <input
+                              type="text"
+                              value={selectedDate}
+                              onChange={(e) => setSelectedDate(e.target.value)}
+                              name="tanggal_reservasi"
+                              id="tanggal_reservasi"
+                              placeholder="Pilih tanggal reservasi"
+                              className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                              min={currentDate}
+                              max={maxDate}
+                              required
+                            />
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={date}
+                              onSelect={(date) => {
+                                setDate(date)
+                                const nextDay = addDays(date, 1)
+                                setSelectedDate(
+                                  nextDay.toISOString().split('T')[0],
+                                )
+                              }}
+                              disabled={(date) =>
+                                date > new addDays(new Date(), 15) ||
+                                date < subDays(new Date(), 1)
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                    </form>
-                  </fieldset>
+                    )}
 
-                  <AlertDialogFooter>
-                    <AlertDialogCancel
-                      onClick={(e) => setOpenCreateReservationForm(false)}
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={(e) =>
-                        openUpdate
-                          ? handleUpdateFacilityContent(idSelected)
-                          : handleUploadCustomTime(e)
-                      }
-                    >
-                      Setting
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </section>
-          )}
+                    <div className="flex flex-row gap-2 w-full">
+                      <div>
+                        <label className="text-black" htmlFor="nama">
+                          Waktu Buka
+                        </label>
+                        <input
+                          type="number"
+                          value={openTime}
+                          onChange={(e) => setOpenTime(e.target.value)}
+                          name="tanggal_reservasi"
+                          id="tanggal_reservasi"
+                          placeholder="Waktu buka..."
+                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-black" htmlFor="nama">
+                          Waktu Tutup
+                        </label>
+                        <input
+                          type="number"
+                          value={closeTime}
+                          onChange={(e) => setCloseTime(e.target.value)}
+                          name="tanggal_reservasi"
+                          id="tanggal_reservasi"
+                          placeholder="Waktu tutup..."
+                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                          required
+                        />
+                      </div>
+                    </div>
+                  </form>
+                </fieldset>
 
-          {selectedFeature == 'spaces' && <SpaceTimes />}
-        </>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={(e) => setOpenCreateReservationForm(false)}
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) =>
+                      openUpdate
+                        ? handleUpdateFacilityContent(idSelected)
+                        : handleUploadCustomTime(e)
+                    }
+                  >
+                    Setting
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </section>
+        )}
 
-        {/* <Reservation /> */}
+        {selectedFeature == 'spaces' && <SpaceTimes />}
+
+        {selectedFeature == 'maintenances' && <MaintenanceTimes />}
       </section>
     </main>
   )

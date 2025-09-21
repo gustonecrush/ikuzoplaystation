@@ -112,7 +112,7 @@ function CTAButton() {
       }`}
     >
       <Link
-        href="/reservation/options"
+        href="/reservation"
         title="Reserve Now"
         className={`flex hover:animate-pulse duration-750 items-center gap-3 px-5 py-3 bg-orange-500 hover:bg-orange-600  rounded-full shadow-lg transition-all justify-center w-full duration-200 ease-in-out hover:scale-105 group ${
           scrolled
