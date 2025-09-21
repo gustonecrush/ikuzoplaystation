@@ -2582,7 +2582,7 @@ export default function Reservation() {
                                             {timeSet == null ? (
                                               <></>
                                             ) : isSeatInMaintenance ? (
-                                              <></>
+                                              <> </>
                                             ) : (
                                               <DrawerClose asChild>
                                                 <Button
