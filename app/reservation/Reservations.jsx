@@ -2689,15 +2689,7 @@ export default function Reservation() {
                                             overflow: 'hidden',
                                           }}
                                         >
-                                          <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
-                                            useMap="#image-map"
-                                            alt=""
-                                            style={{
-                                              width: '100%',
-                                              height: 'auto',
-                                            }}
-                                          />
+                                        
                                         </div>
                                       </div>
                                     ) : catalogs.length > 0 ? (
