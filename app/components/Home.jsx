@@ -134,7 +134,7 @@ function CTAButton() {
 function ReserveButton({ type }) {
   return (
     <Link
-      href={'/reservation'}
+      href={'/reservation/options'}
       className={`bg-orange text-white border-orange py-2 rounded-full text-base mt-4 mb-20 w-fit px-10 relative font-semibold duration-1000 hover:bg-yellow-700 ${
         type == 'large' ? 'px-20 py-4 text-xl' : ''
       }`}
