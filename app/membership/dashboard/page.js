@@ -101,14 +101,11 @@ export default function CustomerDashboard() {
           </h1>
 
           {/* Active Membership */}
-          {currentTier ? (
+          {/* {currentTier ? (
             <div className="bg-white/20 border border-white/30 rounded-2xl p-6 shadow-lg mb-10 text-white">
               <h2 className="text-xl font-semibold mb-2 text-[#FF6200]">
                 Keanggotaan Aktif: {currentTier.icon} {currentTier.full_name}
               </h2>
-              <p className="text-sm text-white/80 mb-4">
-                Rp {Number(currentTier.price).toLocaleString()}
-              </p>
               <div
                 className="prose prose-sm text-white/80"
                 dangerouslySetInnerHTML={{ __html: currentTier.benefits }}
@@ -142,7 +139,27 @@ export default function CustomerDashboard() {
                 ))}
               </div>
             </>
-          )}
+          )} */}
+
+          <div className="flex flex-col justify-center items-center min-h-screen gap-4 px-10">
+            <Image
+              src={'/error.png'}
+              alt="Failed Pay"
+              title={'Failed Pay'}
+              width={0}
+              height={0}
+              className="w-[300px] h-fit object-contain"
+            />
+            <div className="flex flex-col gap-1 items-center mt-7 text-center">
+              <h1 className="text-xl font-semibold">
+                Benefits and Save Time Not Available!
+              </h1>
+              <p className="text-sm text-gray-400">
+                This features are in development right now, you can utilize
+                these feature after development proccess
+              </p>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
