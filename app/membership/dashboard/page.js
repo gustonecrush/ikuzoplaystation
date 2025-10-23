@@ -96,8 +96,9 @@ export default function CustomerDashboard() {
         >
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-4xl font-bold leading-none text-white drop-shadow-md mb-2">
-              <span className="text-orange">Ikuzo</span> Member Area
+            <h1 className="mt-5 text-2xl sm:text-4xl font-bold leading-none text-white drop-shadow-md mb-2">
+              <span className="text-orange">Ikuzo</span>
+              <br /> Member Area
             </h1>
             <p className="text-gray-200 text-xs sm:text-sm">
               Welcome back,{' '}
