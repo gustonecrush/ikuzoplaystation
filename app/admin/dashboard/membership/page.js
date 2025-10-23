@@ -12,32 +12,38 @@ import MembershipWeeklyReport from '../components/Membership/MembershipWeeklyRep
 
 function page() {
   const features = [
-    {
-      id: 'customers',
-      name: 'Customers',
-      desc: 'Checking memberships',
-      img: '/membership.png',
-    },
-    {
-      id: 'memberships',
-      name: 'Transactions',
-      desc: 'Checking transactions',
-      img: '/payment.png',
-    },
-    {
-      id: 'tiers',
-      name: 'Tiers',
-      desc: 'Custom membership tiers',
-      img: '/tier.png',
-    },
+    // {
+    //   id: 'members',
+    //   name: 'Members',
+    //   desc: 'Checking membessr',
+    //   img: '/membership.png',
+    // },
+    // {
+    //   id: 'reservations',
+    //   name: 'Reservations',
+    //   desc: 'Reservations',
+    //   img: '/tier.png',
+    // },
+    // {
+    //   id: 'memberships',
+    //   name: 'Transactions',
+    //   desc: 'Checking transactions',
+    //   img: '/payment.png',
+    // },
+    // {
+    //   id: 'tiers',
+    //   name: 'Tiers',
+    //   desc: 'Custom membership tiers',
+    //   img: '/tier.png',
+    // },
   ]
-  const [selectedFeature, setSelectedFeature] = React.useState('customers')
+  const [selectedFeature, setSelectedFeature] = React.useState('members')
 
   return (
     <Layout>
       <section className="flex flex-col pt-3 w-full bg-white h-full overflow-y-scroll">
         <>
-          <div className=" w-fit py-5 px-7 text-black bg-white rounded-lg  flex flex-row gap-3 items-center">
+          <div className=" w-full py-5 px-7 text-black bg-white rounded-lg  flex flex-row gap-3 items-center">
             <Fade>
               <Image
                 src={'/reserve.png'}
@@ -57,7 +63,7 @@ function page() {
               </div>
             </Fade>
 
-            <div className="flex flex-row gap-4 w-full ">
+            <div className="flex flex-row gap-4 w-full justify-end items-end">
               {features.map((feature, index) => (
                 <div
                   key={index}
@@ -65,7 +71,7 @@ function page() {
                     setSelectedFeature(feature.id)
                     fetchContents()
                   }}
-                  className={`flex w-full hover:scale-110 duration-1000 cursor-pointer items-center px-4 py-3 justify-center ${
+                  className={`flex w-fit hover:scale-110 duration-1000 cursor-pointer items-center px-4 py-3 justify-center ${
                     selectedFeature == feature.id
                       ? 'bg-orange bg-opacity-5'
                       : 'bg-white'
@@ -96,11 +102,12 @@ function page() {
             </div>
           </div>
 
-          {selectedFeature == 'customers' && (
-            <>
-              <MembershipCustomers />
-            </>
+          {selectedFeature == 'members' && <MembershipCustomers />}
+
+          {selectedFeature == 'reservations' && (
+            <MembershipCustomerTransactions />
           )}
+
           {selectedFeature == 'memberships' && (
             <MembershipCustomerTransactions />
           )}

@@ -42,10 +42,10 @@ export default function Sidebar() {
       href: '/admin/dashboard/dates',
       icon: <IoCalendarClear className="text-4xl" />,
     },
-    // {
-    //   href: '/admin/dashboard/membership',
-    //   icon: <BsStars className="text-4xl" />,
-    // },
+    {
+      href: '/admin/dashboard/membership',
+      icon: <BsStars className="text-4xl" />,
+    },
     {
       icon: <IoLogOut className="text-4xl text-gray-400" />,
       onClick: handleLogout,

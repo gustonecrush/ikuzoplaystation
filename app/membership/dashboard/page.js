@@ -156,7 +156,7 @@ export default function CustomerDashboard() {
               </h1>
               <p className="text-sm text-gray-400">
                 This features are in development right now, you can utilize
-                these feature after development proccess
+                these feature after development proccess.
               </p>
             </div>
           </div>
