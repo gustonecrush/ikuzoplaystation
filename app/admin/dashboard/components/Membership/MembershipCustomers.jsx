@@ -2,6 +2,11 @@
 
 import { Bs123 } from 'react-icons/bs'
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
   MdOutlineAccessTime,
   MdOutlineUpdate,
   MdInfoOutline,
@@ -16,6 +21,7 @@ import {
   FaRegUserCircle,
   FaTrash,
   FaWhatsapp,
+  FaUsers,
 } from 'react-icons/fa'
 import { BsTelephone, BsPerson } from 'react-icons/bs'
 import { HiOutlineCalendar } from 'react-icons/hi'
@@ -49,6 +55,7 @@ import {
 } from '@tanstack/react-table'
 
 import axios from 'axios'
+import { ChevronDown, Plus, Users } from 'lucide-react'
 
 function MembershipCustomers() {
   const [data, setData] = React.useState([])
@@ -61,6 +68,10 @@ function MembershipCustomers() {
   const [selectedCustomer, setSelectedCustomer] = React.useState(null)
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = React.useState(false)
   const [isBenefitsDialogOpen, setIsBenefitsDialogOpen] = React.useState(false)
+  const [
+    isBulkBenefitsDialogOpen,
+    setIsBulkBenefitsDialogOpen,
+  ] = React.useState(false)
   const [isSavedTimesDialogOpen, setIsSavedTimesDialogOpen] = React.useState(
     false,
   )
@@ -70,6 +81,9 @@ function MembershipCustomers() {
   ] = React.useState(false)
 
   const [open, setOpen] = React.useState(false)
+  const [benefitInputs, setBenefitInputs] = React.useState([''])
+  const [bulkBenefitInputs, setBulkBenefitInputs] = React.useState([''])
+  const [isBulkLoading, setIsBulkLoading] = React.useState(false)
 
   // Columns Definition
   const columns = [
@@ -301,9 +315,7 @@ function MembershipCustomers() {
     }
   }
 
-  const [benefitInputs, setBenefitInputs] = React.useState([''])
-
-  // Function untuk save benefits
+  // Function untuk save benefits (single customer)
   const handleSaveBenefits = async () => {
     if (!selectedCustomer) return
 
@@ -332,6 +344,41 @@ function MembershipCustomers() {
     }
   }
 
+  // Function untuk save benefits ke semua customer
+  const handleSaveBulkBenefits = async () => {
+    setIsBulkLoading(true)
+    try {
+      const benefitsString = bulkBenefitInputs.filter((b) => b.trim()).join('.')
+
+      // Loop through all customers
+      const promises = data.map((customer) =>
+        axios.put(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/customers/${customer.id}/benefits`,
+          { benefits: benefitsString },
+        ),
+      )
+
+      await Promise.all(promises)
+
+      Toast.fire({
+        icon: 'success',
+        title: `Benefits updated for ${data.length} customers!`,
+      })
+
+      setIsBulkBenefitsDialogOpen(false)
+      setBulkBenefitInputs([''])
+      getAllDataMembershipCustomers()
+    } catch (error) {
+      console.error(error)
+      Toast.fire({
+        icon: 'error',
+        title: 'Failed to update benefits!',
+      })
+    } finally {
+      setIsBulkLoading(false)
+    }
+  }
+
   // Reset inputs saat dialog dibuka
   React.useEffect(() => {
     if (isBenefitsDialogOpen && selectedCustomer?.benefits) {
@@ -347,18 +394,15 @@ function MembershipCustomers() {
 
   return (
     <>
-      {/* Registration Form */}
       <MembershipFormRegistration
         open={open}
         setOpen={setOpen}
         onSuccess={getAllDataMembershipCustomers}
       />
 
-      {/* Main Content */}
       <section className="gap-3 px-5">
         <div className="w-full">
           <Card extra="gap-3 px-5 py-7 bg-white shadow-md rounded-2xl">
-            {/* Search and Actions */}
             <div className="flex items-center justify-between py-4">
               <Input
                 placeholder="Search member based on username.."
@@ -368,18 +412,41 @@ function MembershipCustomers() {
                 }
                 className="max-w-sm"
               />
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <MembershipCheck />
-                <Button
-                  onClick={() => setOpen(true)}
-                  className="bg-orange hover:bg-orange"
-                >
-                  Add Data
-                </Button>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button className="bg-orange hover:bg-orange/90">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Settings
+                      <ChevronDown className="w-4 h-4 ml-2" />
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent align="end" className="w-48 p-2">
+                    <div className="flex flex-col gap-1">
+                      <button
+                        onClick={() => setOpen(true)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-neutral-100 transition-colors text-sm"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Member
+                      </button>
+
+                      <button
+                        onClick={() => setIsBulkBenefitsDialogOpen(true)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-neutral-100 transition-colors text-sm"
+                      >
+                        <Users className="w-4 h-4" />
+                        Bulk Benefits
+                      </button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
-            {/* Table */}
             <div className="flex flex-col gap-3">
               {isLoading ? (
                 <div className="flex h-[300px] w-full flex-col items-center justify-center py-20">
@@ -394,7 +461,6 @@ function MembershipCustomers() {
                 />
               )}
 
-              {/* Pagination */}
               <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="text-muted-foreground flex-1 text-sm">
                   {table.getFilteredSelectedRowModel().rows.length} of{' '}
@@ -484,8 +550,7 @@ function MembershipCustomers() {
         </AlertDialog>
       )}
 
-      {/* Benefits Dialog */}
-      {/* Benefits Dialog */}
+      {/* Single Customer Benefits Dialog */}
       <AlertDialog
         open={isBenefitsDialogOpen}
         onOpenChange={setIsBenefitsDialogOpen}
@@ -502,7 +567,6 @@ function MembershipCustomers() {
           </AlertDialogHeader>
 
           <div className="py-4 space-y-4">
-            {/* Current Benefits Display */}
             {selectedCustomer?.benefits && (
               <div className="p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm font-medium text-blue-900 mb-2">
@@ -523,7 +587,6 @@ function MembershipCustomers() {
               </div>
             )}
 
-            {/* Benefits Input */}
             <div className="space-y-3">
               <label className="text-sm font-medium">Add New Benefits</label>
               {benefitInputs.map((benefit, index) => (
@@ -538,21 +601,19 @@ function MembershipCustomers() {
                     }}
                     className="flex-1"
                   />
-                  {benefitInputs.length > 1 && (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="text-red-600 border-red-600 hover:bg-red-50"
-                      onClick={() => {
-                        const newInputs = benefitInputs.filter(
-                          (_, i) => i !== index,
-                        )
-                        setBenefitInputs(newInputs)
-                      }}
-                    >
-                      <FaTrash className="w-4 h-4" />
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="text-red-600 border-red-600 hover:bg-red-50"
+                    onClick={() => {
+                      const newInputs = benefitInputs.filter(
+                        (_, i) => i !== index,
+                      )
+                      setBenefitInputs(newInputs)
+                    }}
+                  >
+                    <FaTrash className="w-4 h-4" />
+                  </Button>
                 </div>
               ))}
 
@@ -567,7 +628,6 @@ function MembershipCustomers() {
               </Button>
             </div>
 
-            {/* Preview */}
             {benefitInputs.some((b) => b.trim()) && (
               <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-700 mb-2">
@@ -585,9 +645,109 @@ function MembershipCustomers() {
             <Button
               className="bg-blue-600 hover:bg-blue-700"
               onClick={handleSaveBenefits}
-              disabled={!benefitInputs.some((b) => b.trim())}
             >
               Save Benefits
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Benefits Dialog */}
+      <AlertDialog
+        open={isBulkBenefitsDialogOpen}
+        onOpenChange={setIsBulkBenefitsDialogOpen}
+      >
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <FaUsers className="w-5 h-5 text-orange" />
+              Bulk Add Benefits to All Customers
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Add benefits to all {data.length} customers at once
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="py-4 space-y-4">
+            <div className="p-3 bg-orange/10 border border-orange/30 rounded-lg">
+              <p className="text-sm font-medium text-orange-900 mb-1">
+                ⚠️ Warning
+              </p>
+              <p className="text-xs text-orange-800">
+                This will apply the same benefits to all customers. Existing
+                benefits will be replaced.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-medium">Benefits to Add</label>
+              {bulkBenefitInputs.map((benefit, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    placeholder={`Benefit ${index + 1}`}
+                    value={benefit}
+                    onChange={(e) => {
+                      const newInputs = [...bulkBenefitInputs]
+                      newInputs[index] = e.target.value
+                      setBulkBenefitInputs(newInputs)
+                    }}
+                    className="flex-1"
+                  />
+                  {bulkBenefitInputs.length > 1 && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="text-red-600 border-red-600 hover:bg-red-50"
+                      onClick={() => {
+                        const newInputs = bulkBenefitInputs.filter(
+                          (_, i) => i !== index,
+                        )
+                        setBulkBenefitInputs(newInputs)
+                      }}
+                    >
+                      <FaTrash className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-orange border-orange hover:bg-orange/10"
+                onClick={() => setBulkBenefitInputs([...bulkBenefitInputs, ''])}
+              >
+                <FaPlus className="w-3 h-3 mr-1" />
+                Add More Benefit
+              </Button>
+            </div>
+
+            {bulkBenefitInputs.some((b) => b.trim()) && (
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  Preview:
+                </p>
+                <p className="text-sm text-gray-600">
+                  {bulkBenefitInputs.filter((b) => b.trim()).join('.')}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkLoading}>
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              className="bg-orange hover:bg-orange/90"
+              onClick={handleSaveBulkBenefits}
+              disabled={
+                !bulkBenefitInputs.some((b) => b.trim()) || isBulkLoading
+              }
+            >
+              {isBulkLoading
+                ? 'Saving...'
+                : `Save to All ${data.length} Customers`}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
