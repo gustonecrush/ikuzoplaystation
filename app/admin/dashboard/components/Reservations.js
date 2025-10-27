@@ -153,7 +153,7 @@ export default function Reservation() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
-      getAllPositions()
+      // getAllPositions()
       console.log(`${baseUrl}/reservations?reserve_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
@@ -652,7 +652,7 @@ export default function Reservation() {
       }
     }
 
-    getAllPositions()
+    // getAllPositions()
 
     const intervalTime = 500
     const interval = setInterval(() => {
@@ -859,15 +859,38 @@ export default function Reservation() {
                             }
                             getTimeSelected(format(date, 'yyyy-MM-dd'))
                           }}
-                          disabled={(date) => {
-                            const today = startOfDay(new Date()) // Normalize today's date
-                            const maxDate = addDays(today, 14) // Max selectable date
-                            const minDate = subDays(today, 1) // Min selectable date
+                          // disabled={(date) => {
+                          //   const today = startOfDay(new Date()) // Normalize today's date
+                          //   const maxDate = addDays(today, 14) // Max selectable date
+                          //   const minDate = subDays(today, 1) // Min selectable date
 
-                            // Normalize the input date
+                          //   // Normalize the input date
+                          //   const checkDate = startOfDay(date)
+
+                          //   // Check if the date falls within any closed date range
+                          //   const isInClosedRange = dateClose.some(
+                          //     ({ start_date, end_date }) => {
+                          //       const startDate = startOfDay(
+                          //         new Date(start_date),
+                          //       )
+                          //       const endDate = startOfDay(new Date(end_date))
+                          //       return (
+                          //         checkDate >= startDate && checkDate <= endDate
+                          //       ) // Ensure start_date is included
+                          //     },
+                          //   )
+
+                          //   return (
+                          //     checkDate > maxDate ||
+                          //     checkDate < minDate ||
+                          //     isInClosedRange
+                          //   )
+                          // }}
+                          disabled={(date) => {
+                            const today = startOfDay(new Date())
+                            const maxDate = addDays(today, 14)
                             const checkDate = startOfDay(date)
 
-                            // Check if the date falls within any closed date range
                             const isInClosedRange = dateClose.some(
                               ({ start_date, end_date }) => {
                                 const startDate = startOfDay(
@@ -876,13 +899,13 @@ export default function Reservation() {
                                 const endDate = startOfDay(new Date(end_date))
                                 return (
                                   checkDate >= startDate && checkDate <= endDate
-                                ) // Ensure start_date is included
+                                )
                               },
                             )
 
                             return (
                               checkDate > maxDate ||
-                              checkDate < minDate ||
+                              checkDate < today || // ← Ganti minDate dengan today
                               isInClosedRange
                             )
                           }}
