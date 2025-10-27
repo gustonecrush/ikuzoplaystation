@@ -96,7 +96,7 @@ export default function CustomerDashboard() {
         >
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="mt-5 text-2xl sm:text-4xl font-bold leading-none text-white drop-shadow-md mb-2">
+            <h1 className="mt-5 text-3xl sm:text-4xl font-bold leading-none text-white drop-shadow-md mb-2">
               <span className="text-orange">Ikuzo</span>
               <br /> Member Area
             </h1>
@@ -217,7 +217,7 @@ function MemberInfoTab({ user }) {
               <BsPerson className="w-4 h-4 text-orange" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-gray-400 text-xs">Username</p>
+              <p className="text-gray-200 text-xs">Username</p>
               <p className="text-white font-semibold truncate">
                 @{user?.username}
               </p>
@@ -229,7 +229,7 @@ function MemberInfoTab({ user }) {
               <HiOutlineCalendar className="w-4 h-4 text-orange" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-gray-400 text-xs">Birth Date</p>
+              <p className="text-gray-200 text-xs">Birth Date</p>
               <p className="text-white font-semibold">{user?.birth_date}</p>
             </div>
           </div>
@@ -241,7 +241,7 @@ function MemberInfoTab({ user }) {
               <FaWhatsapp className="w-4 h-4 text-green-300" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-gray-400 text-xs">WhatsApp</p>
+              <p className="text-gray-200 text-xs">WhatsApp</p>
               <p className="text-white font-semibold truncate">
                 {user?.whatsapp_number}
               </p>
@@ -253,7 +253,7 @@ function MemberInfoTab({ user }) {
               <BsTelephone className="w-4 h-4 text-orange" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-gray-400 text-xs">Phone</p>
+              <p className="text-gray-200 text-xs">Phone</p>
               <p className="text-white font-semibold truncate">
                 {user?.phone_number}
               </p>
@@ -386,24 +386,417 @@ function BenefitsTab({ user }) {
   )
 }
 
-// Playtime Tab Component
+// Replace the PlaytimeTab component with this updated version
+
+// Replace the PlaytimeTab component with this enhanced version
+
 function PlaytimeTab({ user }) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[300px] sm:min-h-[400px] px-4">
-      <div className="relative mb-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-        <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-orange via-orange-500 to-orange-600 rounded-full shadow-2xl flex items-center justify-center">
-          <FaClock className="w-12 h-12 sm:w-16 sm:h-16 text-white drop-shadow-lg" />
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [selectedReservation, setSelectedReservation] = useState(null)
+  const [formData, setFormData] = useState({
+    date_saving: '',
+    start_time_saving: '',
+    end_time_saving: '',
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const reservations = user?.reservations || []
+
+  const handleAddSavingTime = (reservation) => {
+    setSelectedReservation(reservation)
+    setFormData({
+      date_saving: reservation.reserve_date,
+      start_time_saving: reservation.reserve_start_time,
+      end_time_saving: reservation.reserve_end_time,
+    })
+    setShowAddModal(true)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    try {
+      const response = await axios.post(
+        `${apiBaseUrl}/reservation-saving-times`,
+        {
+          id_reservation: selectedReservation.id,
+          ...formData,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('XSRF_CUST')}`,
+          },
+        },
+      )
+
+      Toast.fire({
+        icon: 'success',
+        title: 'Saving time berhasil ditambahkan!',
+      })
+
+      setShowAddModal(false)
+      window.location.reload()
+    } catch (error) {
+      Toast.fire({
+        icon: 'error',
+        title:
+          error?.response?.data?.message || 'Gagal menambahkan saving time',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (reservations.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] sm:min-h-[400px] px-4">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+          <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-orange via-orange-500 to-orange-600 rounded-full shadow-2xl flex items-center justify-center">
+            <FaClock className="w-12 h-12 sm:w-16 sm:h-16 text-white drop-shadow-lg" />
+          </div>
+        </div>
+        <div className="text-center max-w-md">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+            No Reservations Yet
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+            You haven't made any reservations. Start booking your gaming
+            sessions!
+          </p>
         </div>
       </div>
-      <div className="text-center max-w-md">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-          Save Playing Time
-        </h2>
-        <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-          This feature is coming soon! Track and save your gaming sessions here.
-        </p>
+    )
+  }
+
+  return (
+    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-orange/50 scrollbar-track-white/10">
+      {/* Header with Stats */}
+      <div className="sticky top-0 z-10 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+              <FaClock className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold text-white">
+                My Reservations
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300">
+                {reservations.length} active booking
+                {reservations.length > 1 ? 's' : ''}
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-xs text-gray-200">Total Spent</p>
+              <p className="text-white font-bold">
+                Rp{' '}
+                {reservations
+                  .reduce((sum, r) => sum + parseInt(r.price), 0)
+                  .toLocaleString('id-ID')}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Reservations Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {reservations.map((reservation, index) => (
+          <motion.div
+            key={reservation.id}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.05, type: 'spring' }}
+            whileHover={{ y: -4 }}
+            className="bg-gradient-to-br from-white/15 via-white/10 to-white/5 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-orange/50 transition-all group"
+          >
+            {/* Card Header */}
+            <div className="bg-gradient-to-r from-orange/20 via-orange/10 to-transparent p-4 border-b border-white/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 bg-gradient-to-br from-orange to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <span className="text-2xl">
+                      {reservation.location?.includes('PS4')
+                        ? '🎮'
+                        : reservation.location?.includes('PS5')
+                        ? '🎯'
+                        : '🖥️'}
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold text-lg">
+                      {reservation.location}
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-300 bg-white/10 px-2 py-0.5 rounded-full">
+                        Pos {reservation.position}
+                      </span>
+                      <div
+                        className={`px-2 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${
+                          reservation.status_reserve === 'settlement'
+                            ? 'bg-green-500/30 text-green-200'
+                            : reservation.status_reserve === 'pending'
+                            ? 'bg-yellow-500/30 text-yellow-200'
+                            : 'bg-red-500/30 text-red-200'
+                        }`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                        {reservation.status_reserve}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card Body */}
+            <div className="p-4 space-y-3">
+              {/* Date & Time Info */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                  <div className="w-8 h-8 bg-orange/20 rounded-lg flex items-center justify-center">
+                    <HiOutlineCalendar className="w-4 h-4 text-orange" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-gray-200 text-xs">Date</p>
+                    <p className="text-white text-sm font-semibold">
+                      {new Date(reservation.reserve_date).toLocaleDateString(
+                        'id-ID',
+                        {
+                          day: 'numeric',
+                          month: 'short',
+                        },
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                  <div className="w-8 h-8 bg-orange/20 rounded-lg flex items-center justify-center">
+                    <FaClock className="w-4 h-4 text-orange" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-gray-200 text-xs">Duration</p>
+                    <p className="text-white text-sm font-semibold">
+                      {reservation.reserve_start_time.slice(0, 5)} -{' '}
+                      {reservation.reserve_end_time.slice(0, 5)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Price Display */}
+              <div className="bg-gradient-to-r from-orange/15 via-orange/10 to-orange/5 border border-orange/30 rounded-xl p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">💰</span>
+                    <span className="text-gray-300 text-sm font-medium">
+                      Total
+                    </span>
+                  </div>
+                  <span className="text-white text-xl font-bold">
+                    Rp {parseInt(reservation.price).toLocaleString('id-ID')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Saving Times Section */}
+              <div className="pt-3 border-t border-white/20">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-orange/20 rounded-lg flex items-center justify-center">
+                      <span className="text-xs">⏱️</span>
+                    </div>
+                    <h5 className="text-white font-semibold text-sm">
+                      Saved Times
+                    </h5>
+                  </div>
+
+                  {(!reservation.saving_times ||
+                    reservation.saving_times.length === 0) && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleAddSavingTime(reservation)}
+                      className="text-xs text-gray-200 bg-orange/20 hover:bg-orange/30 font-semibold px-3 py-1.5 rounded-lg border border-orange/40 transition-all flex items-center gap-1"
+                    >
+                      <span>+</span> Add
+                    </motion.button>
+                  )}
+                </div>
+
+                {reservation.saving_times &&
+                reservation.saving_times.length > 0 ? (
+                  <div className="space-y-2 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-orange/30 scrollbar-track-white/5">
+                    {reservation.saving_times.map((saveTime) => (
+                      <motion.div
+                        key={saveTime.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-2 p-2.5 bg-gradient-to-r from-white/10 to-white/5 border border-white/10 rounded-lg hover:border-orange/30 transition-all"
+                      >
+                        <div className="w-8 h-8 bg-orange/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FaClock className="w-3 h-3 text-orange" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-xs font-medium">
+                            {new Date(saveTime.date_saving).toLocaleDateString(
+                              'id-ID',
+                              {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              },
+                            )}
+                          </p>
+                          <p className="text-gray-200 text-xs">
+                            {saveTime.start_time_saving.slice(0, 5)} -{' '}
+                            {saveTime.end_time_saving.slice(0, 5)}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 px-3 bg-white/5 rounded-lg border border-dashed border-white/20">
+                    <p className="text-gray-200 text-xs">No saved times yet</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Invoice Button */}
+              {reservation.invoice && (
+                <motion.a
+                  href={`${apiBaseUrl}/storage/${reservation.invoice}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange to-orange-600 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-orange/50 transition-all"
+                >
+                  <span>📄</span>
+                  View Invoice
+                </motion.a>
+              )}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Add Saving Time Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowAddModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-xl border border-white/30 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange to-orange-600 rounded-xl flex items-center justify-center">
+                    <FaClock className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">
+                    Add Saving Time
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center text-white transition-all"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={formData.date_saving}
+                    onChange={(e) =>
+                      setFormData({ ...formData, date_saving: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Start Time
+                    </label>
+                    <input
+                      type="time"
+                      required
+                      value={formData.start_time_saving}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          start_time_saving: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      End Time
+                    </label>
+                    <input
+                      type="time"
+                      required
+                      value={formData.end_time_saving}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          end_time_saving: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-orange/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Saving...' : 'Save Time'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
