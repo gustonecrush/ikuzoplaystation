@@ -75,7 +75,7 @@ export default function CustomerDashboard() {
   const tabs = [
     { id: 'info', label: 'Member Info', icon: FaUser },
     { id: 'benefits', label: 'Benefits', icon: FaGift },
-    { id: 'playtime', label: 'Save Playing Time', icon: FaClock },
+    { id: 'playtime', label: 'Reservations', icon: FaClock },
   ]
 
   return (
