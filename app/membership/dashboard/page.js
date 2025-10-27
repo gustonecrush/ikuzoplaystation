@@ -386,10 +386,6 @@ function BenefitsTab({ user }) {
   )
 }
 
-// Replace the PlaytimeTab component with this updated version
-
-// Replace the PlaytimeTab component with this enhanced version
-
 function PlaytimeTab({ user }) {
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState(null)

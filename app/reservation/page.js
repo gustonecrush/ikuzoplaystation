@@ -3,6 +3,7 @@ import Reservation from './Reservations'
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import React from 'react'
 import { Video } from '../components/Home'
+import ReservationTesting from './ReservationTesting'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -25,7 +26,7 @@ export default function Page() {
         className={`${plusJakartaSans.className} flex flex-col h-full  w-full relative md:overflow-y-scroll items-center justify-center scroll-smooth overflow-x-hidden`}
       >
         <Video extra="!h-[1000px]" />
-        <Reservation />
+        <ReservationTesting />
       </section>
     </>
   )
