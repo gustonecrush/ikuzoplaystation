@@ -997,6 +997,7 @@ export default function ReservationTesting() {
         <div className="flex flex-col gap-1 w-full mt-5">
           <Checkout
             id={idReservasi}
+            idMembership={user.id}
             price={safePrice}
             productName={`Reservation ${namaPosisiReservasi}`}
             detailCustomer={{

@@ -14,15 +14,12 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 
-const Checkout = ({ id, productName, price, detailCustomer }) => {
+const Checkout = ({ id, idMembership, productName, price, detailCustomer }) => {
   const [quantity, setQuantity] = useState(1)
   const [payClicked, setPayClicked] = useState(false)
   const [alertDialogOpen, setAlertDialogOpen] = useState(false)
 
-  console.error({ productName })
-
   const checkout = async () => {
-    console.log({ productName })
     setAlertDialogOpen(false)
 
     try {
@@ -52,6 +49,9 @@ const Checkout = ({ id, productName, price, detailCustomer }) => {
         status_reserve: 'pending',
         price: price,
         position: detailCustomer.position,
+        is_membership:
+          idMembership != '' || idMembership != null ? '' : 'Actvie',
+        id_membership: idMembership,
       }
       const reserveResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/reservations`,
