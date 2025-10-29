@@ -45,10 +45,9 @@ import ReservationDrawer from './ReservationDrawer'
 import ReservationLegend from './ReservationLegend'
 import ReservationSummary from './ReservationSummary'
 import LoaderHome from '../components/LoaderHome'
+import { apiBaseUrl } from '@/utils/urls'
 
 export default function ReservationTesting() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-
   // Hooks
   const {
     data: dataMaintenance,
@@ -170,7 +169,7 @@ export default function ReservationTesting() {
   const getAllReservationsPositon = async (date) => {
     try {
       const response = await axios.get(
-        `${baseUrl}/reservations?reserve_date=${date}`,
+        `${apiBaseUrl}/reservations?reserve_date=${date}`,
       )
       if (response.status === 200) {
         setReservesPosition(response.data)
@@ -185,7 +184,7 @@ export default function ReservationTesting() {
   const getAllReservation = async (date, position) => {
     try {
       const response = await axios.get(
-        `${baseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
+        `${apiBaseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
       if (response.status === 200) {
         setReserves(response.data)
@@ -204,7 +203,7 @@ export default function ReservationTesting() {
 
   const getDateClosed = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/dates`)
+      const response = await axios.get(`${apiBaseUrl}/dates`)
       if (response.status === 200) {
         setDateClose(response.data.data)
       }
@@ -215,7 +214,9 @@ export default function ReservationTesting() {
 
   const getTimeSelected = async (date) => {
     try {
-      const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
+      const response = await axios.get(
+        `${apiBaseUrl}/times?selected_date=${date}`,
+      )
       if (response.status === 200) {
         setCustomTimeSelected(
           response.data.data.length > 0 ? response.data.data : [],
@@ -331,7 +332,7 @@ export default function ReservationTesting() {
 
   const handleCancle = async () => {
     try {
-      await axios.delete(`${baseUrl}/reservations/${idReservasi}`)
+      await axios.delete(`${apiBaseUrl}/reservations/${idReservasi}`)
       setNamaReservasi('')
       setNoWhatsappReservasi('')
       setSelectedReservationPlace('')
