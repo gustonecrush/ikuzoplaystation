@@ -46,8 +46,12 @@ import ReservationLegend from './ReservationLegend'
 import ReservationSummary from './ReservationSummary'
 import LoaderHome from '../components/LoaderHome'
 import { apiBaseUrl } from '@/utils/urls'
+import Cookies from 'js-cookie'
 
 export default function ReservationTesting() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingUser, setIsLoadingUser] = useState(false)
+
   // Hooks
   const {
     data: dataMaintenance,
@@ -60,6 +64,35 @@ export default function ReservationTesting() {
     fetchPositions,
   } = useFetchPositions()
 
+  // User State
+  const [user, setUser] = useState(null)
+  const fetchUser = async () => {
+    const token = Cookies.get('XSRF_CUST')
+    const isLoggedIn = Cookies.get('isLoggedIn')
+
+    if (!token || !isLoggedIn) return
+
+    setIsLoadingUser(true)
+    try {
+      const res = await axios.get(`${apiBaseUrl}/customer/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setUser(res.data)
+      if (res.data.full_name) setNamaReservasi(res.data.full_name)
+      if (res.data.whatsapp_number)
+        setNoWhatsappReservasi(res.data.whatsapp_number)
+      console.log('PENGGUNA', res)
+      setIsLoadingUser(false)
+    } catch (err) {
+      console.error('Gagal memuat data pengguna:', err)
+      Cookies.remove('XSRF_CUST')
+      Cookies.remove('isLoggedIn')
+      setIsLoadingUser(false)
+    }
+  }
+
+  console.log('USER PENG', user)
+
   // Reservation State
   const [continueTapped, setContinueTapped] = useState(false)
   const [idReservasi, setIdReservasi] = useState(generateRandomString)
@@ -68,7 +101,6 @@ export default function ReservationTesting() {
   const [startTimeReservasi, setStartTimeReservasi] = useState('')
   const [endTimeReservasi, setEndTimeReservasi] = useState('')
   const [totalTime, setTotalTime] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
   const [pricePerReserve, setPricePerReserve] = useState(0)
   const [posisiReservasi, setPosisiReservasi] = useState(0)
   const [namaPosisiReservasi, setNamaPosisiReservasi] = useState('')
@@ -103,10 +135,6 @@ export default function ReservationTesting() {
   const [reservesPosition, setReservesPosition] = useState([])
   const [catalogs, setCatalogs] = useState([])
   const [latestUpdatedAt, setLatestUpdatedAt] = useState('')
-  const [filterKeyword, setFilterKeyword] = useState('')
-  const [filteredCatalogs, setFilteredCatalogs] = useState([])
-  const [drawerContent, setDrawerContent] = useState('default')
-  const [selectedSeat, setSelectedSeat] = useState(0)
 
   // UI State
   const [scale, setScale] = useState(1)
@@ -410,6 +438,10 @@ export default function ReservationTesting() {
   }, [fetchPositions])
 
   useEffect(() => {
+    fetchUser()
+  }, [])
+
+  useEffect(() => {
     fetchDataTimes()
     getAllDataMaintenances()
     fetchDataContents()
@@ -436,7 +468,7 @@ export default function ReservationTesting() {
   }, [startTimeReservasi, endTimeReservasi])
 
   // Render Position Drawer
-  const renderPositionDrawer = (numbers, getPositionIndex) => {
+  const renderPositionDrawer = (numbers, getPositionIndex, prices) => {
     return numbers.map((number) => {
       const isSeatInMaintenance = dataMaintenance.find(
         (s) => s.no_seat === number,
@@ -472,7 +504,7 @@ export default function ReservationTesting() {
           endTime={endTimeReservasi}
           onStartTimeChange={setStartTimeReservasi}
           onEndTimeChange={setEndTimeReservasi}
-          facilityPriceData={ps5RegulerData}
+          facilityPriceData={prices}
           formatDateIndonesian={formatDateIndonesian}
           formatTimestampIndonesian={formatTimestampIndonesian}
         />
@@ -495,7 +527,7 @@ export default function ReservationTesting() {
     ikuzoRacingSimulatorData == null ||
     isLoadingMaintenance
 
-  if (isLoadingData) {
+  if (isLoadingData || isLoadingUser) {
     return (
       <div className="z-[999999] w-full h-full absolute top-50">
         <LoaderHome />
@@ -811,7 +843,11 @@ export default function ReservationTesting() {
                             cursor: 'move',
                           }}
                         >
-                          {renderPositionDrawer([1, 2, 3, 4, 5], 0)}
+                          {renderPositionDrawer(
+                            [1, 2, 3, 4, 5],
+                            0,
+                            ps5RegulerData,
+                          )}
                         </div>
 
                         {/* Seats 6-7 */}
@@ -824,7 +860,11 @@ export default function ReservationTesting() {
                             cursor: 'move',
                           }}
                         >
-                          {renderPositionDrawer([6, 7], 1)}
+                          {renderPositionDrawer(
+                            [6, 7],
+                            1,
+                            ikuzoRacingSimulatorData,
+                          )}
                         </div>
 
                         {/* Seat 8 */}
@@ -837,7 +877,7 @@ export default function ReservationTesting() {
                             cursor: 'move',
                           }}
                         >
-                          {renderPositionDrawer([8], 0)}
+                          {renderPositionDrawer([8], 0, ps4RegulerData)}
                         </div>
                       </div>
                     )}
@@ -856,7 +896,11 @@ export default function ReservationTesting() {
                             cursor: 'move',
                           }}
                         >
-                          {renderPositionDrawer([13, 14, 15, 16], 3)}
+                          {renderPositionDrawer(
+                            [13, 14, 15, 16],
+                            3,
+                            squadOpenSpaceData,
+                          )}
                         </div>
 
                         {/* Seat 17 */}
@@ -869,7 +913,7 @@ export default function ReservationTesting() {
                             cursor: 'move',
                           }}
                         >
-                          {renderPositionDrawer([17], 2)}
+                          {renderPositionDrawer([17], 2, familyOpenSpaceData)}
                         </div>
                       </div>
                     )}
@@ -888,7 +932,7 @@ export default function ReservationTesting() {
                             cursor: 'move',
                           }}
                         >
-                          {renderPositionDrawer([18, 19], 4)}
+                          {renderPositionDrawer([18, 19], 4, familyVIPRoomData)}
                         </div>
 
                         {/* Seats 20-22 */}
@@ -901,7 +945,11 @@ export default function ReservationTesting() {
                             cursor: 'move',
                           }}
                         >
-                          {renderPositionDrawer([20, 21, 22], 5)}
+                          {renderPositionDrawer(
+                            [20, 21, 22],
+                            5,
+                            lovebirdsVIPRoomData,
+                          )}
                         </div>
                       </div>
                     )}

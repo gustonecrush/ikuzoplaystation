@@ -15,32 +15,13 @@ import NavbarMembership from '@/app/components/NavbarMembership'
 import { FaGift, FaWhatsapp, FaClock, FaUser } from 'react-icons/fa'
 import { BsPerson, BsTelephone } from 'react-icons/bs'
 import { HiOutlineCalendar } from 'react-icons/hi'
+import Link from 'next/link'
 
 export default function CustomerDashboard() {
   const router = useRouter()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('info')
-
-  const handleLogout = async () => {
-    try {
-      await axios.post(`${apiBaseUrl}/customer/logout`, null, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('XSRF_CUST')}`,
-        },
-      })
-
-      Toast.fire({ icon: 'success', title: 'Berhasil logout' })
-      Cookies.remove('XSRF_CUST')
-
-      setTimeout(() => router.push('/membership/login'), 1000)
-    } catch (err) {
-      Toast.fire({
-        icon: 'error',
-        title: err?.response?.data?.message || 'Gagal logout',
-      })
-    }
-  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -389,6 +370,7 @@ function BenefitsTab({ user }) {
 function PlaytimeTab({ user }) {
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState(null)
+  const [viewMode, setViewMode] = useState('active') // 'active' or 'history'
   const [formData, setFormData] = useState({
     date_saving: '',
     start_time_saving: '',
@@ -396,7 +378,30 @@ function PlaytimeTab({ user }) {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const reservations = user?.reservations || []
+  const allReservations = user?.reservations || []
+
+  // Filter reservations based on current time
+  const { activeReservations, historyReservations } = allReservations.reduce(
+    (acc, reservation) => {
+      const now = new Date()
+      const [endHour, endMin] = reservation.reserve_end_time
+        .split(':')
+        .map(Number)
+      const endDateTime = new Date(reservation.reserve_date)
+      endDateTime.setHours(endHour, endMin, 0, 0)
+
+      if (now > endDateTime) {
+        acc.historyReservations.push(reservation)
+      } else {
+        acc.activeReservations.push(reservation)
+      }
+      return acc
+    },
+    { activeReservations: [], historyReservations: [] },
+  )
+
+  const displayedReservations =
+    viewMode === 'active' ? activeReservations : historyReservations
 
   const handleAddSavingTime = (reservation) => {
     setSelectedReservation(reservation)
@@ -444,7 +449,7 @@ function PlaytimeTab({ user }) {
     }
   }
 
-  if (reservations.length === 0) {
+  if (allReservations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] sm:min-h-[400px] px-4">
         <div className="relative mb-6">
@@ -457,10 +462,17 @@ function PlaytimeTab({ user }) {
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
             No Reservations Yet
           </h2>
-          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-6">
             You haven't made any reservations. Start booking your gaming
             sessions!
           </p>
+          <Link
+            href="/reservation"
+            className="inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-orange to-orange-600 text-white text-sm sm:text-base font-bold rounded-xl shadow-2xl hover:shadow-orange/50 transition-all"
+          >
+            <span className="text-xl">🎮</span>
+            Make a Reservation
+          </Link>
         </div>
       </div>
     )
@@ -468,9 +480,9 @@ function PlaytimeTab({ user }) {
 
   return (
     <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-orange/50 scrollbar-track-white/10">
-      {/* Header with Stats */}
+      {/* Header with Stats and Toggle */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-xl p-4 mb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-orange to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
               <FaClock className="w-6 h-6 text-white" />
@@ -480,8 +492,8 @@ function PlaytimeTab({ user }) {
                 My Reservations
               </h3>
               <p className="text-xs sm:text-sm text-gray-300">
-                {reservations.length} active booking
-                {reservations.length > 1 ? 's' : ''}
+                {activeReservations.length} active, {historyReservations.length}{' '}
+                history
               </p>
             </div>
           </div>
@@ -491,18 +503,74 @@ function PlaytimeTab({ user }) {
               <p className="text-xs text-gray-200">Total Spent</p>
               <p className="text-white font-bold">
                 Rp{' '}
-                {reservations
+                {allReservations
                   .reduce((sum, r) => sum + parseInt(r.price), 0)
                   .toLocaleString('id-ID')}
               </p>
             </div>
+            <Link
+              href="/reservation"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange to-orange-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-orange/50 transition-all"
+            >
+              <span>+</span>
+              New Booking
+            </Link>
           </div>
+        </div>
+
+        {/* Toggle Buttons */}
+        <div className="flex gap-2 bg-white/5 p-1 rounded-lg">
+          <button
+            onClick={() => setViewMode('active')}
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-semibold transition-all ${
+              viewMode === 'active'
+                ? 'bg-gradient-to-r from-orange to-orange-600 text-white shadow-lg'
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            Active ({activeReservations.length})
+          </button>
+          <button
+            onClick={() => setViewMode('history')}
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-semibold transition-all ${
+              viewMode === 'history'
+                ? 'bg-gradient-to-r from-orange to-orange-600 text-white shadow-lg'
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            History ({historyReservations.length})
+          </button>
         </div>
       </div>
 
+      {/* Mobile New Reservation Button */}
+      <div className="sm:hidden">
+        <Link
+          href="/reservation"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange to-orange-600 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-orange/50 transition-all"
+        >
+          <span className="text-lg">🎮</span>
+          Make New Reservation
+        </Link>
+      </div>
+
+      {/* Empty State */}
+      {displayedReservations.length === 0 && (
+        <div className="text-center py-12">
+          <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaClock className="w-10 h-10 text-gray-400" />
+          </div>
+          <p className="text-gray-300 text-sm">
+            {viewMode === 'active'
+              ? 'No active reservations'
+              : 'No history yet'}
+          </p>
+        </div>
+      )}
+
       {/* Reservations Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {reservations.map((reservation, index) => (
+        {displayedReservations.map((reservation, index) => (
           <motion.div
             key={reservation.id}
             initial={{ opacity: 0, scale: 0.95 }}
@@ -586,6 +654,17 @@ function PlaytimeTab({ user }) {
                 </div>
               </div>
 
+              {/* Progress Bar - Only show for active reservations */}
+              {viewMode === 'active' && (
+                <div className="bg-white/5 rounded-xl p-3">
+                  <PlayTimeProgress
+                    startTime={reservation.reserve_start_time}
+                    endTime={reservation.reserve_end_time}
+                    reserveDate={reservation.reserve_date}
+                  />
+                </div>
+              )}
+
               {/* Price Display */}
               <div className="bg-gradient-to-r from-orange/15 via-orange/10 to-orange/5 border border-orange/30 rounded-xl p-3">
                 <div className="flex items-center justify-between">
@@ -613,17 +692,32 @@ function PlaytimeTab({ user }) {
                     </h5>
                   </div>
 
-                  {(!reservation.saving_times ||
-                    reservation.saving_times.length === 0) && (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleAddSavingTime(reservation)}
-                      className="text-xs text-gray-200 bg-orange/20 hover:bg-orange/30 font-semibold px-3 py-1.5 rounded-lg border border-orange/40 transition-all flex items-center gap-1"
-                    >
-                      <span>+</span> Add
-                    </motion.button>
-                  )}
+                  {/* Only show Add button if reservation hasn't ended yet */}
+                  {(() => {
+                    const now = new Date()
+                    const [
+                      endHour,
+                      endMin,
+                    ] = reservation.reserve_end_time.split(':').map(Number)
+                    const endDateTime = new Date(reservation.reserve_date)
+                    endDateTime.setHours(endHour, endMin, 0, 0)
+                    const hasNotEnded = now <= endDateTime
+
+                    return (
+                      hasNotEnded &&
+                      (!reservation.saving_times ||
+                        reservation.saving_times.length === 0) && (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleAddSavingTime(reservation)}
+                          className="text-xs text-gray-200 bg-orange/20 hover:bg-orange/30 font-semibold px-3 py-1.5 rounded-lg border border-orange/40 transition-all flex items-center gap-1"
+                        >
+                          <span>+</span> Add
+                        </motion.button>
+                      )
+                    )
+                  })()}
                 </div>
 
                 {reservation.saving_times &&
@@ -793,6 +887,122 @@ function PlaytimeTab({ user }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  )
+}
+
+function PlayTimeProgress({ startTime, endTime, reserveDate }) {
+  const [progress, setProgress] = useState(0)
+  const [timeLeft, setTimeLeft] = useState('')
+  const [status, setStatus] = useState('upcoming') // upcoming, playing, finished
+
+  useEffect(() => {
+    const calculateProgress = () => {
+      const now = new Date()
+      const today = new Date().toISOString().split('T')[0]
+
+      // Parse start and end times
+      const [startHour, startMin] = startTime.split(':').map(Number)
+      const [endHour, endMin] = endTime.split(':').map(Number)
+
+      const startDateTime = new Date(reserveDate)
+      startDateTime.setHours(startHour, startMin, 0, 0)
+
+      const endDateTime = new Date(reserveDate)
+      endDateTime.setHours(endHour, endMin, 0, 0)
+
+      const totalDuration = endDateTime - startDateTime
+      const elapsed = now - startDateTime
+
+      // Determine status
+      if (now < startDateTime) {
+        setStatus('upcoming')
+        setProgress(0)
+        const timeUntilStart = Math.floor((startDateTime - now) / 1000 / 60)
+        setTimeLeft(`Starts in ${timeUntilStart} min`)
+      } else if (now >= startDateTime && now <= endDateTime) {
+        setStatus('playing')
+        const currentProgress = (elapsed / totalDuration) * 100
+        setProgress(Math.min(currentProgress, 100))
+
+        const remaining = Math.floor((endDateTime - now) / 1000 / 60)
+        setTimeLeft(`${remaining} min left`)
+      } else {
+        setStatus('finished')
+        setProgress(100)
+        setTimeLeft('Finished')
+      }
+    }
+
+    // Calculate immediately
+    calculateProgress()
+
+    // Update every 10 seconds
+    const interval = setInterval(calculateProgress, 10000)
+
+    return () => clearInterval(interval)
+  }, [startTime, endTime, reserveDate])
+
+  if (status === 'upcoming') {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-300 flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+            Upcoming
+          </span>
+          <span className="text-blue-300 font-medium">{timeLeft}</span>
+        </div>
+        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full w-0"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'finished') {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-300 flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-green-400"></span>
+            Completed
+          </span>
+          <span className="text-green-300 font-medium">✓ {timeLeft}</span>
+        </div>
+        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full w-full"></div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-gray-300 flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-orange animate-pulse"></span>
+          Playing Now
+        </span>
+        <span className="text-orange font-medium">{timeLeft}</span>
+      </div>
+      <div className="h-2 bg-white/10 rounded-full overflow-hidden relative">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="h-full bg-gradient-to-r from-orange via-orange-500 to-orange-600 rounded-full relative"
+        >
+          <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+        </motion.div>
+      </div>
+      <div className="flex justify-between text-xs text-gray-400">
+        <span>{startTime.slice(0, 5)}</span>
+        <span className="text-orange font-semibold">
+          {progress.toFixed(0)}%
+        </span>
+        <span>{endTime.slice(0, 5)}</span>
+      </div>
     </div>
   )
 }
