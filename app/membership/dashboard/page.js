@@ -404,11 +404,47 @@ function PlaytimeTab({ user }) {
     viewMode === 'active' ? activeReservations : historyReservations
 
   const handleAddSavingTime = (reservation) => {
+    // Validasi: Modal hanya bisa diakses jika waktu sekarang dalam range reservasi
+    const now = new Date()
+    const [startHour, startMin] = reservation.reserve_start_time
+      .split(':')
+      .map(Number)
+    const [endHour, endMin] = reservation.reserve_end_time
+      .split(':')
+      .map(Number)
+
+    const startDateTime = new Date(reservation.reserve_date)
+    startDateTime.setHours(startHour, startMin, 0, 0)
+
+    const endDateTime = new Date(reservation.reserve_date)
+    endDateTime.setHours(endHour, endMin, 0, 0)
+
+    // Check if within reservation time
+    if (now < startDateTime || now > endDateTime) {
+      Toast.fire({
+        icon: 'warning',
+        title: 'Can only add saving time during your reservation period!',
+      })
+      return
+    }
+
+    // Auto-fill current time and 1 hour later
+    const currentTime = new Date()
+    const oneHourLater = new Date(currentTime.getTime() + 60 * 60 * 1000)
+
+    const formatTime = (date) => {
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${hours}:${minutes}`
+    }
+
+    const today = new Date().toISOString().split('T')[0]
+
     setSelectedReservation(reservation)
     setFormData({
-      date_saving: reservation.reserve_date,
-      start_time_saving: reservation.reserve_start_time,
-      end_time_saving: reservation.reserve_end_time,
+      date_saving: today,
+      start_time_saving: formatTime(currentTime),
+      end_time_saving: formatTime(oneHourLater),
     })
     setShowAddModal(true)
   }
@@ -692,19 +728,37 @@ function PlaytimeTab({ user }) {
                     </h5>
                   </div>
 
-                  {/* Only show Add button if reservation hasn't ended yet */}
+                  {/* Only show Add button if within reservation time and >30min before end */}
                   {(() => {
                     const now = new Date()
+                    const [
+                      startHour,
+                      startMin,
+                    ] = reservation.reserve_start_time.split(':').map(Number)
                     const [
                       endHour,
                       endMin,
                     ] = reservation.reserve_end_time.split(':').map(Number)
+
+                    const startDateTime = new Date(reservation.reserve_date)
+                    startDateTime.setHours(startHour, startMin, 0, 0)
+
                     const endDateTime = new Date(reservation.reserve_date)
                     endDateTime.setHours(endHour, endMin, 0, 0)
-                    const hasNotEnded = now <= endDateTime
+
+                    const thirtyMinutesBeforeEnd = new Date(
+                      endDateTime.getTime() - 30 * 60 * 1000,
+                    )
+
+                    // Must be within reservation time AND more than 30min before end
+                    const isWithinReservationTime =
+                      now >= startDateTime && now <= endDateTime
+                    const hasTimeLeft = now <= thirtyMinutesBeforeEnd
+                    const canAddSavingTime =
+                      isWithinReservationTime && hasTimeLeft
 
                     return (
-                      hasNotEnded &&
+                      canAddSavingTime &&
                       (!reservation.saving_times ||
                         reservation.saving_times.length === 0) && (
                         <motion.button
@@ -777,8 +831,6 @@ function PlaytimeTab({ user }) {
           </motion.div>
         ))}
       </div>
-
-      {/* Add Saving Time Modal */}
       <AnimatePresence>
         {showAddModal && (
           <motion.div
@@ -812,77 +864,203 @@ function PlaytimeTab({ user }) {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.date_saving}
-                    onChange={(e) =>
-                      setFormData({ ...formData, date_saving: e.target.value })
+              {(() => {
+                const now = new Date()
+                const [
+                  endHour,
+                  endMin,
+                ] = selectedReservation.reserve_end_time.split(':').map(Number)
+                const endDateTime = new Date(selectedReservation.reserve_date)
+                endDateTime.setHours(endHour, endMin, 0, 0)
+
+                const thirtyMinutesBeforeEnd = new Date(
+                  endDateTime.getTime() - 30 * 60 * 1000,
+                )
+                const canAddSavingTime = now <= thirtyMinutesBeforeEnd
+
+                if (!canAddSavingTime) {
+                  return (
+                    <div className="text-center py-6">
+                      <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FaClock className="w-8 h-8 text-red-300" />
+                      </div>
+                      <h4 className="text-white font-bold text-lg mb-2">
+                        Too Late!
+                      </h4>
+                      <p className="text-gray-300 text-sm mb-4">
+                        You can only add saving time until 30 minutes before
+                        your reservation ends.
+                      </p>
+                      <p className="text-red-300 font-semibold text-sm">
+                        Reservation ends at{' '}
+                        {selectedReservation.reserve_end_time.slice(0, 5)}
+                      </p>
+                      <button
+                        onClick={() => setShowAddModal(false)}
+                        className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  )
+                }
+
+                // Generate end time options (1 hour steps, not >= reservation end time)
+                const generateEndTimeOptions = () => {
+                  if (!formData.start_time_saving) return []
+
+                  const [
+                    startHour,
+                    startMin,
+                  ] = formData.start_time_saving.split(':').map(Number)
+                  const [
+                    resEndHour,
+                    resEndMin,
+                  ] = selectedReservation.reserve_end_time
+                    .split(':')
+                    .map(Number)
+
+                  const options = []
+                  let currentHour = startHour + 1 // Start from 1 hour after start time
+
+                  // Max 10 options (10 hours)
+                  while (options.length < 10) {
+                    // Check if this time is before reservation end time
+                    if (
+                      currentHour < resEndHour ||
+                      (currentHour === resEndHour && startMin < resEndMin)
+                    ) {
+                      const timeStr = `${String(currentHour).padStart(
+                        2,
+                        '0',
+                      )}:${String(startMin).padStart(2, '0')}`
+                      options.push(timeStr)
+                      currentHour++
+                    } else {
+                      break
                     }
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
-                  />
-                </div>
+                  }
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Start Time
-                    </label>
-                    <input
-                      type="time"
-                      required
-                      value={formData.start_time_saving}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          start_time_saving: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
-                    />
-                  </div>
+                  return options
+                }
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      End Time
-                    </label>
-                    <input
-                      type="time"
-                      required
-                      value={formData.end_time_saving}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          end_time_saving: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
-                    />
-                  </div>
-                </div>
+                const endTimeOptions = generateEndTimeOptions()
+                const today = new Date().toISOString().split('T')[0]
 
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-orange/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? 'Saving...' : 'Save Time'}
-                  </button>
-                </div>
-              </form>
+                return (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Info Banner */}
+                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3">
+                      <div className="flex items-start gap-2">
+                        <span className="text-blue-300 text-lg">ℹ️</span>
+                        <div>
+                          <p className="text-white text-xs font-semibold mb-1">
+                            Saving Time Guidelines
+                          </p>
+                          <p className="text-gray-300 text-xs">
+                            • Date: Today or later
+                            <br />• End time: 1-hour steps, before{' '}
+                            {selectedReservation.reserve_end_time.slice(0, 5)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Date
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        min={today}
+                        value={formData.date_saving}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            date_saving: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Start Time
+                        </label>
+                        <input
+                          type="time"
+                          required
+                          value={formData.start_time_saving}
+                          onChange={(e) => {
+                            setFormData({
+                              ...formData,
+                              start_time_saving: e.target.value,
+                              end_time_saving: '', // Reset end time when start time changes
+                            })
+                          }}
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          End Time
+                        </label>
+                        <select
+                          required
+                          value={formData.end_time_saving}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              end_time_saving: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:border-orange focus:ring-2 focus:ring-orange/50 outline-none transition-all"
+                        >
+                          <option value="" className="bg-gray-800">
+                            Select time
+                          </option>
+                          {endTimeOptions.map((time) => (
+                            <option
+                              key={time}
+                              value={time}
+                              className="bg-gray-800"
+                            >
+                              {time}
+                            </option>
+                          ))}
+                        </select>
+                        {endTimeOptions.length === 0 &&
+                          formData.start_time_saving && (
+                            <p className="text-red-300 text-xs mt-1">
+                              No available end time options
+                            </p>
+                          )}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddModal(false)}
+                        className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !formData.end_time_saving}
+                        className="flex-1 px-4 py-3 bg-gradient-to-r from-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-orange/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? 'Saving...' : 'Save Time'}
+                      </button>
+                    </div>
+                  </form>
+                )
+              })()}
             </motion.div>
           </motion.div>
         )}
