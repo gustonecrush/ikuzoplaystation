@@ -1067,7 +1067,7 @@ function PlaytimeTab({ user }) {
                             🎯 Till End (
                             {selectedReservation.reserve_end_time.slice(0, 5)})
                           </option>
-                          {endTimeOptions.map((time) => (
+                          {/* {endTimeOptions.map((time) => (
                             <option
                               key={time}
                               value={time}
@@ -1075,7 +1075,7 @@ function PlaytimeTab({ user }) {
                             >
                               {time}
                             </option>
-                          ))}
+                          ))} */}
                         </select>
                         {endTimeOptions.length === 0 &&
                           formData.start_time_saving && (
