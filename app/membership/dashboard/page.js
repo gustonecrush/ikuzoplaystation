@@ -375,33 +375,56 @@ function PlaytimeTab({ user }) {
     date_saving: '',
     start_time_saving: '',
     end_time_saving: '',
+    is_active: 'No Active',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const allReservations = user?.reservations || []
 
   // Filter reservations based on current time
-  const { activeReservations, historyReservations } = allReservations.reduce(
+  const {
+    activeReservations,
+    historyReservations,
+    savedTimeReservations,
+  } = allReservations.reduce(
     (acc, reservation) => {
       const now = new Date()
+      const today = new Date().toISOString().split('T')[0]
+
       const [endHour, endMin] = reservation.reserve_end_time
         .split(':')
         .map(Number)
       const endDateTime = new Date(reservation.reserve_date)
       endDateTime.setHours(endHour, endMin, 0, 0)
 
-      if (now > endDateTime) {
+      // Check if has saved times for today
+      const hasSavedTimeToday = reservation.saving_times?.some(
+        (saveTime) => saveTime.date_saving === today,
+      )
+
+      if (hasSavedTimeToday) {
+        acc.savedTimeReservations.push(reservation)
+      } else if (now > endDateTime) {
         acc.historyReservations.push(reservation)
       } else {
         acc.activeReservations.push(reservation)
       }
+
       return acc
     },
-    { activeReservations: [], historyReservations: [] },
+    {
+      activeReservations: [],
+      historyReservations: [],
+      savedTimeReservations: [],
+    },
   )
 
   const displayedReservations =
-    viewMode === 'active' ? activeReservations : historyReservations
+    viewMode === 'active'
+      ? activeReservations
+      : viewMode === 'history'
+      ? historyReservations
+      : savedTimeReservations
 
   const handleAddSavingTime = (reservation) => {
     // Validasi: Modal hanya bisa diakses jika waktu sekarang dalam range reservasi
@@ -445,6 +468,7 @@ function PlaytimeTab({ user }) {
       date_saving: today,
       start_time_saving: formatTime(currentTime),
       end_time_saving: formatTime(oneHourLater),
+      is_active: 'No Active',
     })
     setShowAddModal(true)
   }
@@ -565,6 +589,16 @@ function PlaytimeTab({ user }) {
             }`}
           >
             Active ({activeReservations.length})
+          </button>
+          <button
+            onClick={() => setViewMode('saved')}
+            className={`flex-1 px-4 py-2 rounded-md text-sm font-semibold transition-all ${
+              viewMode === 'saved'
+                ? 'bg-gradient-to-r from-orange to-orange-600 text-white shadow-lg'
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            Saved ({savedTimeReservations.length})
           </button>
           <button
             onClick={() => setViewMode('history')}
@@ -1022,6 +1056,16 @@ function PlaytimeTab({ user }) {
                         >
                           <option value="" className="bg-gray-800">
                             Select time
+                          </option>
+                          <option
+                            value={selectedReservation.reserve_end_time.slice(
+                              0,
+                              5,
+                            )}
+                            className="bg-gray-800 font-semibold text-orange-300"
+                          >
+                            🎯 Till End (
+                            {selectedReservation.reserve_end_time.slice(0, 5)})
                           </option>
                           {endTimeOptions.map((time) => (
                             <option
