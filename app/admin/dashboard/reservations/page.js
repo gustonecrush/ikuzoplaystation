@@ -110,6 +110,8 @@ import { addDays, subDays } from 'date-fns'
 import Sidebar from '@/app/components/Admin/Sidebar'
 import MembershipCheck from '../components/Membership/MembershipCheck'
 import { useFetchDataMaintenances } from '@/hooks/useFetchDataMaintenance'
+import { apiBaseUrl } from '@/utils/urls'
+import Swal from 'sweetalert2'
 
 function page() {
   const {
@@ -297,11 +299,7 @@ function page() {
     }
   }
 
-  const handleOpenUpdate = (id) => {
-    setIdSelected(id)
-    setOpenUpdate(true)
-  }
-
+  console.log({ data })
   const [dateClose, setDateClose] = React.useState([])
 
   const getDateClosed = async (date) => {
@@ -414,130 +412,266 @@ function page() {
 
   const [selectedTypeSeat, setSelectedTypeSeat] = React.useState('')
 
+  // Tambahkan state
+  const [openMembershipDetail, setOpenMembershipDetail] = React.useState(false)
+  const [selectedMembership, setSelectedMembership] = React.useState(null)
+
+  // Tambahkan function handler
+  const handleShowMembershipDetail = async (membershipId) => {
+    try {
+      const response = await axios.get(`${baseUrl}/memberships/${membershipId}`)
+      if (response.status === 200) {
+        setSelectedMembership(response.data)
+        setOpenMembershipDetail(true)
+      }
+    } catch (error) {
+      console.error({ error })
+      Toast.fire({
+        icon: 'error',
+        title: 'Gagal memuat data membership!',
+      })
+    }
+  }
+
+  // Tambahkan state untuk modal saving times
+  const [openSavingTimes, setOpenSavingTimes] = React.useState(false)
+  const [selectedSavingTimes, setSelectedSavingTimes] = React.useState([])
+  const [selectedReservationInfo, setSelectedReservationInfo] = React.useState(
+    null,
+  )
+
+  // Tambahkan function handler
+  const handleShowSavingTimes = (reservation) => {
+    setSelectedReservationInfo(reservation)
+    setSelectedSavingTimes(reservation.saving_times || [])
+    setOpenSavingTimes(true)
+  }
+
+  // Tambahkan state untuk modal update
+  const [openUpdateSavingTime, setOpenUpdateSavingTime] = React.useState(false)
+  const [selectedSavingTime, setSelectedSavingTime] = React.useState(null)
+  const [isUpdatingSavingTime, setIsUpdatingSavingTime] = React.useState(false)
+
+  // Function untuk handle update is_active
+  const handleUpdateSavingTimeStatus = async (savingTimeId, newStatus) => {
+    setIsUpdatingSavingTime(true)
+
+    try {
+      const response = await axios.post(
+        `${apiBaseUrl}/reservation-saving-times/${savingTimeId}`,
+        {
+          is_active: newStatus,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      if (response.status === 200) {
+        Toast.fire({
+          icon: 'success',
+          title: 'Status saving time berhasil diupdate!',
+        })
+
+        // Refresh data
+        getAllDataReservations()
+
+        // Update selected saving times
+        setSelectedSavingTimes((prevTimes) =>
+          prevTimes.map((st) =>
+            st.id === savingTimeId ? { ...st, is_active: newStatus } : st,
+          ),
+        )
+      }
+    } catch (error) {
+      console.error({ error })
+      Toast.fire({
+        icon: 'error',
+        title:
+          error.code === 'ERR_NETWORK'
+            ? 'Koneksi terputus!'
+            : error.response?.data?.message || 'Gagal update status!',
+      })
+    } finally {
+      setIsUpdatingSavingTime(false)
+    }
+  }
+
+  // Tambahkan state
+  const [confirmDialog, setConfirmDialog] = React.useState({
+    open: false,
+    saveTime: null,
+    newStatus: '',
+  })
+
+  // Update handler
+  const handleToggleSavingTimeStatus = (saveTime) => {
+    const newStatus = saveTime.is_active === 'Active' ? 'No Active' : 'Active'
+
+    setConfirmDialog({
+      open: true,
+      saveTime: saveTime,
+      newStatus: newStatus,
+    })
+  }
+
+  // Function untuk confirm update
+  const handleConfirmUpdate = () => {
+    if (confirmDialog.saveTime) {
+      handleUpdateSavingTimeStatus(
+        confirmDialog.saveTime.id,
+        confirmDialog.newStatus,
+      )
+    }
+    setConfirmDialog({ open: false, saveTime: null, newStatus: '' })
+  }
   const columns = [
     {
       accessorKey: 'id',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`w-fit`}
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            No
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="w-fit"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          No
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
-        <div className={`text-center uppercase`}>{row.index + 1}</div>
+        <div className="text-center uppercase">{row.index + 1}</div>
       ),
     },
     {
       accessorKey: 'reserve_id',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`flex w-full items-center justify-center`}
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Action
-            <AiFillEdit className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (
-        <div className={`flex items-center justify-center gap-1`}>
-          <Button
-            variant="outline"
-            className="border-black border-opacity-5 bg-black bg-opacity-10 text-xs text-black"
-          >
-            <IoIosInformationCircle className="h-4 w-4" /> Info
-          </Button>
-          <Button
-            variant="outline"
-            onClick={(e) => {
-              handleGetReservationById(row.original.reserve_id)
-            }}
-            className="border-blue-500 border-opacity-5 bg-blue-500 bg-opacity-10 text-xs text-blue-500"
-          >
-            <IoMoveOutline className="h-4 w-4" /> Move
-          </Button>
-          <Button
-            onClick={(e) => handleOpenUpdate(row.getValue('reserve_id'))}
-            variant="outline"
-            className=" border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs  text-yellow-500"
-          >
-            <FiEdit3 className="h-4 w-4" /> Edit
-          </Button>
-
-          <AlertDialog className="bg-black/20">
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs  text-red-500"
-              >
-                <AiOutlineDelete className="h-4 w-4" /> Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your content and remove your data from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) =>
-                    handleDeleteFacilityContent(row.getValue('reserve_id'))
-                  }
-                >
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+      header: () => (
+        <div className="flex w-full items-center justify-center">
+          Action
+          <AiFillEdit className="ml-2 h-4 w-4" />
         </div>
       ),
+      cell: ({ row }) => {
+        const isMembership =
+          row.original.id_membership && row.original.id_membership !== ''
+        const hasSavingTimes =
+          row.original.saving_times && row.original.saving_times.length > 0
+
+        return (
+          <div className="flex items-center justify-center gap-1">
+            <Button
+              variant="outline"
+              className="border-black border-opacity-5 bg-black bg-opacity-10 text-xs text-black"
+            >
+              <IoIosInformationCircle className="h-4 w-4" /> Info
+            </Button>
+
+            {hasSavingTimes && (
+              <Button
+                variant="outline"
+                onClick={() => handleShowSavingTimes(row.original)}
+                className="border-orange-500 border-opacity-5 bg-orange-500 bg-opacity-10 text-xs text-orange-500 hover:bg-orange-500 hover:text-white"
+              >
+                <IoTime className="h-4 w-4" /> Times (
+                {row.original.saving_times.length})
+              </Button>
+            )}
+
+            <Button
+              variant="outline"
+              onClick={() => handleGetReservationById(row.original.reserve_id)}
+              className="border-blue-500 border-opacity-5 bg-blue-500 bg-opacity-10 text-xs text-blue-500"
+            >
+              <IoMoveOutline className="h-4 w-4" /> Move
+            </Button>
+
+            <Button
+              onClick={() => {
+                setIdSelected(row.getValue('reserve_id'))
+                setOpenUpdate(true)
+              }}
+              variant="outline"
+              className="border border-yellow-500 hover:bg-yellow-500 bg-yellow-200 bg-opacity-10 text-xs text-yellow-500"
+            >
+              <FiEdit3 className="h-4 w-4" /> Edit
+            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border border-red-500 hover:bg-red-500 bg-red-200 bg-opacity-10 text-xs text-red-500"
+                >
+                  <AiOutlineDelete className="h-4 w-4" /> Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your content and remove your data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() =>
+                      handleDeleteReservation(row.getValue('reserve_id'))
+                    }
+                  >
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )
+      },
     },
     {
       accessorKey: 'id',
-      header: ({ column }) => {
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          ID Reservasi
+          <TbNumber className="ml-2 h-5 w-5" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const isMembership =
+          row.original.id_membership && row.original.id_membership !== ''
+
         return (
-          <Button
-            variant="ghost"
-            className={''}
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          <div
+            className={`text-center capitalize font-semibold ${
+              isMembership ? 'text-purple-600' : ''
+            }`}
           >
-            ID Reservasi
-            <TbNumber className="ml-2 h-5 w-5" />
-          </Button>
+            {row.original.reserve_id}
+            {isMembership && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                ⭐ Member
+              </span>
+            )}
+          </div>
         )
       },
-      cell: ({ row }) => (
-        <div className={`text-center capitalize`}>
-          {row.original.reserve_id}
-        </div>
-      ),
     },
     {
       accessorKey: 'invoice',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={''}
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Invoice
-            <IoDocument className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Invoice
+          <IoDocument className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <Link
           target="_blank"
@@ -546,133 +680,126 @@ function page() {
               ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${row.getValue('invoice')}`
               : `/payment/failed/invoice`
           }
-          className={`text-center text-black`}
+          className="text-center text-black"
         >
-          <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 border-gray-500 bg-gray-500 text-gray-500 hover:bg-gray-600
-            `}
-          >
-            {<IoDocument />} invoice
+          <Badge className="flex w-fit items-center gap-1 border bg-opacity-15 border-gray-500 bg-gray-500 text-gray-500 hover:bg-gray-600">
+            <IoDocument /> invoice
           </Badge>
         </Link>
       ),
     },
     {
       accessorKey: 'status_reserve',
-      header: ({ column }) => {
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="flex w-fit items-center justify-center"
+        >
+          Status
+          <br />
+          Pembayaran
+          <FaMoneyBillWaveAlt className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const status = row.getValue('status_reserve')
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex w-fit items-center justify-center"
-          >
-            Status
-            <br /> Pembayaran
-            <FaMoneyBillWaveAlt className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="flex w-full items-center justify-center text-center">
+            <Badge
+              className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+                status === 'settlement'
+                  ? 'border-green-500 bg-green-500 text-green-600'
+                  : status === 'pending'
+                  ? 'border-yellow-500 bg-yellow-500 text-yellow-500'
+                  : 'border-red-500 bg-red-500 text-red-500'
+              }`}
+            >
+              {status === 'settlement' && <MdPaid />}
+              {status === 'pending' && <MdOutlineAccessTimeFilled />}
+              {status !== 'pending' && status !== 'settlement' && <TiTimes />}
+              {status === 'settlement' ? 'paid' : status}
+            </Badge>
+          </div>
         )
       },
-      cell: ({ row }) => (
-        <div className="flex w-full items-center justify-center text-center">
-          <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
-              row.getValue('status_reserve') == 'settlement'
-                ? 'border-green-500 bg-green-500 text-green-600'
-                : row.getValue('status_reserve') == 'pending'
-                ? 'border-yellow-500 bg-yellow-500 text-yellow-500'
-                : 'border-red-500 bg-red-500 text-red-500'
-            }`}
-          >
-            {' '}
-            {row.getValue('status_reserve') == 'settlement' && <MdPaid />}
-            {row.getValue('status_reserve') == 'pending' && (
-              <MdOutlineAccessTimeFilled />
-            )}
-            {row.getValue('status_reserve') != 'pending' &&
-              row.getValue('status_reserve') != 'settlement' && <TiTimes />}
-            {row.getValue('status_reserve') == 'settlement'
-              ? 'paid'
-              : row.getValue('status_reserve')}
-          </Badge>
-        </div>
-      ),
     },
     {
       accessorKey: 'status_payment',
-      header: ({ column }) => {
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="flex w-full items-center justify-center"
+        >
+          Status
+          <br />
+          Reservasi
+          <IoLogoGameControllerB className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const status = row.getValue('status_payment')
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="flex w-full items-center justify-center"
-          >
-            Status
-            <br /> Reservasi
-            <IoLogoGameControllerB className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (
-        <div className="flex w-full items-center justify-center text-center">
-          <Badge
-            className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
-              row.getValue('status_payment') == 'done'
-                ? 'border-blue-500 bg-blue-500 text-blue-600'
-                : row.getValue('status_payment') == 'not playing'
-                ? 'border-purple-400 bg-purple-500 text-purple-600'
-                : 'border-gray-500 bg-gray-500 text-gray-700'
-            }`}
-          >
-            {' '}
-            {row.getValue('status_payment') == 'playing' && (
-              <IoLogoGameControllerB />
-            )}
-            {row.getValue('status_payment') == 'done' && <MdOutlineDoneAll />}
-            {row.getValue('status_payment') != 'playing' &&
-              row.getValue('status_payment') != 'done' && (
+          <div className="flex w-full items-center justify-center text-center">
+            <Badge
+              className={`flex w-fit items-center gap-1 border bg-opacity-15 ${
+                status === 'done'
+                  ? 'border-blue-500 bg-blue-500 text-blue-600'
+                  : status === 'not playing'
+                  ? 'border-purple-400 bg-purple-500 text-purple-600'
+                  : 'border-gray-500 bg-gray-500 text-gray-700'
+              }`}
+            >
+              {status === 'playing' && <IoLogoGameControllerB />}
+              {status === 'done' && <MdOutlineDoneAll />}
+              {status !== 'playing' && status !== 'done' && (
                 <HiMiniQuestionMarkCircle />
               )}
-            {row.getValue('status_payment') == 'settlement'
-              ? 'paid'
-              : row.getValue('status_payment')}
-          </Badge>
-        </div>
-      ),
-    },
-
-    {
-      accessorKey: 'reserve_name',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Nama Customer
-            <FaCircleUser className="ml-2 h-4 w-4" />
-          </Button>
+              {status === 'settlement' ? 'paid' : status}
+            </Badge>
+          </div>
         )
       },
-      cell: ({ row }) => (
-        <div className="text-center capitalize">
-          {row.getValue('reserve_name')}
-        </div>
+    },
+    {
+      accessorKey: 'reserve_name',
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Nama Customer
+          <FaCircleUser className="ml-2 h-4 w-4" />
+        </Button>
       ),
+      cell: ({ row }) => {
+        const isMembership =
+          row.original.id_membership && row.original.id_membership !== ''
+
+        return (
+          <div
+            className={`text-center capitalize ${
+              isMembership ? 'font-semibold text-purple-600' : ''
+            }`}
+          >
+            {row.getValue('reserve_name')}
+          </div>
+        )
+      },
     },
     {
       accessorKey: 'price',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="w-full"
-          >
-            Harga
-            <FaRupiahSign className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="w-full"
+        >
+          Harga
+          <FaRupiahSign className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="w-full text-center">
           Rp {parseInt(row.getValue('price')).toLocaleString('id-ID')}
@@ -681,18 +808,16 @@ function page() {
     },
     {
       accessorKey: 'reserve_contact',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className="w-[150px] text-center "
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Nomor Tlp
-            <HiPhone className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="w-[150px] text-center"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Nomor Tlp
+          <HiPhone className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="w-[150px] text-center">
           {row.getValue('reserve_contact')}
@@ -701,53 +826,46 @@ function page() {
     },
     {
       accessorKey: 'location',
-
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Lantai Reservasi
-            <PiHouseSimpleFill className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Lantai Reservasi
+          <PiHouseSimpleFill className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="text-center">{row.getValue('location')}</div>
       ),
     },
     {
       accessorKey: 'position',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Posisi
-            <TbNumber className="ml-2 h-6 w-6" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Posisi
+          <TbNumber className="ml-2 h-6 w-6" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="text-center">{row.getValue('position')}</div>
       ),
     },
     {
       accessorKey: 'reserve_date',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="w-full"
-          >
-            Tanggal Reservasi
-            <HiCalendar className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="w-full"
+        >
+          Tanggal Reservasi
+          <HiCalendar className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="w-full text-center">
           {formatDateOnTheUI(row.getValue('reserve_date'))}
@@ -756,57 +874,51 @@ function page() {
     },
     {
       accessorKey: 'reserve_start_time',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="w-full"
-          >
-            Waktu Mulai
-            <BiSolidTime className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="w-full"
+        >
+          Waktu Mulai
+          <BiSolidTime className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
-        <div className="w-full text-center ">
+        <div className="w-full text-center">
           {row.getValue('reserve_start_time')} WIB
         </div>
       ),
     },
     {
       accessorKey: 'reserve_end_time',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="w-full"
-          >
-            Waktu Berakhir
-            <BiSolidTimeFive className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="w-full"
+        >
+          Waktu Berakhir
+          <BiSolidTimeFive className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
-        <div className="w-2/3 text-center ">
+        <div className="w-2/3 text-center">
           {row.getValue('reserve_end_time')} WIB
         </div>
       ),
     },
     {
       accessorKey: 'created_at',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Created at
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Created at
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="text-center">
           {formatDateOnTheUI(row.getValue('created_at'))}
@@ -815,17 +927,15 @@ function page() {
     },
     {
       accessorKey: 'updated_at',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Updated at
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Updated at
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="text-center">
           {formatDateOnTheUI(row.getValue('updated_at'))}
@@ -1039,20 +1149,6 @@ function page() {
   const [typeSeatPlaying, setTypeSeatPlaying] = React.useState('')
   const [selectedSeat, setSelectedSeat] = React.useState('')
 
-  const disableTimes =
-    reserves.length > 0
-      ? reserves
-          .map((reserve) => {
-            if (reserve.reserve_end_time) {
-              const [hour, minute, second] = reserve.reserve_end_time.split(':')
-              const formattedTime = `${hour}:${minute}`
-              return formattedTime
-            }
-            return null
-          })
-          .filter((time) => time !== null)
-      : []
-
   React.useEffect(() => {
     getAllDataReservations()
     getAllDataStatistics()
@@ -1061,6 +1157,284 @@ function page() {
 
   return (
     <main className="flex w-full h-screen rounded-3xl">
+      {/* Confirmation Dialog */}
+      <AlertDialog
+        open={confirmDialog.open}
+        onOpenChange={(open) =>
+          setConfirmDialog({ open, saveTime: null, newStatus: '' })
+        }
+      >
+        <AlertDialogContent className="z-[100]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update Status?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <div className="space-y-3 mt-3">
+                <div className="p-3 bg-orange rounded-lg">
+                  <p className="text-sm text-white">
+                    Ubah status saving time menjadi:
+                  </p>
+                  <p className="font-bold text-white text-lg mt-1">
+                    {confirmDialog.newStatus}
+                  </p>
+                </div>
+
+                {confirmDialog.saveTime && (
+                  <div className="border-t pt-3 space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Time:</span>
+                      <span className="font-semibold">
+                        {confirmDialog.saveTime.start_time_saving.slice(0, 5)} -{' '}
+                        {confirmDialog.saveTime.end_time_saving.slice(0, 5)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Date:</span>
+                      <span className="font-semibold">
+                        {formatDateOnTheUI(confirmDialog.saveTime.date_saving)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() =>
+                setConfirmDialog({ open: false, saveTime: null, newStatus: '' })
+              }
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmUpdate}
+              className="bg-orange hover:bg-orange"
+            >
+              Yes, Update!
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={openSavingTimes} onOpenChange={setOpenSavingTimes}>
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <IoTime className="h-5 w-5 text-orange-600" />
+              Saving Times - {selectedReservationInfo?.reserve_id}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Total {selectedSavingTimes.length} saving time(s) untuk reservasi
+              ini
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {selectedReservationInfo && (
+            <div className="space-y-4">
+              {/* Reservation Info */}
+              <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                  <div>
+                    <p className="text-gray-600 text-xs">Customer</p>
+                    <p className="font-semibold text-gray-800">
+                      {selectedReservationInfo.reserve_name}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-xs">Location</p>
+                    <p className="font-semibold text-gray-800">
+                      {selectedReservationInfo.location}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-xs">Position</p>
+                    <p className="font-semibold text-gray-800">
+                      Pos {selectedReservationInfo.position}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-xs">Date</p>
+                    <p className="font-semibold text-gray-800">
+                      {formatDateOnTheUI(selectedReservationInfo.reserve_date)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Saving Times List */}
+              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                {selectedSavingTimes.length > 0 ? (
+                  selectedSavingTimes.map((saveTime, index) => (
+                    <div
+                      key={saveTime.id}
+                      className="p-4 bg-white border-2 border-orange-200 rounded-lg hover:border-orange-400 transition-all"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                            <span className="text-orange-600 font-bold">
+                              {index + 1}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <IoTime className="h-4 w-4 text-orange-600" />
+                              <p className="font-semibold text-gray-800">
+                                {saveTime.start_time_saving.slice(0, 5)} -{' '}
+                                {saveTime.end_time_saving.slice(0, 5)} WIB
+                              </p>
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">
+                              📅 {formatDateOnTheUI(saveTime.date_saving)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="text-right">
+                            <Badge
+                              className={`${
+                                saveTime.is_active === 'Active'
+                                  ? 'bg-green-100 text-green-700 border-green-300'
+                                  : 'bg-gray-100 text-gray-600 border-gray-300'
+                              }`}
+                            >
+                              {saveTime.is_active === 'Active'
+                                ? '✓ Active'
+                                : '○ Inactive'}
+                            </Badge>
+                          </div>
+
+                          {/* Toggle Status Button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleToggleSavingTimeStatus(saveTime)
+                            }
+                            disabled={isUpdatingSavingTime}
+                            className={`${
+                              saveTime.is_active === 'Active'
+                                ? 'border-red-300 text-red-600 hover:bg-red-50'
+                                : 'border-green-300 text-green-600 hover:bg-green-50'
+                            }`}
+                          >
+                            {isUpdatingSavingTime ? (
+                              <span className="animate-spin">⏳</span>
+                            ) : saveTime.is_active === 'Active' ? (
+                              <>
+                                <TiTimes className="h-4 w-4 mr-1" />
+                                Deactivate
+                              </>
+                            ) : (
+                              <>
+                                <MdOutlineDoneAll className="h-4 w-4 mr-1" />
+                                Activate
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Duration Calculation */}
+                      {(() => {
+                        const [
+                          startHour,
+                          startMin,
+                        ] = saveTime.start_time_saving.split(':').map(Number)
+                        const [
+                          endHour,
+                          endMin,
+                        ] = saveTime.end_time_saving.split(':').map(Number)
+                        const durationMinutes =
+                          endHour * 60 + endMin - (startHour * 60 + startMin)
+                        const hours = Math.floor(durationMinutes / 60)
+                        const minutes = durationMinutes % 60
+
+                        return (
+                          <div className="mt-3 pt-3 border-t border-orange-100">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-gray-600">Duration:</span>
+                              <span className="font-semibold text-orange-600">
+                                {hours > 0 && `${hours}h `}
+                                {minutes > 0 && `${minutes}m`}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      })()}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <IoTime className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                    <p className="text-gray-500">No saving times found</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Summary */}
+              {selectedSavingTimes.length > 0 && (
+                <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                    <div>
+                      <p className="text-gray-600 text-xs">Total Times</p>
+                      <p className="font-bold text-orange-600 text-lg">
+                        {selectedSavingTimes.length}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-xs">Active</p>
+                      <p className="font-bold text-green-600 text-lg">
+                        {
+                          selectedSavingTimes.filter(
+                            (st) => st.is_active === 'Active',
+                          ).length
+                        }
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-xs">Total Duration</p>
+                      <p className="font-bold text-orange-600 text-lg">
+                        {(() => {
+                          const totalMinutes = selectedSavingTimes.reduce(
+                            (sum, st) => {
+                              const [
+                                startHour,
+                                startMin,
+                              ] = st.start_time_saving.split(':').map(Number)
+                              const [
+                                endHour,
+                                endMin,
+                              ] = st.end_time_saving.split(':').map(Number)
+                              return (
+                                sum +
+                                (endHour * 60 +
+                                  endMin -
+                                  (startHour * 60 + startMin))
+                              )
+                            },
+                            0,
+                          )
+                          const hours = Math.floor(totalMinutes / 60)
+                          const minutes = totalMinutes % 60
+                          return `${hours}h ${minutes}m`
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setOpenSavingTimes(false)}>
+              Close
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Sidebar />
       <section className="flex flex-col pt-3 w-10/12 bg-white h-full overflow-y-scroll">
         {openCreateReservationForm ? (

@@ -30,6 +30,7 @@ export default function CustomerDashboard() {
           headers: { Authorization: `Bearer ${Cookies.get('XSRF_CUST')}` },
         })
         setUser(res.data)
+        console.log({ res })
       } catch (err) {
         Toast.fire({ icon: 'error', title: 'Gagal memuat data pengguna' })
       } finally {
@@ -381,7 +382,6 @@ function PlaytimeTab({ user }) {
 
   const allReservations = user?.reservations || []
 
-  // Filter reservations based on current time
   const {
     activeReservations,
     historyReservations,
@@ -389,7 +389,7 @@ function PlaytimeTab({ user }) {
   } = allReservations.reduce(
     (acc, reservation) => {
       const now = new Date()
-      const today = new Date().toISOString().split('T')[0]
+      const today = now.toLocaleDateString('en-CA') // Format: YYYY-MM-DD in local time
 
       const [endHour, endMin] = reservation.reserve_end_time
         .split(':')
@@ -397,17 +397,114 @@ function PlaytimeTab({ user }) {
       const endDateTime = new Date(reservation.reserve_date)
       endDateTime.setHours(endHour, endMin, 0, 0)
 
-      // Check if has saved times for today
-      const hasSavedTimeToday = reservation.saving_times?.some(
-        (saveTime) => saveTime.date_saving === today,
-      )
+      const hasSavingTimes =
+        reservation.saving_times && reservation.saving_times.length > 0
 
-      if (hasSavedTimeToday) {
-        acc.savedTimeReservations.push(reservation)
-      } else if (now > endDateTime) {
-        acc.historyReservations.push(reservation)
+      if (hasSavingTimes) {
+        const activeSavingTimes = reservation.saving_times.filter(
+          (saveTime) => {
+            const isActive = saveTime.is_active
+              ?.toString()
+              .trim()
+              .toLowerCase()
+              .includes('active')
+            console.log(
+              `Checking: is_active="${saveTime.is_active}" → ${isActive}`,
+            )
+            return isActive
+          },
+        )
+
+        if (activeSavingTimes.length > 0) {
+          // 1. Check if currently IN active saving time range
+          const isInActiveSavingTime = activeSavingTimes.some((saveTime) => {
+            // Normalize date format for comparison
+            const savingDate =
+              saveTime.date_saving?.split('T')[0] || saveTime.date_saving
+
+            console.log('Checking saving time:', {
+              savingDate,
+              today,
+              start: saveTime.start_time_saving,
+              end: saveTime.end_time_saving,
+              now: now.toLocaleTimeString(),
+            })
+
+            if (savingDate !== today) return false
+
+            const [
+              saveStartHour,
+              saveStartMin,
+            ] = saveTime.start_time_saving.split(':').map(Number)
+            const [saveEndHour, saveEndMin] = saveTime.end_time_saving
+              .split(':')
+              .map(Number)
+
+            // Create datetime using current date in LOCAL timezone
+            const saveStartDateTime = new Date()
+            saveStartDateTime.setHours(saveStartHour, saveStartMin, 0, 0)
+
+            const saveEndDateTime = new Date()
+            saveEndDateTime.setHours(saveEndHour, saveEndMin, 0, 0)
+
+            console.log('Time comparison:', {
+              now: now.getTime(),
+              start: saveStartDateTime.getTime(),
+              end: saveEndDateTime.getTime(),
+              isInRange: now >= saveStartDateTime && now <= saveEndDateTime,
+            })
+
+            // Changed back to <= to include the exact end time
+            return now >= saveStartDateTime && now <= saveEndDateTime
+          })
+
+          if (isInActiveSavingTime) {
+            console.log('✅ Adding to ACTIVE:', reservation.ps_number)
+            acc.activeReservations.push(reservation)
+          } else {
+            // 2. Check if any FUTURE saving times exist
+            const hasFutureSavingTime = activeSavingTimes.some((saveTime) => {
+              const savingDate =
+                saveTime.date_saving?.split('T')[0] || saveTime.date_saving
+
+              // Date is after today
+              if (savingDate > today) return true
+
+              // Date is today - check if start time hasn't arrived
+              if (savingDate === today) {
+                const [startHour, startMin] = saveTime.start_time_saving
+                  .split(':')
+                  .map(Number)
+                const startDateTime = new Date()
+                startDateTime.setHours(startHour, startMin, 0, 0)
+                return now < startDateTime
+              }
+
+              return false
+            })
+
+            if (hasFutureSavingTime) {
+              console.log('📅 Adding to SAVED:', reservation.ps_number)
+              acc.savedTimeReservations.push(reservation)
+            } else {
+              console.log('📜 Adding to HISTORY:', reservation.ps_number)
+              acc.historyReservations.push(reservation)
+            }
+          }
+        } else {
+          console.log(
+            '💾 No active saving times, adding to SAVED:',
+            reservation.ps_number,
+          )
+          acc.savedTimeReservations.push(reservation)
+        }
       } else {
-        acc.activeReservations.push(reservation)
+        // NO SAVING TIMES - use original reservation time logic
+        if (now > endDateTime) {
+          acc.historyReservations.push(reservation)
+        } else {
+          acc.activeReservations.push(reservation)
+        }
       }
 
       return acc
@@ -418,7 +515,6 @@ function PlaytimeTab({ user }) {
       savedTimeReservations: [],
     },
   )
-
   const displayedReservations =
     viewMode === 'active'
       ? activeReservations
@@ -724,13 +820,27 @@ function PlaytimeTab({ user }) {
                 </div>
               </div>
 
-              {/* Progress Bar - Only show for active reservations */}
               {viewMode === 'active' && (
                 <div className="bg-white/5 rounded-xl p-3">
                   <PlayTimeProgress
-                    startTime={reservation.reserve_start_time}
-                    endTime={reservation.reserve_end_time}
-                    reserveDate={reservation.reserve_date}
+                    startTime={
+                      reservation.saving_times &&
+                      reservation.saving_times.length > 0
+                        ? reservation.saving_times[0].start_time_saving
+                        : reservation.reserve_start_time
+                    }
+                    endTime={
+                      reservation.saving_times &&
+                      reservation.saving_times.length > 0
+                        ? reservation.saving_times[0].end_time_saving
+                        : reservation.reserve_end_time
+                    }
+                    reserveDate={
+                      reservation.saving_times &&
+                      reservation.saving_times.length > 0
+                        ? reservation.saving_times[0].date_saving
+                        : reservation.reserve_date
+                    }
                   />
                 </div>
               )}
