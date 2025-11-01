@@ -185,6 +185,7 @@ export default function ReservationDrawer({
             disableTimes={disableTimes}
             startTime={startTime}
             endTime={endTime}
+            selectedDate={selectedDate}
             onStartTimeChange={onStartTimeChange}
             onEndTimeChange={onEndTimeChange}
           />
@@ -237,6 +238,7 @@ function DefaultDrawerContent({
   disableTimes,
   startTime,
   endTime,
+  selectedDate,
   onStartTimeChange,
   onEndTimeChange,
 }) {
@@ -263,19 +265,39 @@ function DefaultDrawerContent({
             <div className="flex flex-col gap-2 w-full flex-1">
               <label className="text-sm">Reserved Times</label>
               <div className="flex flex-row flex-wrap gap-1">
-                {reserves.map((reserve, index) => (
-                  <div
-                    key={index}
-                    className={`text-xs px-2 py-1 border ${
-                      reserve.status_reserve === 'pending'
-                        ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                        : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                    } rounded-md w-fit`}
-                  >
-                    {reserve.reserve_start_time} - {reserve.reserve_end_time}{' '}
-                    WIB
-                  </div>
-                ))}
+                {reserves.map((reserve, index) => {
+                  // Find saving_times that match the date AND is_active = 'Active'
+                  const matchingSavingTime = reserve.saving_times?.find(
+                    (saveTime) => {
+                      const savingDate =
+                        saveTime.date_saving?.split('T')[0] ||
+                        saveTime.date_saving
+                      const isActive = saveTime.is_active?.trim() === 'Active'
+                      return savingDate === selectedDate && isActive
+                    },
+                  )
+
+                  const startTime = matchingSavingTime
+                    ? matchingSavingTime.start_time_saving
+                    : reserve.reserve_start_time
+
+                  const endTime = matchingSavingTime
+                    ? matchingSavingTime.end_time_saving
+                    : reserve.reserve_end_time
+
+                  return (
+                    <div
+                      key={index}
+                      className={`text-xs px-2 py-1 border ${
+                        reserve.status_reserve === 'pending'
+                          ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                          : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                      } rounded-md w-fit`}
+                    >
+                      {startTime} - {endTime} WIB
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>

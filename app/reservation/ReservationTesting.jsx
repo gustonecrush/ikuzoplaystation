@@ -214,12 +214,34 @@ export default function ReservationTesting() {
       const response = await axios.get(
         `${apiBaseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
+      console.log('RESERVATION TEST', response)
+
       if (response.status === 200) {
         setReserves(response.data)
-        const slots = response.data.map((reserve) => ({
-          startTime: reserve.reserve_start_time,
-          endTime: reserve.reserve_end_time,
-        }))
+
+        const slots = response.data.map((reserve) => {
+          // Find saving_times that match the date AND is_active = 'Active'
+          const matchingSavingTime = reserve.saving_times?.find((saveTime) => {
+            const savingDate =
+              saveTime.date_saving?.split('T')[0] || saveTime.date_saving
+            const isActive = saveTime.is_active?.trim() === 'Active'
+            return savingDate === date && isActive
+          })
+
+          if (matchingSavingTime) {
+            return {
+              startTime: matchingSavingTime.start_time_saving,
+              endTime: matchingSavingTime.end_time_saving,
+            }
+          } else {
+            return {
+              startTime: reserve.reserve_start_time,
+              endTime: reserve.reserve_end_time,
+            }
+          }
+        })
+
+        console.log('BOOKED SLOTS:', slots)
         setBookedSlots(slots)
         setIsLoading(false)
       }
