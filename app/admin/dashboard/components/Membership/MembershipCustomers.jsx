@@ -22,6 +22,8 @@ import {
   FaTrash,
   FaWhatsapp,
   FaUsers,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
 } from 'react-icons/fa'
 import { BsTelephone, BsPerson } from 'react-icons/bs'
 import { HiOutlineCalendar } from 'react-icons/hi'
@@ -314,6 +316,8 @@ function MembershipCustomers() {
       setIsLoading(false)
     }
   }
+
+  console.log('ALL MEMBER', data)
 
   // Function untuk save benefits (single customer)
   const handleSaveBenefits = async () => {
@@ -782,19 +786,192 @@ function MembershipCustomers() {
         open={isReservationsDialogOpen}
         onOpenChange={setIsReservationsDialogOpen}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <FaCalendarAlt className="w-5 h-5 text-purple-600" />
-              Reservations
+              Reservations History
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Reservations for {selectedCustomer?.full_name}
+              Showing all reservations for{' '}
+              <span className="font-semibold text-black">
+                {selectedCustomer?.full_name}
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4">
-            <p>Reservations content goes here...</p>
+
+          <div className="py-4 overflow-y-auto max-h-[500px]">
+            {selectedCustomer?.reservations?.length > 0 ? (
+              <div className="space-y-3">
+                {selectedCustomer.reservations.map((reservation, index) => (
+                  <div
+                    key={reservation.reserve_id || index}
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+                  >
+                    {/* Header with Status */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-base text-gray-900">
+                          {reservation.location}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          ID: {reservation.reserve_id}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          reservation.status_reserve === 'settlement'
+                            ? 'bg-green-100 text-green-700'
+                            : reservation.status_reserve === 'pending'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : reservation.status_reserve === 'cancelled'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {reservation.status_reserve?.toUpperCase()}
+                      </span>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      {/* Date */}
+                      <div className="flex items-center gap-2">
+                        <FaCalendarAlt className="w-4 h-4 text-gray-400" />
+                        <div>
+                          <p className="text-xs text-gray-500">Date</p>
+                          <p className="font-medium text-gray-900">
+                            {new Date(
+                              reservation.reserve_date,
+                            ).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Time */}
+                      <div className="flex items-center gap-2">
+                        <FaClock className="w-4 h-4 text-gray-400" />
+                        <div>
+                          <p className="text-xs text-gray-500">Time</p>
+                          <p className="font-medium text-gray-900">
+                            {reservation.reserve_start_time} -{' '}
+                            {reservation.reserve_end_time}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Position */}
+                      <div className="flex items-center gap-2">
+                        <FaMapMarkerAlt className="w-4 h-4 text-gray-400" />
+                        <div>
+                          <p className="text-xs text-gray-500">Position</p>
+                          <p className="font-medium text-gray-900">
+                            Position {reservation.position}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Price */}
+                      <div className="flex items-center gap-2">
+                        <FaMoneyBillWave className="w-4 h-4 text-gray-400" />
+                        <div>
+                          <p className="text-xs text-gray-500">Price</p>
+                          <p className="font-medium text-gray-900">
+                            IDR {reservation.price?.toLocaleString('id-ID')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-2 text-sm">
+                        <FaWhatsapp className="w-4 h-4 text-green-500" />
+                        <span className="text-gray-600">
+                          {reservation.reserve_contact}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Saving Times if exists */}
+                    {reservation.saving_times?.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                          Modified Times:
+                        </p>
+                        <div className="space-y-1">
+                          {reservation.saving_times.map((saveTime, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between text-xs bg-blue-50 p-2 rounded"
+                            >
+                              <span>
+                                {new Date(
+                                  saveTime.date_saving,
+                                ).toLocaleDateString('id-ID')}{' '}
+                                • {saveTime.start_time_saving} -{' '}
+                                {saveTime.end_time_saving}
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 rounded ${
+                                  saveTime.is_active === 'Active'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {saveTime.is_active}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Empty State
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <FaCalendarAlt className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  No Reservations Yet
+                </h3>
+                <p className="text-sm text-gray-500 text-center max-w-sm">
+                  This customer hasn't made any reservations yet.
+                </p>
+              </div>
+            )}
           </div>
+
+          {/* Footer with Summary */}
+          {selectedCustomer?.reservations?.length > 0 && (
+            <div className="border-t pt-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">
+                  Total Reservations:{' '}
+                  <span className="font-semibold text-gray-900">
+                    {selectedCustomer.reservations.length}
+                  </span>
+                </span>
+                <span className="text-gray-600">
+                  Total Spent:{' '}
+                  <span className="font-semibold text-purple-600">
+                    IDR{' '}
+                    {selectedCustomer.reservations
+                      .reduce((sum, r) => sum + (r.price || 0), 0)
+                      .toLocaleString('id-ID')}
+                  </span>
+                </span>
+              </div>
+            </div>
+          )}
+
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
           </AlertDialogFooter>
