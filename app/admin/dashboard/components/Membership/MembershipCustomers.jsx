@@ -45,7 +45,6 @@ import Card from '@/app/components/Card'
 import TableReservations from '@/app/components/TableReservations'
 import Toast from '@/app/components/Toast'
 import Loading from '../loading'
-import MembershipCheck from './MembershipCheck'
 import MembershipFormRegistration from '@/app/components/Membership/MembershipFormRegistration'
 
 import {
@@ -86,6 +85,31 @@ function MembershipCustomers() {
   const [benefitInputs, setBenefitInputs] = React.useState([''])
   const [bulkBenefitInputs, setBulkBenefitInputs] = React.useState([''])
   const [isBulkLoading, setIsBulkLoading] = React.useState(false)
+
+  const [globalFilter, setGlobalFilter] = React.useState('')
+
+  const customGlobalFilterFn = (row, columnId, filterValue) => {
+    const username = row.getValue('username')?.toString().toLowerCase() || ''
+    const phoneNumber = row.getValue('phone_number')?.toString() || ''
+    const searchValue = filterValue.toLowerCase()
+
+    // Validasi format nomor Indonesia
+    const isValidIndonesianPhone = (phone) => {
+      // Harus dimulai dengan 62 atau 08, dan minimal 10 digit
+      return (
+        (phone.startsWith('62') && phone.length >= 11) ||
+        (phone.startsWith('08') && phone.length >= 10)
+      )
+    }
+
+    // Filter nomor tidak valid
+    if (phoneNumber && !isValidIndonesianPhone(phoneNumber)) {
+      return false
+    }
+
+    // Search di username atau phone_number
+    return username.includes(searchValue) || phoneNumber.includes(searchValue)
+  }
 
   // Columns Definition
   const columns = [
@@ -212,7 +236,7 @@ function MembershipCustomers() {
       },
     },
     {
-      accessorKey: 'awareness_source',
+      accessorKey: 'phone_number',
       header: () => (
         <Button
           variant="ghost"
@@ -294,6 +318,7 @@ function MembershipCustomers() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter,
     },
   })
 
@@ -409,16 +434,12 @@ function MembershipCustomers() {
           <Card extra="gap-3 px-5 py-7 bg-white shadow-md rounded-2xl">
             <div className="flex items-center justify-between py-4">
               <Input
-                placeholder="Search member based on username.."
-                value={table.getColumn('username')?.getFilterValue() ?? ''}
-                onChange={(e) =>
-                  table.getColumn('username')?.setFilterValue(e.target.value)
-                }
+                placeholder="Search by username or phone number..."
+                value={globalFilter ?? ''}
+                onChange={(e) => setGlobalFilter(e.target.value)}
                 className="max-w-sm"
               />
               <div className="flex gap-2 items-center">
-                <MembershipCheck />
-
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button className="bg-orange hover:bg-orange/90">
