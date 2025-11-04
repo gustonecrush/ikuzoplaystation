@@ -108,7 +108,6 @@ import { Statistics } from '@/app/components'
 import { Calendar } from '@/components/ui/calendar'
 import { addDays, subDays } from 'date-fns'
 import Sidebar from '@/app/components/Admin/Sidebar'
-import MembershipCheck from '../components/Membership/MembershipCheck'
 import { useFetchDataMaintenances } from '@/hooks/useFetchDataMaintenance'
 import { apiBaseUrl } from '@/utils/urls'
 import Swal from 'sweetalert2'
@@ -1480,7 +1479,6 @@ function page() {
                         }
                         className="max-w-sm"
                       />
-                      <MembershipCheck />
                     </div>
                     <div className="w-full flex items-center justify between gap-10">
                       <Select

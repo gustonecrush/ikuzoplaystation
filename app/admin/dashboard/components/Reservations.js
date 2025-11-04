@@ -227,8 +227,6 @@ export default function Reservation() {
     }
   }
 
-  console.log({ bookedSlots })
-
   /***********************************************************
    * functions & states for scaling image
    ***********************************************************/
@@ -258,7 +256,6 @@ export default function Reservation() {
       position: posisiReservasi,
     }
 
-    console.log({ data })
     // Assuming you have some state variables for your input values
     if (
       namaReservasi &&
@@ -609,22 +606,6 @@ export default function Reservation() {
       prevPosition = getEventPosition(e)
     }
 
-    const handleMouseMove = (e) => {
-      if (!isDragging) return
-      const currentPosition = getEventPosition(e)
-      const deltaX = currentPosition.x - prevPosition.x
-      const deltaY = currentPosition.y - prevPosition.y
-      prevPosition = currentPosition
-      setPosition((position) => ({
-        x: position.x + deltaX,
-        y: position.y + deltaY,
-      }))
-    }
-
-    const handleMouseUp = () => {
-      isDragging = false
-    }
-
     const getEventPosition = (e) => {
       if (e.touches && e.touches.length) {
         return {
@@ -661,8 +642,6 @@ export default function Reservation() {
         setIsLoading(false)
       }
     }
-
-    // getAllPositions()
 
     const intervalTime = 500
     const interval = setInterval(() => {
@@ -745,8 +724,41 @@ export default function Reservation() {
   )
   console.log({ finalPrice })
 
-  // fallback if any part returns NaN
   const safePrice = isNaN(finalPrice) ? 0 : finalPrice + 4000
+
+  // USER OPTIONS
+  const [userType, setUserType] = React.useState('guest')
+
+  // MEMBERS
+  const [idMembership, setIdMembership] = React.useState('')
+  const [members, setMembers] = React.useState([])
+  const getAllMembers = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/customers`,
+      )
+      setMembers(response.data.data)
+    } catch (error) {
+      const message =
+        error.code === 'ERR_NETWORK'
+          ? 'Data tidak dapat ditampilkan. Cek jaringan Anda!'
+          : 'Server error, coba lagi nanti!'
+      Toast.fire({ icon: 'error', title: message })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSelectMember = (member) => {
+    setNamaReservasi(member.full_name)
+    setNoWhatsappReservasi(member.phone_number)
+    setIdMembership(member.id)
+  }
+
+  React.useEffect(() => {
+    getAllMembers()
+  }, [])
 
   return (
     <>
@@ -791,327 +803,1092 @@ export default function Reservation() {
           </div>
 
           {!continueTapped ? (
-            <>
-              <div className="flex flex-col gap-3 px-5 bg-white shadow-md rounded-lg mt-5 py-7">
-                <Fade>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-black" htmlFor="nama">
-                      Nama
-                    </label>
-                    <input
-                      type="text"
-                      value={namaReservasi}
-                      onChange={(e) => setNamaReservasi(e.target.value)}
-                      name="nama"
-                      id="nama"
-                      placeholder="Masukkan namamu"
-                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange   "
-                      required
-                    />
-                  </div>
-                </Fade>
+            <div className="flex flex-col gap-3 px-5 bg-white shadow-md rounded-lg mt-5 py-7">
+              <UserOptions selected={userType} onChange={setUserType} />
+              {userType == 'membership' && (
+                <MemberSelector
+                  members={members}
+                  onSelect={handleSelectMember}
+                  selectedId={idMembership}
+                />
+              )}
 
-                <Fade delay={5} duration={1100}>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-black" htmlFor="nama">
-                      No Whatsapp
-                    </label>
-                    <input
-                      type="text"
-                      name="nomor_whatsapp"
-                      id="nomor_whatsapp"
-                      placeholder="Masukkan nomor Whatsapp"
-                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange "
-                      value={nomorWhatsappReservasi}
-                      onChange={(e) => setNoWhatsappReservasi(e.target.value)}
-                      required
-                    />
-                  </div>
-                </Fade>
+              {(userType == 'guest' ||
+                (userType == 'membership' && idMembership != '')) && (
+                <>
+                  <Fade>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-black" htmlFor="nama">
+                        Nama
+                      </label>
+                      <input
+                        type="text"
+                        value={namaReservasi}
+                        onChange={(e) => setNamaReservasi(e.target.value)}
+                        name="nama"
+                        id="nama"
+                        placeholder="Masukkan namamu"
+                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange   "
+                        required
+                      />
+                    </div>
+                  </Fade>
 
-                {/* Tanggal Reservasi */}
-                <Fade delay={6} duration={1200}>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-black" htmlFor="nama">
-                      Tanggal Reservasi
-                    </label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <input
-                          type="text"
-                          value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                          name="tanggal_reservasi"
-                          id="tanggal_reservasi"
-                          placeholder="Pilih tanggal reservasi"
-                          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
-                          min={currentDate}
-                          max={maxDate}
-                          required
-                        />
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={date}
-                          onSelect={(date) => {
-                            setDate(date)
-                            // const nextDay = addDays(date)
-                            setSelectedDate(format(date, 'yyyy-MM-dd'))
-                            getAllReservationsPositon(
-                              format(date, 'yyyy-MM-dd'),
-                            )
-                            if (selectedReservationPlace != '') {
-                              getTimeSetForTodayAgain(
-                                selectedReservationPlace,
+                  <Fade delay={5} duration={1100}>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-black" htmlFor="nama">
+                        No Whatsapp
+                      </label>
+                      <input
+                        type="text"
+                        name="nomor_whatsapp"
+                        id="nomor_whatsapp"
+                        placeholder="Masukkan nomor Whatsapp"
+                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange "
+                        value={nomorWhatsappReservasi}
+                        onChange={(e) => setNoWhatsappReservasi(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </Fade>
+
+                  <Fade delay={6} duration={1200}>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-black" htmlFor="nama">
+                        Tanggal Reservasi
+                      </label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <input
+                            type="text"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            name="tanggal_reservasi"
+                            id="tanggal_reservasi"
+                            placeholder="Pilih tanggal reservasi"
+                            className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange  w-full "
+                            min={currentDate}
+                            max={maxDate}
+                            required
+                          />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={(date) => {
+                              setDate(date)
+                              // const nextDay = addDays(date)
+                              setSelectedDate(format(date, 'yyyy-MM-dd'))
+                              getAllReservationsPositon(
                                 format(date, 'yyyy-MM-dd'),
                               )
-                            }
-                            getTimeSelected(format(date, 'yyyy-MM-dd'))
-                          }}
-                          // disabled={(date) => {
-                          //   const today = startOfDay(new Date()) // Normalize today's date
-                          //   const maxDate = addDays(today, 14) // Max selectable date
-                          //   const minDate = subDays(today, 1) // Min selectable date
-
-                          //   // Normalize the input date
-                          //   const checkDate = startOfDay(date)
-
-                          //   // Check if the date falls within any closed date range
-                          //   const isInClosedRange = dateClose.some(
-                          //     ({ start_date, end_date }) => {
-                          //       const startDate = startOfDay(
-                          //         new Date(start_date),
-                          //       )
-                          //       const endDate = startOfDay(new Date(end_date))
-                          //       return (
-                          //         checkDate >= startDate && checkDate <= endDate
-                          //       ) // Ensure start_date is included
-                          //     },
-                          //   )
-
-                          //   return (
-                          //     checkDate > maxDate ||
-                          //     checkDate < minDate ||
-                          //     isInClosedRange
-                          //   )
-                          // }}
-                          disabled={(date) => {
-                            const today = startOfDay(new Date())
-                            const maxDate = addDays(today, 14)
-                            const checkDate = startOfDay(date)
-
-                            const isInClosedRange = dateClose.some(
-                              ({ start_date, end_date }) => {
-                                const startDate = startOfDay(
-                                  new Date(start_date),
+                              if (selectedReservationPlace != '') {
+                                getTimeSetForTodayAgain(
+                                  selectedReservationPlace,
+                                  format(date, 'yyyy-MM-dd'),
                                 )
-                                const endDate = startOfDay(new Date(end_date))
-                                return (
-                                  checkDate >= startDate && checkDate <= endDate
-                                )
-                              },
-                            )
+                              }
+                              getTimeSelected(format(date, 'yyyy-MM-dd'))
+                            }}
+                            disabled={(date) => {
+                              const today = startOfDay(new Date())
+                              const maxDate = addDays(today, 14)
+                              const checkDate = startOfDay(date)
 
-                            return (
-                              checkDate > maxDate ||
-                              checkDate < today || // ← Ganti minDate dengan today
-                              isInClosedRange
-                            )
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </Fade>
+                              const isInClosedRange = dateClose.some(
+                                ({ start_date, end_date }) => {
+                                  const startDate = startOfDay(
+                                    new Date(start_date),
+                                  )
+                                  const endDate = startOfDay(new Date(end_date))
+                                  return (
+                                    checkDate >= startDate &&
+                                    checkDate <= endDate
+                                  )
+                                },
+                              )
 
-                <Fade delay={7} duration={1300}>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-black" htmlFor="nama">
-                      Tempat Reservasi
-                    </label>
-                    <Select
-                      value={selectedReservationPlace}
-                      onValueChange={(value) => {
-                        setSelectedReservationPlace(value)
-                        getTimeSetForToday(value)
-                      }}
-                      required
-                      className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-800 rounded-lg !px-3 !py-4 "
-                    >
-                      <SelectTrigger className="py-5 px-3 text-base text-black">
-                        <SelectValue
-                          className="text-base text-white placeholder:text-white"
-                          placeholder="Choose Space"
-                        >
-                          {selectedReservationPlace == ''
-                            ? 'Choose Space'
-                            : capitalizeAndFormat(
-                                selectedReservationPlace || '',
-                              )}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel className="text-base">
-                            Pilih Tempat Reservasi
-                          </SelectLabel>
-                          {RESERVATION_PLACE.map((place, index) => (
-                            <SelectItem
-                              key={index}
-                              className="text-base"
-                              value={place.slug}
-                            >
-                              <div className="flex flex-col gap-1">
-                                <span>{place.name}</span>
+                              return (
+                                checkDate > maxDate ||
+                                checkDate < today || // ← Ganti minDate dengan today
+                                isInClosedRange
+                              )
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </Fade>
 
-                                {regularSpaceData == null ||
-                                premiumSpaceData == null ||
-                                privateSpaceData == null ? (
-                                  <></>
-                                ) : (
-                                  <span className="text-gray-500 flex flex-col gap-0">
-                                    {(place.slug === 'regular-space' &&
-                                      regularSpaceData.times) ||
-                                    (place.slug === 'private-space' &&
-                                      privateSpaceData.times) ||
-                                    (place.slug === 'premium-space' &&
-                                      premiumSpaceData.times)
-                                      ? (place.slug === 'regular-space'
-                                          ? regularSpaceData.times
-                                          : place.slug === 'private-space'
-                                          ? privateSpaceData.times
-                                          : premiumSpaceData.times
-                                        ).map((time, index) => (
-                                          <span key={index}>
-                                            {time['time-day']} -{' '}
-                                            {time['time-set']['start-time']} -{' '}
-                                            {convertToStandardTime(
-                                              time['time-set']['end-time'],
-                                            )}
-                                          </span>
-                                        ))
-                                      : null}
-                                  </span>
+                  <Fade delay={7} duration={1300}>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-black" htmlFor="nama">
+                        Tempat Reservasi
+                      </label>
+                      <Select
+                        value={selectedReservationPlace}
+                        onValueChange={(value) => {
+                          setSelectedReservationPlace(value)
+                          getTimeSetForToday(value)
+                        }}
+                        required
+                        className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-800 rounded-lg !px-3 !py-4 "
+                      >
+                        <SelectTrigger className="py-5 px-3 text-base text-black">
+                          <SelectValue
+                            className="text-base text-white placeholder:text-white"
+                            placeholder="Choose Space"
+                          >
+                            {selectedReservationPlace == ''
+                              ? 'Choose Space'
+                              : capitalizeAndFormat(
+                                  selectedReservationPlace || '',
                                 )}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </Fade>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel className="text-base">
+                              Pilih Tempat Reservasi
+                            </SelectLabel>
+                            {RESERVATION_PLACE.map((place, index) => (
+                              <SelectItem
+                                key={index}
+                                className="text-base"
+                                value={place.slug}
+                              >
+                                <div className="flex flex-col gap-1">
+                                  <span>{place.name}</span>
 
-                <Fade delay={8} duration={1400}>
-                  <div className="flex-relative w-full h-fit">
-                    <div
-                      style={{
-                        backgroundColor: '#ffffff',
-                        borderRadius: '10px',
-                        position: 'relative',
-                        overflow: 'hidden',
-                      }}
-                    >
+                                  {regularSpaceData == null ||
+                                  premiumSpaceData == null ||
+                                  privateSpaceData == null ? (
+                                    <></>
+                                  ) : (
+                                    <span className="text-gray-500 flex flex-col gap-0">
+                                      {(place.slug === 'regular-space' &&
+                                        regularSpaceData.times) ||
+                                      (place.slug === 'private-space' &&
+                                        privateSpaceData.times) ||
+                                      (place.slug === 'premium-space' &&
+                                        premiumSpaceData.times)
+                                        ? (place.slug === 'regular-space'
+                                            ? regularSpaceData.times
+                                            : place.slug === 'private-space'
+                                            ? privateSpaceData.times
+                                            : premiumSpaceData.times
+                                          ).map((time, index) => (
+                                            <span key={index}>
+                                              {time['time-day']} -{' '}
+                                              {time['time-set']['start-time']} -{' '}
+                                              {convertToStandardTime(
+                                                time['time-set']['end-time'],
+                                              )}
+                                            </span>
+                                          ))
+                                        : null}
+                                    </span>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </Fade>
+
+                  <Fade delay={8} duration={1400}>
+                    <div className="flex-relative w-full h-fit">
                       <div
                         style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          gap: '8px',
-                          backgroundColor: 'white',
-                          borderRadius: '8px 0 8px',
+                          backgroundColor: '#ffffff',
+                          borderRadius: '10px',
+                          position: 'relative',
                           overflow: 'hidden',
-                          position: 'absolute',
-                          bottom: 0,
-                          right: 0,
-                          zIndex: 100,
                         }}
                       >
-                        <button
-                          className="border-none text-[#737373] bg-white p-3 text-lg cursor-pointer"
-                          onClick={handleZoomIn}
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: '8px',
+                            backgroundColor: 'white',
+                            borderRadius: '8px 0 8px',
+                            overflow: 'hidden',
+                            position: 'absolute',
+                            bottom: 0,
+                            right: 0,
+                            zIndex: 100,
+                          }}
                         >
-                          <span className="material-symbols-outlined text-lg">
-                            +
-                          </span>
-                        </button>
-                        <button
-                          className="border-none text-[#737373] bg-white p-3 text-lg cursor-pointer"
-                          onClick={handleZoomOut}
-                        >
-                          <span className="material-symbols-outlined text-lg px-2">
-                            -
-                          </span>
-                        </button>
-                      </div>
+                          <button
+                            className="border-none text-[#737373] bg-white p-3 text-lg cursor-pointer"
+                            onClick={handleZoomIn}
+                          >
+                            <span className="material-symbols-outlined text-lg">
+                              +
+                            </span>
+                          </button>
+                          <button
+                            className="border-none text-[#737373] bg-white p-3 text-lg cursor-pointer"
+                            onClick={handleZoomOut}
+                          >
+                            <span className="material-symbols-outlined text-lg px-2">
+                              -
+                            </span>
+                          </button>
+                        </div>
 
-                      <img
-                        src={
-                          selectedReservationPlace == 'regular-space'
-                            ? '/first-floor.jpg'
-                            : selectedReservationPlace == 'premium-space'
-                            ? '/premium-space.PNG'
-                            : '/private-space.PNG'
-                        }
-                        alt=""
-                        style={{
-                          width: '100%',
-                          height: 'auto',
-                          transform: `${
+                        <img
+                          src={
                             selectedReservationPlace == 'regular-space'
-                              ? 'scale(1.4)'
-                              : 'scale(1)'
-                          } translate(${position.x}px, ${position.y}px)`,
-                          cursor: 'move',
-                        }}
-                      />
+                              ? '/first-floor.jpg'
+                              : selectedReservationPlace == 'premium-space'
+                              ? '/premium-space.PNG'
+                              : '/private-space.PNG'
+                          }
+                          alt=""
+                          style={{
+                            width: '100%',
+                            height: 'auto',
+                            transform: `${
+                              selectedReservationPlace == 'regular-space'
+                                ? 'scale(1.4)'
+                                : 'scale(1)'
+                            } translate(${position.x}px, ${position.y}px)`,
+                            cursor: 'move',
+                          }}
+                        />
 
-                      <div className="">
-                        {selectedReservationPlace == 'regular-space' &&
-                          selectedDate != '' && (
-                            <div className={`flex flex-col  mb-6   w-full`}>
-                              <div
-                                className={`flex flex-row justify-around w-full top-24 absolute z-50 gap-[${
-                                  7 + scale * 10
-                                }] `}
-                                ref={imageRef}
-                                style={{
-                                  width: '100%',
-                                  height: 'auto',
-                                  transform: `translate(${position.x}px, ${position.y}px)`,
-                                  cursor: 'move',
-                                }}
-                              >
-                                {[1, 2, 3, 4, 5].map((number) => {
-                                  return (
-                                    <Drawer
-                                      onClose={(e) =>
-                                        setDrawerContent('default')
-                                      }
-                                      key={number}
-                                    >
-                                      <DrawerTrigger asChild>
-                                        <div
-                                          key={number}
-                                          className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
-                                          onClick={() => {
-                                            setPosisiReservasi(number)
-                                            if (number <= 4) {
+                        <div className="">
+                          {selectedReservationPlace == 'regular-space' &&
+                            selectedDate != '' && (
+                              <div className={`flex flex-col  mb-6   w-full`}>
+                                <div
+                                  className={`flex flex-row justify-around w-full top-24 absolute z-50 gap-[${
+                                    7 + scale * 10
+                                  }] `}
+                                  ref={imageRef}
+                                  style={{
+                                    width: '100%',
+                                    height: 'auto',
+                                    transform: `translate(${position.x}px, ${position.y}px)`,
+                                    cursor: 'move',
+                                  }}
+                                >
+                                  {[1, 2, 3, 4, 5].map((number) => {
+                                    return (
+                                      <Drawer
+                                        onClose={(e) =>
+                                          setDrawerContent('default')
+                                        }
+                                        key={number}
+                                      >
+                                        <DrawerTrigger asChild>
+                                          <div
+                                            key={number}
+                                            className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} text-white rounded-lg py-2 flex-col items-center justify-center flex`}
+                                            onClick={() => {
+                                              setPosisiReservasi(number)
+                                              if (number <= 4) {
+                                                setNamaPosisiReservasi(
+                                                  positions[6].name,
+                                                )
+                                                setPricePerReserve(
+                                                  positions[6].price,
+                                                )
+                                                getPriceSetForToday(
+                                                  positions[6].name,
+                                                  selectedDate,
+                                                )
+                                                getPriceDataCustom(
+                                                  positions[6].name,
+                                                )
+                                              } else {
+                                                setNamaPosisiReservasi(
+                                                  positions[0].name,
+                                                )
+                                                setPricePerReserve(
+                                                  positions[0].price,
+                                                )
+                                                getPriceSetForToday(
+                                                  positions[0].name,
+                                                  selectedDate,
+                                                )
+                                                getPriceDataCustom(
+                                                  positions[0].name,
+                                                )
+                                              }
+                                              fetchingAvailableReservation(
+                                                selectedDate,
+                                                number,
+                                              )
+                                            }}
+                                            style={{
+                                              transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                                            }}
+                                          >
+                                            <p className="opacity-100 text-xs py-2 text-white ">
+                                              Reg
+                                            </p>{' '}
+                                          </div>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto pb-5">
+                                          <DrawerHeader className="text-left">
+                                            <DrawerTitle>
+                                              {number <= 4
+                                                ? positions[6].name
+                                                : positions[0].name}
+                                            </DrawerTitle>
+                                            <DrawerDescription>
+                                              IDR{' '}
+                                              {number <= 4
+                                                ? positions[6].price
+                                                : positions[0].price}
+                                              /hour and can only accomodate{' '}
+                                              {number <= 4
+                                                ? positions[6].capacity
+                                                : positions[0].capacity}{' '}
+                                              person (position {number}).
+                                            </DrawerDescription>
+                                            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                              <span className="font-semibold">
+                                                Price on:
+                                              </span>
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceData =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData.prices
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData.prices
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData.prices
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData.prices
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData.prices
+                                                    : []
+
+                                                return priceData.length > 0
+                                                  ? priceData.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.day} - IDR{' '}
+                                                          {price.price}/hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceDataCustom =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : []
+
+                                                return priceDataCustom.length >
+                                                  0
+                                                  ? priceDataCustom.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.keterangan},{' '}
+                                                          {formatDateIndonesian(
+                                                            price.date,
+                                                          )}
+                                                          - IDR {price.price}
+                                                          /hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                            </DrawerDescription>
+                                          </DrawerHeader>
+                                          <div className="flex-relative w-full h-fit px-5">
+                                            <div
+                                              style={{
+                                                backgroundColor: '#ffffff',
+                                                borderRadius: '10px',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                              }}
+                                            >
+                                              <img
+                                                src={`${
+                                                  process.env
+                                                    .NEXT_PUBLIC_IMAGE_URL
+                                                }${
+                                                  number <= 4
+                                                    ? positions[6].pict
+                                                    : positions[0].pict
+                                                }`}
+                                                useMap="#image-map"
+                                                alt=""
+                                                style={{
+                                                  width: '100%',
+                                                  height: 'auto',
+                                                }}
+                                              />
+                                            </div>
+                                          </div>
+
+                                          {reserves.length > 0 ? (
+                                            <>
+                                              <Fade className="px-5 ">
+                                                <div className="flex gap-1 w-full my-2">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Reserved Times
+                                                    </label>
+                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                      {reserves.map(
+                                                        (reserve, index) => {
+                                                          // Find saving_times that match the date AND is_active = 'Active'
+                                                          const matchingSavingTime = reserve.saving_times?.find(
+                                                            (saveTime) => {
+                                                              const savingDate =
+                                                                saveTime.date_saving?.split(
+                                                                  'T',
+                                                                )[0] ||
+                                                                saveTime.date_saving
+                                                              const isActive =
+                                                                saveTime.is_active?.trim() ===
+                                                                'Active'
+                                                              return (
+                                                                savingDate ===
+                                                                  selectedDate &&
+                                                                isActive
+                                                              )
+                                                            },
+                                                          )
+
+                                                          const startTime = matchingSavingTime
+                                                            ? matchingSavingTime.start_time_saving
+                                                            : reserve.reserve_start_time
+
+                                                          const endTime = matchingSavingTime
+                                                            ? matchingSavingTime.end_time_saving
+                                                            : reserve.reserve_end_time
+
+                                                          return (
+                                                            <div
+                                                              key={index}
+                                                              className={`text-xs px-2 py-1 border ${
+                                                                reserve.status_reserve ===
+                                                                'pending'
+                                                                  ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                                  : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                              } rounded-md w-fit`}
+                                                            >
+                                                              {startTime} -{' '}
+                                                              {endTime} WIB
+                                                            </div>
+                                                          )
+                                                        },
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </Fade>
+                                            </>
+                                          ) : null}
+
+                                          <Fade className="px-5 ">
+                                            <div className="flex gap-1 w-full mt-2 mb-3">
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  Start Time
+                                                </label>
+                                                <Select
+                                                  value={startTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setStartTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Mulai
+                                                      </SelectLabel>
+                                                      {generatedTimes.map(
+                                                        (time, index) => (
+                                                          <SelectItem
+                                                            key={index}
+                                                            value={time}
+                                                          >
+                                                            {time}
+                                                          </SelectItem>
+                                                        ),
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  End Time
+                                                </label>
+                                                <Select
+                                                  value={endTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setEndTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Berakhir
+                                                      </SelectLabel>
+                                                      {startTimeReservasi !=
+                                                        '' &&
+                                                      timeArray.length != 0 ? (
+                                                        timeArray.map(
+                                                          (time, index) => {
+                                                            const isDisabled = disableTimes.includes(
+                                                              time,
+                                                            )
+
+                                                            return (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                                className={
+                                                                  'text-sm'
+                                                                }
+                                                                disabled={
+                                                                  isDisabled
+                                                                }
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            )
+                                                          },
+                                                        )
+                                                      ) : (
+                                                        <SelectItem
+                                                          value={'00.00'}
+                                                        >
+                                                          <p className="text-gray-500">
+                                                            Waktu yang kamu
+                                                            pilih <br />
+                                                            sudah terisi.
+                                                            Silakan <br />
+                                                            pilih waktu bermain{' '}
+                                                            <br />
+                                                            di jam yang lain
+                                                          </p>
+                                                        </SelectItem>
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            </div>
+                                          </Fade>
+
+                                          <div className="flex flex-col gap-2 px-5 mt-3">
+                                            <DrawerClose asChild>
+                                              <Button
+                                                variant="outline"
+                                                className={`bg-orange text-white border-orange py-5`}
+                                              >
+                                                Continue
+                                              </Button>
+                                            </DrawerClose>
+                                          </div>
+                                        </DrawerContent>
+                                      </Drawer>
+                                    )
+                                  })}
+                                </div>
+
+                                <div
+                                  className={`flex flex-row justify-around w-72 bottom-10 absolute z-50 left-10  md:left-32`}
+                                  ref={imageRef}
+                                  style={{
+                                    height: 'auto',
+                                    transform: `translate(${position.x}px, ${position.y}px)`,
+                                    cursor: 'move',
+                                  }}
+                                >
+                                  {[6, 7].map((number) => {
+                                    return (
+                                      <Drawer
+                                        onClose={(e) =>
+                                          setDrawerContent('default')
+                                        }
+                                        key={number}
+                                      >
+                                        <DrawerTrigger asChild>
+                                          <div
+                                            key={number}
+                                            className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2  ${
+                                              number == 7 ? 'ml-10' : 'ml-0'
+                                            } flex-col items-center justify-center flex`}
+                                            onClick={() => {
+                                              setPosisiReservasi(number)
                                               setNamaPosisiReservasi(
-                                                positions[6].name,
+                                                positions[1].name,
                                               )
                                               setPricePerReserve(
-                                                positions[6].price,
+                                                positions[1].price,
                                               )
                                               getPriceSetForToday(
-                                                positions[6].name,
+                                                positions[1].name,
                                                 selectedDate,
                                               )
-                                              getPriceDataCustom(
-                                                positions[6].name,
+                                              fetchingAvailableReservation(
+                                                selectedDate,
+                                                number,
                                               )
-                                            } else {
+                                              getPriceDataCustom(
+                                                positions[1].name,
+                                              )
+                                            }}
+                                            style={{
+                                              transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                                            }}
+                                          >
+                                            <p className="opacity-100 py-2 text-xs  text-white">
+                                              Sim
+                                            </p>{' '}
+                                          </div>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+                                          <DrawerHeader className="text-left">
+                                            <DrawerTitle>
+                                              {positions[1].name}
+                                            </DrawerTitle>
+                                            <DrawerDescription>
+                                              IDR {positions[1].price}/hour and
+                                              can only accomodate{' '}
+                                              {positions[1].capacity} person
+                                              (position {number}).
+                                            </DrawerDescription>
+                                            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                              <span className="font-semibold">
+                                                Price on:
+                                              </span>
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  positions[1].name,
+                                                ) // Get the facility ID
+                                                const priceData =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData.prices
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData.prices
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData.prices
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData.prices
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData.prices
+                                                    : []
+
+                                                return priceData.length > 0
+                                                  ? priceData.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.day} - IDR{' '}
+                                                          {price.price}/hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceDataCustom =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : []
+
+                                                return priceDataCustom.length >
+                                                  0
+                                                  ? priceDataCustom.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.keterangan},{' '}
+                                                          {formatDateIndonesian(
+                                                            price.date,
+                                                          )}
+                                                          - IDR {price.price}
+                                                          /hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                            </DrawerDescription>
+                                          </DrawerHeader>
+                                          <div className="flex-relative w-full h-fit px-5">
+                                            <div
+                                              style={{
+                                                backgroundColor: '#ffffff',
+                                                borderRadius: '10px',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                              }}
+                                            >
+                                              <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[1].pict}`}
+                                                useMap="#image-map"
+                                                alt=""
+                                                style={{
+                                                  width: '100%',
+                                                  height: 'auto',
+                                                }}
+                                              />
+                                            </div>
+                                          </div>
+
+                                          {reserves.length > 0 ? (
+                                            <>
+                                              <Fade className="px-5 ">
+                                                <div className="flex gap-1 w-full my-2">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Reserved Times
+                                                    </label>
+                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                      {reserves.map(
+                                                        (reserve, index) => {
+                                                          // Find saving_times that match the date AND is_active = 'Active'
+                                                          const matchingSavingTime = reserve.saving_times?.find(
+                                                            (saveTime) => {
+                                                              const savingDate =
+                                                                saveTime.date_saving?.split(
+                                                                  'T',
+                                                                )[0] ||
+                                                                saveTime.date_saving
+                                                              const isActive =
+                                                                saveTime.is_active?.trim() ===
+                                                                'Active'
+                                                              return (
+                                                                savingDate ===
+                                                                  selectedDate &&
+                                                                isActive
+                                                              )
+                                                            },
+                                                          )
+
+                                                          const startTime = matchingSavingTime
+                                                            ? matchingSavingTime.start_time_saving
+                                                            : reserve.reserve_start_time
+
+                                                          const endTime = matchingSavingTime
+                                                            ? matchingSavingTime.end_time_saving
+                                                            : reserve.reserve_end_time
+
+                                                          return (
+                                                            <div
+                                                              key={index}
+                                                              className={`text-xs px-2 py-1 border ${
+                                                                reserve.status_reserve ===
+                                                                'pending'
+                                                                  ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                                  : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                              } rounded-md w-fit`}
+                                                            >
+                                                              {startTime} -{' '}
+                                                              {endTime} WIB
+                                                            </div>
+                                                          )
+                                                        },
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </Fade>
+                                            </>
+                                          ) : null}
+
+                                          <Fade className="px-5 ">
+                                            <div className="flex gap-1 w-full mt-2 mb-3">
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  Start Time
+                                                </label>
+                                                <Select
+                                                  value={startTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setStartTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Mulai
+                                                      </SelectLabel>
+                                                      {generatedTimes.map(
+                                                        (time, index) => (
+                                                          <SelectItem
+                                                            key={index}
+                                                            value={time}
+                                                          >
+                                                            {time}
+                                                          </SelectItem>
+                                                        ),
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  End Time
+                                                </label>
+                                                <Select
+                                                  value={endTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setEndTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Berakhir
+                                                      </SelectLabel>
+                                                      {startTimeReservasi !=
+                                                        '' &&
+                                                      timeArray.length != 0 ? (
+                                                        timeArray.map(
+                                                          (time, index) => {
+                                                            const isDisabled = disableTimes.includes(
+                                                              time,
+                                                            )
+
+                                                            return (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                                className={
+                                                                  'text-sm'
+                                                                }
+                                                                disabled={
+                                                                  isDisabled
+                                                                }
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            )
+                                                          },
+                                                        )
+                                                      ) : (
+                                                        <SelectItem
+                                                          value={'00.00'}
+                                                        >
+                                                          <p className="text-gray-500">
+                                                            Waktu yang kamu
+                                                            pilih <br />
+                                                            sudah terisi.
+                                                            Silakan <br />
+                                                            pilih waktu bermain{' '}
+                                                            <br />
+                                                            di jam yang lain
+                                                          </p>
+                                                        </SelectItem>
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            </div>
+                                          </Fade>
+
+                                          <div className="flex flex-col gap-2 px-5 mt-2">
+                                            <DrawerClose asChild>
+                                              <Button
+                                                variant="outline"
+                                                className={`bg-orange text-white border-orange py-5`}
+                                              >
+                                                Continue
+                                              </Button>
+                                            </DrawerClose>
+                                          </div>
+                                        </DrawerContent>
+                                      </Drawer>
+                                    )
+                                  })}
+                                </div>
+
+                                <div
+                                  className={`flex flex-row justify-around w-fit bottom-10 absolute z-50 left-40 -ml-2 gap-${
+                                    8 + scale * 10
+                                  } bottom-10  md:left-[53.5%] `}
+                                  ref={imageRef}
+                                  style={{
+                                    height: 'auto',
+                                    transform: `translate(${position.x}px, ${position.y}px)`,
+                                    cursor: 'move',
+                                  }}
+                                >
+                                  {[8].map((number) => {
+                                    return (
+                                      <Drawer
+                                        onClose={(e) =>
+                                          setDrawerContent('default')
+                                        }
+                                        key={number}
+                                      >
+                                        <DrawerTrigger asChild>
+                                          <div
+                                            key={number}
+                                            className={`cursor-pointer md:w-28 md:h-28 w-9  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
+                                            onClick={() => {
+                                              setPosisiReservasi(number)
                                               setNamaPosisiReservasi(
                                                 positions[0].name,
                                               )
@@ -1122,2628 +1899,1108 @@ export default function Reservation() {
                                                 positions[0].name,
                                                 selectedDate,
                                               )
+                                              fetchingAvailableReservation(
+                                                selectedDate,
+                                                number,
+                                              )
                                               getPriceDataCustom(
                                                 positions[0].name,
                                               )
-                                            }
-                                            fetchingAvailableReservation(
-                                              selectedDate,
-                                              number,
-                                            )
-                                          }}
-                                          style={{
-                                            transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                                          }}
-                                        >
-                                          <p className="opacity-100 text-xs py-2 text-white ">
-                                            Reg
-                                          </p>{' '}
-                                        </div>
-                                      </DrawerTrigger>
-                                      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto pb-5">
-                                        <DrawerHeader className="text-left">
-                                          <DrawerTitle>
-                                            {number <= 4
-                                              ? positions[6].name
-                                              : positions[0].name}
-                                          </DrawerTitle>
-                                          <DrawerDescription>
-                                            IDR{' '}
-                                            {number <= 4
-                                              ? positions[6].price
-                                              : positions[0].price}
-                                            /hour and can only accomodate{' '}
-                                            {number <= 4
-                                              ? positions[6].capacity
-                                              : positions[0].capacity}{' '}
-                                            person (position {number}).
-                                          </DrawerDescription>
-                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-                                            <span className="font-semibold">
-                                              Price on:
-                                            </span>
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
-
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.day} - IDR{' '}
-                                                        {price.price}/hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceDataCustom =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : []
-
-                                              return priceDataCustom.length > 0
-                                                ? priceDataCustom.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.keterangan},{' '}
-                                                        {formatDateIndonesian(
-                                                          price.date,
-                                                        )}
-                                                        - IDR {price.price}
-                                                        /hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </DrawerDescription>
-                                        </DrawerHeader>
-                                        <div className="flex-relative w-full h-fit px-5">
-                                          <div
+                                            }}
                                             style={{
-                                              backgroundColor: '#ffffff',
-                                              borderRadius: '10px',
-                                              position: 'relative',
-                                              overflow: 'hidden',
+                                              transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
                                             }}
                                           >
-                                            <img
-                                              src={`${
-                                                process.env
-                                                  .NEXT_PUBLIC_IMAGE_URL
-                                              }${
-                                                number <= 4
-                                                  ? positions[6].pict
-                                                  : positions[0].pict
-                                              }`}
-                                              useMap="#image-map"
-                                              alt=""
-                                              style={{
-                                                width: '100%',
-                                                height: 'auto',
-                                              }}
-                                            />
+                                            <p className="opacity-100 text-xs py-2 text-white ">
+                                              Reg
+                                            </p>{' '}
                                           </div>
-                                        </div>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+                                          <DrawerHeader className="text-left">
+                                            <DrawerTitle>
+                                              {positions[0].name}
+                                            </DrawerTitle>
+                                            <DrawerDescription>
+                                              IDR {positions[0].price}/hour and
+                                              can only accomodate{' '}
+                                              {positions[0].capacity} person
+                                              (position {number}).
+                                            </DrawerDescription>
+                                            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                              <span className="font-semibold">
+                                                Price on:
+                                              </span>
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceData =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData.prices
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData.prices
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData.prices
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData.prices
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData.prices
+                                                    : []
 
-                                        {reserves.length > 0 ? (
-                                          <>
-                                            <Fade className="px-5 ">
-                                              <div className="flex gap-1 w-full my-2">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Reserved Times
-                                                  </label>
-                                                  <div className="flex flex-row flex-wrap gap-1">
-                                                    {reserves.map(
-                                                      (reserve, index) => {
-                                                        // Find saving_times that match the date AND is_active = 'Active'
-                                                        const matchingSavingTime = reserve.saving_times?.find(
-                                                          (saveTime) => {
-                                                            const savingDate =
-                                                              saveTime.date_saving?.split(
-                                                                'T',
-                                                              )[0] ||
-                                                              saveTime.date_saving
-                                                            const isActive =
-                                                              saveTime.is_active?.trim() ===
-                                                              'Active'
+                                                return priceData.length > 0
+                                                  ? priceData.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.day} - IDR{' '}
+                                                          {price.price}/hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceDataCustom =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : []
+
+                                                return priceDataCustom.length >
+                                                  0
+                                                  ? priceDataCustom.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.keterangan},{' '}
+                                                          {formatDateIndonesian(
+                                                            price.date,
+                                                          )}
+                                                          - IDR {price.price}
+                                                          /hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                            </DrawerDescription>
+                                          </DrawerHeader>
+
+                                          <div className="flex-relative w-full h-fit px-5">
+                                            <div
+                                              style={{
+                                                backgroundColor: '#ffffff',
+                                                borderRadius: '10px',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                              }}
+                                            >
+                                              <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[0].pict}`}
+                                                useMap="#image-map"
+                                                alt=""
+                                                style={{
+                                                  width: '100%',
+                                                  height: 'auto',
+                                                }}
+                                              />
+                                            </div>
+                                          </div>
+
+                                          {reserves.length > 0 ? (
+                                            <>
+                                              <Fade className="px-5 ">
+                                                <div className="flex gap-1 w-full my-2">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Reserved Times
+                                                    </label>
+                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                      {reserves.map(
+                                                        (reserve, index) => {
+                                                          // Find saving_times that match the date AND is_active = 'Active'
+                                                          const matchingSavingTime = reserve.saving_times?.find(
+                                                            (saveTime) => {
+                                                              const savingDate =
+                                                                saveTime.date_saving?.split(
+                                                                  'T',
+                                                                )[0] ||
+                                                                saveTime.date_saving
+                                                              const isActive =
+                                                                saveTime.is_active?.trim() ===
+                                                                'Active'
+                                                              return (
+                                                                savingDate ===
+                                                                  selectedDate &&
+                                                                isActive
+                                                              )
+                                                            },
+                                                          )
+
+                                                          const startTime = matchingSavingTime
+                                                            ? matchingSavingTime.start_time_saving
+                                                            : reserve.reserve_start_time
+
+                                                          const endTime = matchingSavingTime
+                                                            ? matchingSavingTime.end_time_saving
+                                                            : reserve.reserve_end_time
+
+                                                          return (
+                                                            <div
+                                                              key={index}
+                                                              className={`text-xs px-2 py-1 border ${
+                                                                reserve.status_reserve ===
+                                                                'pending'
+                                                                  ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                                  : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                              } rounded-md w-fit`}
+                                                            >
+                                                              {startTime} -{' '}
+                                                              {endTime} WIB
+                                                            </div>
+                                                          )
+                                                        },
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </Fade>
+                                            </>
+                                          ) : null}
+
+                                          <Fade className="px-5 ">
+                                            <div className="flex gap-1 w-full mt-2 mb-3">
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  Start Time
+                                                </label>
+                                                <Select
+                                                  value={startTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setStartTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Mulai
+                                                      </SelectLabel>
+                                                      {generatedTimes.map(
+                                                        (time, index) => (
+                                                          <SelectItem
+                                                            key={index}
+                                                            value={time}
+                                                          >
+                                                            {time}
+                                                          </SelectItem>
+                                                        ),
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  End Time
+                                                </label>
+                                                <Select
+                                                  value={endTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setEndTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Berakhir
+                                                      </SelectLabel>
+                                                      {startTimeReservasi !=
+                                                        '' &&
+                                                      timeArray.length != 0 ? (
+                                                        timeArray.map(
+                                                          (time, index) => {
+                                                            const isDisabled = disableTimes.includes(
+                                                              time,
+                                                            )
+
                                                             return (
-                                                              savingDate ===
-                                                                selectedDate &&
-                                                              isActive
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                                className={
+                                                                  'text-sm'
+                                                                }
+                                                                disabled={
+                                                                  isDisabled
+                                                                }
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
                                                             )
                                                           },
                                                         )
-
-                                                        const startTime = matchingSavingTime
-                                                          ? matchingSavingTime.start_time_saving
-                                                          : reserve.reserve_start_time
-
-                                                        const endTime = matchingSavingTime
-                                                          ? matchingSavingTime.end_time_saving
-                                                          : reserve.reserve_end_time
-
-                                                        return (
-                                                          <div
-                                                            key={index}
-                                                            className={`text-xs px-2 py-1 border ${
-                                                              reserve.status_reserve ===
-                                                              'pending'
-                                                                ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                                : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                            } rounded-md w-fit`}
-                                                          >
-                                                            {startTime} -{' '}
-                                                            {endTime} WIB
-                                                          </div>
-                                                        )
-                                                      },
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </Fade>
-                                          </>
-                                        ) : null}
-
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generatedTimes.map(
-                                                      (time, index) => (
+                                                      ) : (
                                                         <SelectItem
-                                                          key={index}
-                                                          value={time}
+                                                          value={'00.00'}
                                                         >
-                                                          {time}
+                                                          <p className="text-gray-500">
+                                                            Waktu yang kamu
+                                                            pilih <br />
+                                                            sudah terisi.
+                                                            Silakan <br />
+                                                            pilih waktu bermain{' '}
+                                                            <br />
+                                                            di jam yang lain
+                                                          </p>
                                                         </SelectItem>
-                                                      ),
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
                                             </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                    timeArray.length != 0 ? (
-                                                      timeArray.map(
-                                                        (time, index) => {
-                                                          const isDisabled = disableTimes.includes(
-                                                            time,
-                                                          )
+                                          </Fade>
 
-                                                          return (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                              className={
-                                                                'text-sm'
-                                                              }
-                                                              disabled={
-                                                                isDisabled
-                                                              }
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          )
-                                                        },
-                                                      )
-                                                    ) : (
-                                                      <SelectItem
-                                                        value={'00.00'}
-                                                      >
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain{' '}
-                                                          <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
+                                          <div className="flex flex-col gap-2 px-5 mt-2">
+                                            <DrawerClose asChild>
+                                              <Button
+                                                variant="outline"
+                                                className={`bg-orange text-white border-orange py-5`}
+                                              >
+                                                Continue
+                                              </Button>
+                                            </DrawerClose>
                                           </div>
-                                        </Fade>
-
-                                        <div className="flex flex-col gap-2 px-5 mt-3">
-                                          <DrawerClose asChild>
-                                            <Button
-                                              variant="outline"
-                                              className={`bg-orange text-white border-orange py-5`}
-                                            >
-                                              Continue
-                                            </Button>
-                                          </DrawerClose>
-                                        </div>
-                                      </DrawerContent>
-                                    </Drawer>
-                                  )
-                                })}
+                                        </DrawerContent>
+                                      </Drawer>
+                                    )
+                                  })}
+                                </div>
                               </div>
+                            )}
 
-                              <div
-                                className={`flex flex-row justify-around w-72 bottom-10 absolute z-50 left-10  md:left-32`}
-                                ref={imageRef}
-                                style={{
-                                  height: 'auto',
-                                  transform: `translate(${position.x}px, ${position.y}px)`,
-                                  cursor: 'move',
-                                }}
-                              >
-                                {[6, 7].map((number) => {
-                                  return (
-                                    <Drawer
-                                      onClose={(e) =>
-                                        setDrawerContent('default')
-                                      }
-                                      key={number}
-                                    >
-                                      <DrawerTrigger asChild>
-                                        <div
-                                          key={number}
-                                          className={`cursor-pointer md:w-28 md:h-28 w-8 h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2  ${
-                                            number == 7 ? 'ml-10' : 'ml-0'
-                                          } flex-col items-center justify-center flex`}
-                                          onClick={() => {
-                                            setPosisiReservasi(number)
-                                            setNamaPosisiReservasi(
-                                              positions[1].name,
-                                            )
-                                            setPricePerReserve(
-                                              positions[1].price,
-                                            )
-                                            getPriceSetForToday(
-                                              positions[1].name,
-                                              selectedDate,
-                                            )
-                                            fetchingAvailableReservation(
-                                              selectedDate,
-                                              number,
-                                            )
-                                            getPriceDataCustom(
-                                              positions[1].name,
-                                            )
-                                          }}
-                                          style={{
-                                            transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                                          }}
-                                        >
-                                          <p className="opacity-100 py-2 text-xs  text-white">
-                                            Sim
-                                          </p>{' '}
-                                        </div>
-                                      </DrawerTrigger>
-                                      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
-                                        <DrawerHeader className="text-left">
-                                          <DrawerTitle>
-                                            {positions[1].name}
-                                          </DrawerTitle>
-                                          <DrawerDescription>
-                                            IDR {positions[1].price}/hour and
-                                            can only accomodate{' '}
-                                            {positions[1].capacity} person
-                                            (position {number}).
-                                          </DrawerDescription>
-                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-                                            <span className="font-semibold">
-                                              Price on:
-                                            </span>
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                positions[1].name,
-                                              ) // Get the facility ID
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
-
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.day} - IDR{' '}
-                                                        {price.price}/hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceDataCustom =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : []
-
-                                              return priceDataCustom.length > 0
-                                                ? priceDataCustom.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.keterangan},{' '}
-                                                        {formatDateIndonesian(
-                                                          price.date,
-                                                        )}
-                                                        - IDR {price.price}
-                                                        /hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </DrawerDescription>
-                                        </DrawerHeader>
-                                        <div className="flex-relative w-full h-fit px-5">
+                          {selectedReservationPlace == 'premium-space' &&
+                            selectedDate != '' && (
+                              <div className="flex flex-col mb-6">
+                                <div
+                                  className={`flex flex-row w-[80%] gap-32 md:gap-44 absolute left-7 md:top-20  ml-20 md:ml-40 z-50 gap-[${
+                                    8 + scale * 10
+                                  }]`}
+                                  ref={imageRef}
+                                  style={{
+                                    height: 'auto',
+                                    transform: `translate(${position.x}px, ${position.y}px)`,
+                                    cursor: 'move',
+                                  }}
+                                >
+                                  {[13, 14, 15, 16].map((number) => {
+                                    return (
+                                      <Drawer
+                                        onClose={(e) =>
+                                          setDrawerContent('default')
+                                        }
+                                        key={number}
+                                      >
+                                        <DrawerTrigger asChild>
                                           <div
-                                            style={{
-                                              backgroundColor: '#ffffff',
-                                              borderRadius: '10px',
-                                              position: 'relative',
-                                              overflow: 'hidden',
-                                            }}
-                                          >
-                                            <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[1].pict}`}
-                                              useMap="#image-map"
-                                              alt=""
-                                              style={{
-                                                width: '100%',
-                                                height: 'auto',
-                                              }}
-                                            />
-                                          </div>
-                                        </div>
-
-                                        {reserves.length > 0 ? (
-                                          <>
-                                            <Fade className="px-5 ">
-                                              <div className="flex gap-1 w-full my-2">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Reserved Times
-                                                  </label>
-                                                  <div className="flex flex-row flex-wrap gap-1">
-                                                    {reserves.map(
-                                                      (reserve, index) => {
-                                                        // Find saving_times that match the date AND is_active = 'Active'
-                                                        const matchingSavingTime = reserve.saving_times?.find(
-                                                          (saveTime) => {
-                                                            const savingDate =
-                                                              saveTime.date_saving?.split(
-                                                                'T',
-                                                              )[0] ||
-                                                              saveTime.date_saving
-                                                            const isActive =
-                                                              saveTime.is_active?.trim() ===
-                                                              'Active'
-                                                            return (
-                                                              savingDate ===
-                                                                selectedDate &&
-                                                              isActive
-                                                            )
-                                                          },
-                                                        )
-
-                                                        const startTime = matchingSavingTime
-                                                          ? matchingSavingTime.start_time_saving
-                                                          : reserve.reserve_start_time
-
-                                                        const endTime = matchingSavingTime
-                                                          ? matchingSavingTime.end_time_saving
-                                                          : reserve.reserve_end_time
-
-                                                        return (
-                                                          <div
-                                                            key={index}
-                                                            className={`text-xs px-2 py-1 border ${
-                                                              reserve.status_reserve ===
-                                                              'pending'
-                                                                ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                                : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                            } rounded-md w-fit`}
-                                                          >
-                                                            {startTime} -{' '}
-                                                            {endTime} WIB
-                                                          </div>
-                                                        )
-                                                      },
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </Fade>
-                                          </>
-                                        ) : null}
-
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generatedTimes.map(
-                                                      (time, index) => (
-                                                        <SelectItem
-                                                          key={index}
-                                                          value={time}
-                                                        >
-                                                          {time}
-                                                        </SelectItem>
-                                                      ),
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                    timeArray.length != 0 ? (
-                                                      timeArray.map(
-                                                        (time, index) => {
-                                                          const isDisabled = disableTimes.includes(
-                                                            time,
-                                                          )
-
-                                                          return (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                              className={
-                                                                'text-sm'
-                                                              }
-                                                              disabled={
-                                                                isDisabled
-                                                              }
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          )
-                                                        },
-                                                      )
-                                                    ) : (
-                                                      <SelectItem
-                                                        value={'00.00'}
-                                                      >
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain{' '}
-                                                          <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                          </div>
-                                        </Fade>
-
-                                        <div className="flex flex-col gap-2 px-5 mt-2">
-                                          <DrawerClose asChild>
-                                            <Button
-                                              variant="outline"
-                                              className={`bg-orange text-white border-orange py-5`}
-                                            >
-                                              Continue
-                                            </Button>
-                                          </DrawerClose>
-                                        </div>
-                                      </DrawerContent>
-                                    </Drawer>
-                                  )
-                                })}
-                              </div>
-
-                              <div
-                                className={`flex flex-row justify-around w-fit bottom-10 absolute z-50 left-40 -ml-2 gap-${
-                                  8 + scale * 10
-                                } bottom-10  md:left-[53.5%] `}
-                                ref={imageRef}
-                                style={{
-                                  height: 'auto',
-                                  transform: `translate(${position.x}px, ${position.y}px)`,
-                                  cursor: 'move',
-                                }}
-                              >
-                                {[8].map((number) => {
-                                  return (
-                                    <Drawer
-                                      onClose={(e) =>
-                                        setDrawerContent('default')
-                                      }
-                                      key={number}
-                                    >
-                                      <DrawerTrigger asChild>
-                                        <div
-                                          key={number}
-                                          className={`cursor-pointer md:w-28 md:h-28 w-9  h-8 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg flex-col items-center justify-center flex`}
-                                          onClick={() => {
-                                            setPosisiReservasi(number)
-                                            setNamaPosisiReservasi(
-                                              positions[0].name,
-                                            )
-                                            setPricePerReserve(
-                                              positions[0].price,
-                                            )
-                                            getPriceSetForToday(
-                                              positions[0].name,
-                                              selectedDate,
-                                            )
-                                            fetchingAvailableReservation(
-                                              selectedDate,
-                                              number,
-                                            )
-                                            getPriceDataCustom(
-                                              positions[0].name,
-                                            )
-                                          }}
-                                          style={{
-                                            transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                                          }}
-                                        >
-                                          <p className="opacity-100 text-xs py-2 text-white ">
-                                            Reg
-                                          </p>{' '}
-                                        </div>
-                                      </DrawerTrigger>
-                                      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
-                                        <DrawerHeader className="text-left">
-                                          <DrawerTitle>
-                                            {positions[0].name}
-                                          </DrawerTitle>
-                                          <DrawerDescription>
-                                            IDR {positions[0].price}/hour and
-                                            can only accomodate{' '}
-                                            {positions[0].capacity} person
-                                            (position {number}).
-                                          </DrawerDescription>
-                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-                                            <span className="font-semibold">
-                                              Price on:
-                                            </span>
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
-
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.day} - IDR{' '}
-                                                        {price.price}/hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceDataCustom =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : []
-
-                                              return priceDataCustom.length > 0
-                                                ? priceDataCustom.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.keterangan},{' '}
-                                                        {formatDateIndonesian(
-                                                          price.date,
-                                                        )}
-                                                        - IDR {price.price}
-                                                        /hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </DrawerDescription>
-                                        </DrawerHeader>
-
-                                        <div className="flex-relative w-full h-fit px-5">
-                                          <div
-                                            style={{
-                                              backgroundColor: '#ffffff',
-                                              borderRadius: '10px',
-                                              position: 'relative',
-                                              overflow: 'hidden',
-                                            }}
-                                          >
-                                            <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[0].pict}`}
-                                              useMap="#image-map"
-                                              alt=""
-                                              style={{
-                                                width: '100%',
-                                                height: 'auto',
-                                              }}
-                                            />
-                                          </div>
-                                        </div>
-
-                                        {reserves.length > 0 ? (
-                                          <>
-                                            <Fade className="px-5 ">
-                                              <div className="flex gap-1 w-full my-2">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Reserved Times
-                                                  </label>
-                                                  <div className="flex flex-row flex-wrap gap-1">
-                                                    {reserves.map(
-                                                      (reserve, index) => {
-                                                        // Find saving_times that match the date AND is_active = 'Active'
-                                                        const matchingSavingTime = reserve.saving_times?.find(
-                                                          (saveTime) => {
-                                                            const savingDate =
-                                                              saveTime.date_saving?.split(
-                                                                'T',
-                                                              )[0] ||
-                                                              saveTime.date_saving
-                                                            const isActive =
-                                                              saveTime.is_active?.trim() ===
-                                                              'Active'
-                                                            return (
-                                                              savingDate ===
-                                                                selectedDate &&
-                                                              isActive
-                                                            )
-                                                          },
-                                                        )
-
-                                                        const startTime = matchingSavingTime
-                                                          ? matchingSavingTime.start_time_saving
-                                                          : reserve.reserve_start_time
-
-                                                        const endTime = matchingSavingTime
-                                                          ? matchingSavingTime.end_time_saving
-                                                          : reserve.reserve_end_time
-
-                                                        return (
-                                                          <div
-                                                            key={index}
-                                                            className={`text-xs px-2 py-1 border ${
-                                                              reserve.status_reserve ===
-                                                              'pending'
-                                                                ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                                : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                            } rounded-md w-fit`}
-                                                          >
-                                                            {startTime} -{' '}
-                                                            {endTime} WIB
-                                                          </div>
-                                                        )
-                                                      },
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </Fade>
-                                          </>
-                                        ) : null}
-
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generatedTimes.map(
-                                                      (time, index) => (
-                                                        <SelectItem
-                                                          key={index}
-                                                          value={time}
-                                                        >
-                                                          {time}
-                                                        </SelectItem>
-                                                      ),
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                    timeArray.length != 0 ? (
-                                                      timeArray.map(
-                                                        (time, index) => {
-                                                          const isDisabled = disableTimes.includes(
-                                                            time,
-                                                          )
-
-                                                          return (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                              className={
-                                                                'text-sm'
-                                                              }
-                                                              disabled={
-                                                                isDisabled
-                                                              }
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          )
-                                                        },
-                                                      )
-                                                    ) : (
-                                                      <SelectItem
-                                                        value={'00.00'}
-                                                      >
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain{' '}
-                                                          <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                          </div>
-                                        </Fade>
-
-                                        <div className="flex flex-col gap-2 px-5 mt-2">
-                                          <DrawerClose asChild>
-                                            <Button
-                                              variant="outline"
-                                              className={`bg-orange text-white border-orange py-5`}
-                                            >
-                                              Continue
-                                            </Button>
-                                          </DrawerClose>
-                                        </div>
-                                      </DrawerContent>
-                                    </Drawer>
-                                  )
-                                })}
-                              </div>
-                            </div>
-                          )}
-
-                        {selectedReservationPlace == 'premium-space' &&
-                          selectedDate != '' && (
-                            <div className="flex flex-col mb-6">
-                              <div
-                                className={`flex flex-row w-[80%] gap-32 md:gap-44 absolute left-7 md:top-20  ml-20 md:ml-40 z-50 gap-[${
-                                  8 + scale * 10
-                                }]`}
-                                ref={imageRef}
-                                style={{
-                                  height: 'auto',
-                                  transform: `translate(${position.x}px, ${position.y}px)`,
-                                  cursor: 'move',
-                                }}
-                              >
-                                {[13, 14, 15, 16].map((number) => {
-                                  return (
-                                    <Drawer
-                                      onClose={(e) =>
-                                        setDrawerContent('default')
-                                      }
-                                      key={number}
-                                    >
-                                      <DrawerTrigger asChild>
-                                        <div
-                                          key={number}
-                                          className={`cursor-pointer md:w-32 md:h-32 w-10 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${
-                                            number == 10 && 'mr-16'
-                                          }`}
-                                          onClick={() => {
-                                            setPosisiReservasi(number)
-                                            setNamaPosisiReservasi(
-                                              positions[3].name,
-                                            )
-                                            setPricePerReserve(
-                                              positions[3].price,
-                                            )
-                                            getPriceSetForToday(
-                                              positions[3].name,
-                                              selectedDate,
-                                            )
-                                            fetchingAvailableReservation(
-                                              selectedDate,
-                                              number,
-                                            )
-                                            getPriceDataCustom(
-                                              positions[3].name,
-                                            )
-                                          }}
-                                          style={{
-                                            transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                                          }}
-                                        >
-                                          <p className="opacity-100 text-[0.65rem] py-2  text-white leading-none text-center">
-                                            Squad Open Space
-                                          </p>
-                                        </div>
-                                      </DrawerTrigger>
-                                      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
-                                        <DrawerHeader className="text-left">
-                                          <DrawerTitle>
-                                            {positions[3].name}
-                                          </DrawerTitle>
-                                          <DrawerDescription>
-                                            IDR {positions[3].price}/hour and
-                                            can only accommodate{' '}
-                                            {positions[3].capacity} person
-                                            (position {number}).
-                                          </DrawerDescription>
-                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-                                            <span className="font-semibold">
-                                              Price on:
-                                            </span>
-                                            {(() => {
-                                              const facilityId = getFacilityId(
+                                            key={number}
+                                            className={`cursor-pointer md:w-32 md:h-32 w-10 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${
+                                              number == 10 && 'mr-16'
+                                            }`}
+                                            onClick={() => {
+                                              setPosisiReservasi(number)
+                                              setNamaPosisiReservasi(
                                                 positions[3].name,
-                                              ) // Get the facility ID
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
-
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.day} - IDR{' '}
-                                                        {price.price}/hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceDataCustom =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : []
-
-                                              return priceDataCustom.length > 0
-                                                ? priceDataCustom.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.keterangan},{' '}
-                                                        {formatDateIndonesian(
-                                                          price.date,
-                                                        )}
-                                                        - IDR {price.price}
-                                                        /hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </DrawerDescription>
-                                        </DrawerHeader>
-
-                                        <div className="flex-relative w-full h-fit px-5">
-                                          <div
+                                              )
+                                              setPricePerReserve(
+                                                positions[3].price,
+                                              )
+                                              getPriceSetForToday(
+                                                positions[3].name,
+                                                selectedDate,
+                                              )
+                                              fetchingAvailableReservation(
+                                                selectedDate,
+                                                number,
+                                              )
+                                              getPriceDataCustom(
+                                                positions[3].name,
+                                              )
+                                            }}
                                             style={{
-                                              backgroundColor: '#ffffff',
-                                              borderRadius: '10px',
-                                              position: 'relative',
-                                              overflow: 'hidden',
+                                              transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
                                             }}
                                           >
-                                            <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[3].pict}`}
-                                              useMap="#image-map"
-                                              alt=""
-                                              style={{
-                                                width: '100%',
-                                                height: 'auto',
-                                              }}
-                                            />
+                                            <p className="opacity-100 text-[0.65rem] py-2  text-white leading-none text-center">
+                                              Squad Open Space
+                                            </p>
                                           </div>
-                                        </div>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+                                          <DrawerHeader className="text-left">
+                                            <DrawerTitle>
+                                              {positions[3].name}
+                                            </DrawerTitle>
+                                            <DrawerDescription>
+                                              IDR {positions[3].price}/hour and
+                                              can only accommodate{' '}
+                                              {positions[3].capacity} person
+                                              (position {number}).
+                                            </DrawerDescription>
+                                            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                              <span className="font-semibold">
+                                                Price on:
+                                              </span>
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  positions[3].name,
+                                                ) // Get the facility ID
+                                                const priceData =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData.prices
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData.prices
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData.prices
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData.prices
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData.prices
+                                                    : []
 
-                                        {reserves.length > 0 ? (
-                                          <>
-                                            <Fade className="px-5 ">
-                                              <div className="flex gap-1 w-full my-2">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Reserved Times
-                                                  </label>
-                                                  <div className="flex flex-row flex-wrap gap-1">
-                                                    {reserves.map(
-                                                      (reserve, index) => {
-                                                        // Find saving_times that match the date AND is_active = 'Active'
-                                                        const matchingSavingTime = reserve.saving_times?.find(
-                                                          (saveTime) => {
-                                                            const savingDate =
-                                                              saveTime.date_saving?.split(
-                                                                'T',
-                                                              )[0] ||
-                                                              saveTime.date_saving
-                                                            const isActive =
-                                                              saveTime.is_active?.trim() ===
-                                                              'Active'
+                                                return priceData.length > 0
+                                                  ? priceData.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.day} - IDR{' '}
+                                                          {price.price}/hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceDataCustom =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : []
+
+                                                return priceDataCustom.length >
+                                                  0
+                                                  ? priceDataCustom.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.keterangan},{' '}
+                                                          {formatDateIndonesian(
+                                                            price.date,
+                                                          )}
+                                                          - IDR {price.price}
+                                                          /hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                            </DrawerDescription>
+                                          </DrawerHeader>
+
+                                          <div className="flex-relative w-full h-fit px-5">
+                                            <div
+                                              style={{
+                                                backgroundColor: '#ffffff',
+                                                borderRadius: '10px',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                              }}
+                                            >
+                                              <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[3].pict}`}
+                                                useMap="#image-map"
+                                                alt=""
+                                                style={{
+                                                  width: '100%',
+                                                  height: 'auto',
+                                                }}
+                                              />
+                                            </div>
+                                          </div>
+
+                                          {reserves.length > 0 ? (
+                                            <>
+                                              <Fade className="px-5 ">
+                                                <div className="flex gap-1 w-full my-2">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Reserved Times
+                                                    </label>
+                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                      {reserves.map(
+                                                        (reserve, index) => {
+                                                          // Find saving_times that match the date AND is_active = 'Active'
+                                                          const matchingSavingTime = reserve.saving_times?.find(
+                                                            (saveTime) => {
+                                                              const savingDate =
+                                                                saveTime.date_saving?.split(
+                                                                  'T',
+                                                                )[0] ||
+                                                                saveTime.date_saving
+                                                              const isActive =
+                                                                saveTime.is_active?.trim() ===
+                                                                'Active'
+                                                              return (
+                                                                savingDate ===
+                                                                  selectedDate &&
+                                                                isActive
+                                                              )
+                                                            },
+                                                          )
+
+                                                          const startTime = matchingSavingTime
+                                                            ? matchingSavingTime.start_time_saving
+                                                            : reserve.reserve_start_time
+
+                                                          const endTime = matchingSavingTime
+                                                            ? matchingSavingTime.end_time_saving
+                                                            : reserve.reserve_end_time
+
+                                                          return (
+                                                            <div
+                                                              key={index}
+                                                              className={`text-xs px-2 py-1 border ${
+                                                                reserve.status_reserve ===
+                                                                'pending'
+                                                                  ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                                  : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                              } rounded-md w-fit`}
+                                                            >
+                                                              {startTime} -{' '}
+                                                              {endTime} WIB
+                                                            </div>
+                                                          )
+                                                        },
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </Fade>
+                                            </>
+                                          ) : null}
+
+                                          <Fade className="px-5 ">
+                                            <div className="flex gap-1 w-full mt-2 mb-3">
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  Start Time
+                                                </label>
+                                                <Select
+                                                  value={startTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setStartTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Mulai
+                                                      </SelectLabel>
+                                                      {generatedTimes.map(
+                                                        (time, index) => (
+                                                          <SelectItem
+                                                            key={index}
+                                                            value={time}
+                                                          >
+                                                            {time}
+                                                          </SelectItem>
+                                                        ),
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  End Time
+                                                </label>
+                                                <Select
+                                                  value={endTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setEndTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Berakhir
+                                                      </SelectLabel>
+                                                      {startTimeReservasi !=
+                                                        '' &&
+                                                      timeArray.length != 0 ? (
+                                                        timeArray.map(
+                                                          (time, index) => {
+                                                            const isDisabled = disableTimes.includes(
+                                                              time,
+                                                            )
+
                                                             return (
-                                                              savingDate ===
-                                                                selectedDate &&
-                                                              isActive
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                                className={
+                                                                  'text-sm'
+                                                                }
+                                                                disabled={
+                                                                  isDisabled
+                                                                }
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
                                                             )
                                                           },
                                                         )
-
-                                                        const startTime = matchingSavingTime
-                                                          ? matchingSavingTime.start_time_saving
-                                                          : reserve.reserve_start_time
-
-                                                        const endTime = matchingSavingTime
-                                                          ? matchingSavingTime.end_time_saving
-                                                          : reserve.reserve_end_time
-
-                                                        return (
-                                                          <div
-                                                            key={index}
-                                                            className={`text-xs px-2 py-1 border ${
-                                                              reserve.status_reserve ===
-                                                              'pending'
-                                                                ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                                : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                            } rounded-md w-fit`}
-                                                          >
-                                                            {startTime} -{' '}
-                                                            {endTime} WIB
-                                                          </div>
-                                                        )
-                                                      },
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </Fade>
-                                          </>
-                                        ) : null}
-
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generatedTimes.map(
-                                                      (time, index) => (
+                                                      ) : (
                                                         <SelectItem
-                                                          key={index}
-                                                          value={time}
+                                                          value={'00.00'}
                                                         >
-                                                          {time}
+                                                          <p className="text-gray-500">
+                                                            Waktu yang kamu
+                                                            pilih <br />
+                                                            sudah terisi.
+                                                            Silakan <br />
+                                                            pilih waktu bermain{' '}
+                                                            <br />
+                                                            di jam yang lain
+                                                          </p>
                                                         </SelectItem>
-                                                      ),
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
                                             </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                    timeArray.length != 0 ? (
-                                                      timeArray.map(
-                                                        (time, index) => {
-                                                          const isDisabled = disableTimes.includes(
-                                                            time,
-                                                          )
+                                          </Fade>
 
-                                                          return (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                              className={
-                                                                'text-sm'
-                                                              }
-                                                              disabled={
-                                                                isDisabled
-                                                              }
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          )
-                                                        },
-                                                      )
-                                                    ) : (
-                                                      <SelectItem
-                                                        value={'00.00'}
-                                                      >
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain{' '}
-                                                          <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
+                                          <DrawerFooter className="pt-2">
+                                            <div className="flex flex-col gap-2 px-2 mt-2">
+                                              <DrawerClose asChild>
+                                                <Button
+                                                  variant="outline"
+                                                  className={`bg-orange text-white border-orange py-5`}
+                                                >
+                                                  Continue
+                                                </Button>
+                                              </DrawerClose>
                                             </div>
-                                          </div>
-                                        </Fade>
-
-                                        <DrawerFooter className="pt-2">
-                                          <div className="flex flex-col gap-2 px-2 mt-2">
-                                            <DrawerClose asChild>
-                                              <Button
-                                                variant="outline"
-                                                className={`bg-orange text-white border-orange py-5`}
-                                              >
-                                                Continue
-                                              </Button>
-                                            </DrawerClose>
-                                          </div>
-                                        </DrawerFooter>
-                                      </DrawerContent>
-                                    </Drawer>
-                                  )
-                                })}
-                              </div>
-                              <div
-                                className={`flex flex-row w-auto bottom-32 gap-16 absolute left-[46%]   z-50 gap-[${
-                                  8 + scale * 10
-                                }]`}
-                                ref={imageRef}
-                                style={{
-                                  height: 'auto',
-                                  transform: `translate(${position.x}px, ${position.y}px)`,
-                                  cursor: 'move',
-                                }}
-                              >
-                                {[17].map((number) => {
-                                  return (
-                                    <Drawer key={number}>
-                                      <DrawerTrigger asChild>
-                                        <div
-                                          key={number}
-                                          className={`cursor-pointer md:w-32 md:h-32 w-16 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
-                                          onClick={() => {
-                                            setPosisiReservasi(number)
-                                            setNamaPosisiReservasi(
-                                              positions[2].name,
-                                            )
-                                            setPricePerReserve(
-                                              positions[2].price,
-                                            )
-                                            getPriceSetForToday(
-                                              positions[2].name,
-                                              selectedDate,
-                                            )
-                                            fetchingAvailableReservation(
-                                              selectedDate,
-                                              number,
-                                            )
-                                            getPriceDataCustom(
-                                              positions[2].name,
-                                            )
-                                          }}
-                                          style={{
-                                            transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                                          }}
-                                        >
-                                          <p className="opacity-100 text-[0.6rem] leading-none py-2 text-white text-center">
-                                            Family Open Space
-                                          </p>{' '}
-                                        </div>
-                                      </DrawerTrigger>
-                                      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
-                                        <DrawerHeader className="text-left">
-                                          <DrawerTitle>
-                                            {positions[2].name}
-                                          </DrawerTitle>
-                                          <DrawerDescription>
-                                            IDR {positions[2].price}/hour and
-                                            can only accomodate{' '}
-                                            {positions[2].capacity} person
-                                            (position {number}).
-                                          </DrawerDescription>
-                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-                                            <span className="font-semibold">
-                                              Price on:
-                                            </span>
-                                            {(() => {
-                                              const facilityId = getFacilityId(
+                                          </DrawerFooter>
+                                        </DrawerContent>
+                                      </Drawer>
+                                    )
+                                  })}
+                                </div>
+                                <div
+                                  className={`flex flex-row w-auto bottom-32 gap-16 absolute left-[46%]   z-50 gap-[${
+                                    8 + scale * 10
+                                  }]`}
+                                  ref={imageRef}
+                                  style={{
+                                    height: 'auto',
+                                    transform: `translate(${position.x}px, ${position.y}px)`,
+                                    cursor: 'move',
+                                  }}
+                                >
+                                  {[17].map((number) => {
+                                    return (
+                                      <Drawer key={number}>
+                                        <DrawerTrigger asChild>
+                                          <div
+                                            key={number}
+                                            className={`cursor-pointer md:w-32 md:h-32 w-16 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
+                                            onClick={() => {
+                                              setPosisiReservasi(number)
+                                              setNamaPosisiReservasi(
                                                 positions[2].name,
-                                              ) // Get the facility ID
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
-
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.day} - IDR{' '}
-                                                        {price.price}/hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceDataCustom =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : []
-
-                                              return priceDataCustom.length > 0
-                                                ? priceDataCustom.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.keterangan},{' '}
-                                                        {formatDateIndonesian(
-                                                          price.date,
-                                                        )}
-                                                        - IDR {price.price}
-                                                        /hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </DrawerDescription>
-                                        </DrawerHeader>
-
-                                        <div className="flex-relative w-full h-fit px-5">
-                                          <div
+                                              )
+                                              setPricePerReserve(
+                                                positions[2].price,
+                                              )
+                                              getPriceSetForToday(
+                                                positions[2].name,
+                                                selectedDate,
+                                              )
+                                              fetchingAvailableReservation(
+                                                selectedDate,
+                                                number,
+                                              )
+                                              getPriceDataCustom(
+                                                positions[2].name,
+                                              )
+                                            }}
                                             style={{
-                                              backgroundColor: '#ffffff',
-                                              borderRadius: '10px',
-                                              position: 'relative',
-                                              overflow: 'hidden',
+                                              transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
                                             }}
                                           >
-                                            <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
-                                              useMap="#image-map"
-                                              alt=""
-                                              style={{
-                                                width: '100%',
-                                                height: 'auto',
-                                              }}
-                                            />
+                                            <p className="opacity-100 text-[0.6rem] leading-none py-2 text-white text-center">
+                                              Family Open Space
+                                            </p>{' '}
                                           </div>
-                                        </div>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+                                          <DrawerHeader className="text-left">
+                                            <DrawerTitle>
+                                              {positions[2].name}
+                                            </DrawerTitle>
+                                            <DrawerDescription>
+                                              IDR {positions[2].price}/hour and
+                                              can only accomodate{' '}
+                                              {positions[2].capacity} person
+                                              (position {number}).
+                                            </DrawerDescription>
+                                            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                              <span className="font-semibold">
+                                                Price on:
+                                              </span>
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  positions[2].name,
+                                                ) // Get the facility ID
+                                                const priceData =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData.prices
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData.prices
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData.prices
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData.prices
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData.prices
+                                                    : []
 
-                                        {reserves.length > 0 ? (
-                                          <>
-                                            <Fade className="px-5 ">
-                                              <div className="flex gap-1 w-full my-2">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Reserved Times
-                                                  </label>
-                                                  <div className="flex flex-row flex-wrap gap-1">
-                                                    {reserves.map(
-                                                      (reserve, index) => {
-                                                        // Find saving_times that match the date AND is_active = 'Active'
-                                                        const matchingSavingTime = reserve.saving_times?.find(
-                                                          (saveTime) => {
-                                                            const savingDate =
-                                                              saveTime.date_saving?.split(
-                                                                'T',
-                                                              )[0] ||
-                                                              saveTime.date_saving
-                                                            const isActive =
-                                                              saveTime.is_active?.trim() ===
-                                                              'Active'
-                                                            return (
-                                                              savingDate ===
-                                                                selectedDate &&
-                                                              isActive
-                                                            )
-                                                          },
-                                                        )
-
-                                                        const startTime = matchingSavingTime
-                                                          ? matchingSavingTime.start_time_saving
-                                                          : reserve.reserve_start_time
-
-                                                        const endTime = matchingSavingTime
-                                                          ? matchingSavingTime.end_time_saving
-                                                          : reserve.reserve_end_time
-
-                                                        return (
-                                                          <div
-                                                            key={index}
-                                                            className={`text-xs px-2 py-1 border ${
-                                                              reserve.status_reserve ===
-                                                              'pending'
-                                                                ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                                : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                            } rounded-md w-fit`}
-                                                          >
-                                                            {startTime} -{' '}
-                                                            {endTime} WIB
-                                                          </div>
-                                                        )
-                                                      },
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </Fade>
-                                          </>
-                                        ) : null}
-
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generatedTimes.map(
-                                                      (time, index) => (
-                                                        <SelectItem
-                                                          key={index}
-                                                          value={time}
-                                                        >
-                                                          {time}
-                                                        </SelectItem>
+                                                return priceData.length > 0
+                                                  ? priceData.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.day} - IDR{' '}
+                                                          {price.price}/hour
+                                                        </span>
                                                       ),
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                    timeArray.length != 0 ? (
-                                                      timeArray.map(
-                                                        (time, index) => {
-                                                          const isDisabled = disableTimes.includes(
-                                                            time,
-                                                          )
+                                                    )
+                                                  : null
+                                              })()}
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceDataCustom =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : []
 
-                                                          return (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                              className={
-                                                                'text-sm'
-                                                              }
-                                                              disabled={
-                                                                isDisabled
-                                                              }
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          )
-                                                        },
-                                                      )
-                                                    ) : (
-                                                      <SelectItem
-                                                        value={'00.00'}
-                                                      >
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain{' '}
-                                                          <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                          </div>
-                                        </Fade>
+                                                return priceDataCustom.length >
+                                                  0
+                                                  ? priceDataCustom.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.keterangan},{' '}
+                                                          {formatDateIndonesian(
+                                                            price.date,
+                                                          )}
+                                                          - IDR {price.price}
+                                                          /hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                            </DrawerDescription>
+                                          </DrawerHeader>
 
-                                        <div className="flex flex-col gap-2 px-5 my-2">
-                                          <DrawerClose asChild>
-                                            <Button
-                                              variant="outline"
-                                              className={`bg-orange text-white border-orange py-5`}
+                                          <div className="flex-relative w-full h-fit px-5">
+                                            <div
+                                              style={{
+                                                backgroundColor: '#ffffff',
+                                                borderRadius: '10px',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                              }}
                                             >
-                                              Continue
-                                            </Button>
-                                          </DrawerClose>
-                                        </div>
-                                      </DrawerContent>
-                                    </Drawer>
-                                  )
-                                })}
-                              </div>
-                            </div>
-                          )}
-
-                        {selectedReservationPlace == 'private-space' &&
-                          selectedDate != '' && (
-                            <div className="flex flex-col mb-6">
-                              <div
-                                className={`flex flex-row w-full justify-between items-center absolute md:top-36  z-50 px-56`}
-                                ref={imageRef}
-                                style={{
-                                  height: 'auto',
-                                  transform: `translate(${position.x}px, ${position.y}px)`,
-                                  cursor: 'move',
-                                }}
-                              >
-                                {[18, 19].map((number) => {
-                                  return (
-                                    <Drawer key={number}>
-                                      <DrawerTrigger asChild>
-                                        <div
-                                          key={number}
-                                          className={`cursor-pointer md:w-28 md:h-28 w-20 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
-                                          onClick={() => {
-                                            setPosisiReservasi(number)
-                                            setNamaPosisiReservasi(
-                                              positions[4].name,
-                                            )
-                                            setPricePerReserve(
-                                              positions[4].price,
-                                            )
-                                            getPriceSetForToday(
-                                              positions[4].name,
-                                              selectedDate,
-                                            )
-                                            fetchingAvailableReservation(
-                                              selectedDate,
-                                              number,
-                                            )
-                                            getPriceDataCustom(
-                                              positions[4].name,
-                                            )
-                                          }}
-                                          style={{
-                                            transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                                          }}
-                                        >
-                                          <p className="opacity-100 text-[0.65rem] py-2 text-white text-center leading-none">
-                                            Family VIP Room
-                                          </p>{' '}
-                                        </div>
-                                      </DrawerTrigger>
-                                      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
-                                        <DrawerHeader className="text-left">
-                                          <DrawerTitle>
-                                            {positions[4].name}
-                                          </DrawerTitle>
-                                          <DrawerDescription>
-                                            IDR {positions[4].price}/hour and
-                                            can only accomodate{' '}
-                                            {positions[4].capacity} person
-                                            (position {number}).
-                                          </DrawerDescription>
-                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-                                            <span className="font-semibold">
-                                              Price on:
-                                            </span>
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                positions[4].name,
-                                              ) // Get the facility ID
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
-
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.day} - IDR{' '}
-                                                        {price.price}/hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceDataCustom =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : []
-
-                                              return priceDataCustom.length > 0
-                                                ? priceDataCustom.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.keterangan},{' '}
-                                                        {formatDateIndonesian(
-                                                          price.date,
-                                                        )}
-                                                        - IDR {price.price}
-                                                        /hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </DrawerDescription>
-                                        </DrawerHeader>
-
-                                        <div className="flex-relative w-full h-fit px-5">
-                                          <div
-                                            style={{
-                                              backgroundColor: '#ffffff',
-                                              borderRadius: '10px',
-                                              position: 'relative',
-                                              overflow: 'hidden',
-                                            }}
-                                          >
-                                            <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
-                                              useMap="#image-map"
-                                              alt=""
-                                              style={{
-                                                width: '100%',
-                                                height: 'auto',
-                                              }}
-                                            />
+                                              <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[2].pict}`}
+                                                useMap="#image-map"
+                                                alt=""
+                                                style={{
+                                                  width: '100%',
+                                                  height: 'auto',
+                                                }}
+                                              />
+                                            </div>
                                           </div>
-                                        </div>
 
-                                        {reserves.length > 0 ? (
-                                          <>
-                                            <Fade className="px-5 ">
-                                              <div className="flex gap-1 w-full my-2">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Reserved Times
-                                                  </label>
-                                                  <div className="flex flex-row flex-wrap gap-1">
-                                                    {reserves.map(
-                                                      (reserve, index) => {
-                                                        // Find saving_times that match the date AND is_active = 'Active'
-                                                        const matchingSavingTime = reserve.saving_times?.find(
-                                                          (saveTime) => {
-                                                            const savingDate =
-                                                              saveTime.date_saving?.split(
-                                                                'T',
-                                                              )[0] ||
-                                                              saveTime.date_saving
-                                                            const isActive =
-                                                              saveTime.is_active?.trim() ===
-                                                              'Active'
+                                          {reserves.length > 0 ? (
+                                            <>
+                                              <Fade className="px-5 ">
+                                                <div className="flex gap-1 w-full my-2">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Reserved Times
+                                                    </label>
+                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                      {reserves.map(
+                                                        (reserve, index) => {
+                                                          // Find saving_times that match the date AND is_active = 'Active'
+                                                          const matchingSavingTime = reserve.saving_times?.find(
+                                                            (saveTime) => {
+                                                              const savingDate =
+                                                                saveTime.date_saving?.split(
+                                                                  'T',
+                                                                )[0] ||
+                                                                saveTime.date_saving
+                                                              const isActive =
+                                                                saveTime.is_active?.trim() ===
+                                                                'Active'
+                                                              return (
+                                                                savingDate ===
+                                                                  selectedDate &&
+                                                                isActive
+                                                              )
+                                                            },
+                                                          )
+
+                                                          const startTime = matchingSavingTime
+                                                            ? matchingSavingTime.start_time_saving
+                                                            : reserve.reserve_start_time
+
+                                                          const endTime = matchingSavingTime
+                                                            ? matchingSavingTime.end_time_saving
+                                                            : reserve.reserve_end_time
+
+                                                          return (
+                                                            <div
+                                                              key={index}
+                                                              className={`text-xs px-2 py-1 border ${
+                                                                reserve.status_reserve ===
+                                                                'pending'
+                                                                  ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                                  : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                              } rounded-md w-fit`}
+                                                            >
+                                                              {startTime} -{' '}
+                                                              {endTime} WIB
+                                                            </div>
+                                                          )
+                                                        },
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </Fade>
+                                            </>
+                                          ) : null}
+
+                                          <Fade className="px-5 ">
+                                            <div className="flex gap-1 w-full mt-2 mb-3">
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  Start Time
+                                                </label>
+                                                <Select
+                                                  value={startTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setStartTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Mulai
+                                                      </SelectLabel>
+                                                      {generatedTimes.map(
+                                                        (time, index) => (
+                                                          <SelectItem
+                                                            key={index}
+                                                            value={time}
+                                                          >
+                                                            {time}
+                                                          </SelectItem>
+                                                        ),
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  End Time
+                                                </label>
+                                                <Select
+                                                  value={endTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setEndTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Berakhir
+                                                      </SelectLabel>
+                                                      {startTimeReservasi !=
+                                                        '' &&
+                                                      timeArray.length != 0 ? (
+                                                        timeArray.map(
+                                                          (time, index) => {
+                                                            const isDisabled = disableTimes.includes(
+                                                              time,
+                                                            )
+
                                                             return (
-                                                              savingDate ===
-                                                                selectedDate &&
-                                                              isActive
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                                className={
+                                                                  'text-sm'
+                                                                }
+                                                                disabled={
+                                                                  isDisabled
+                                                                }
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
                                                             )
                                                           },
                                                         )
-
-                                                        const startTime = matchingSavingTime
-                                                          ? matchingSavingTime.start_time_saving
-                                                          : reserve.reserve_start_time
-
-                                                        const endTime = matchingSavingTime
-                                                          ? matchingSavingTime.end_time_saving
-                                                          : reserve.reserve_end_time
-
-                                                        return (
-                                                          <div
-                                                            key={index}
-                                                            className={`text-xs px-2 py-1 border ${
-                                                              reserve.status_reserve ===
-                                                              'pending'
-                                                                ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                                : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                            } rounded-md w-fit`}
-                                                          >
-                                                            {startTime} -{' '}
-                                                            {endTime} WIB
-                                                          </div>
-                                                        )
-                                                      },
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </Fade>
-                                          </>
-                                        ) : null}
-
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generatedTimes.map(
-                                                      (time, index) => (
+                                                      ) : (
                                                         <SelectItem
-                                                          key={index}
-                                                          value={time}
+                                                          value={'00.00'}
                                                         >
-                                                          {time}
+                                                          <p className="text-gray-500">
+                                                            Waktu yang kamu
+                                                            pilih <br />
+                                                            sudah terisi.
+                                                            Silakan <br />
+                                                            pilih waktu bermain{' '}
+                                                            <br />
+                                                            di jam yang lain
+                                                          </p>
                                                         </SelectItem>
-                                                      ),
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                    timeArray.length != 0 ? (
-                                                      timeArray.map(
-                                                        (time, index) => {
-                                                          const isDisabled = disableTimes.includes(
-                                                            time,
-                                                          )
-
-                                                          return (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                              className={
-                                                                'text-sm'
-                                                              }
-                                                              disabled={
-                                                                isDisabled
-                                                              }
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          )
-                                                        },
-                                                      )
-                                                    ) : (
-                                                      <SelectItem
-                                                        value={'00.00'}
-                                                      >
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain{' '}
-                                                          <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                          </div>
-                                        </Fade>
-
-                                        <div className="flex flex-col gap-2 px-5 my-2">
-                                          <DrawerClose asChild>
-                                            <Button
-                                              variant="outline"
-                                              className={`bg-orange text-white border-orange py-5`}
-                                            >
-                                              Continue
-                                            </Button>
-                                          </DrawerClose>
-                                        </div>
-                                      </DrawerContent>
-                                    </Drawer>
-                                  )
-                                })}
-                              </div>
-
-                              <div
-                                className={`flex flex-row w-full bottom-52 gap-60  md:gap-80 absolute left-6  md:left-48 z-50 gap-[${
-                                  10 + scale * 10
-                                }]`}
-                                ref={imageRef}
-                                style={{
-                                  height: 'auto',
-                                  transform: `translate(${position.x}px, ${position.y}px)`,
-                                  cursor: 'move',
-                                }}
-                              >
-                                {[20, 21, 22].map((number) => {
-                                  return (
-                                    <Drawer
-                                      onClose={(e) =>
-                                        setDrawerContent('default')
-                                      }
-                                      key={number}
-                                    >
-                                      <DrawerTrigger asChild>
-                                        <div
-                                          key={number}
-                                          className={`cursor-pointer md:w-28 md:h-28 w-20 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${
-                                            number == 10 && 'mr-16'
-                                          }`}
-                                          onClick={() => {
-                                            setPosisiReservasi(number)
-                                            setNamaPosisiReservasi(
-                                              positions[5].name,
-                                            )
-                                            setPricePerReserve(
-                                              positions[5].price,
-                                            )
-                                            getPriceSetForToday(
-                                              positions[5].name,
-                                              selectedDate,
-                                            )
-                                            fetchingAvailableReservation(
-                                              selectedDate,
-                                              number,
-                                            )
-                                            getPriceDataCustom(
-                                              positions[5].name,
-                                            )
-                                          }}
-                                          style={{
-                                            transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                                          }}
-                                        >
-                                          <p className="opacity-100 text-[0.65rem] text-center leading-none py-2 text-white">
-                                            LoveBirds VIP Room
-                                          </p>
-                                        </div>
-                                      </DrawerTrigger>
-                                      <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
-                                        <DrawerHeader className="text-left">
-                                          <DrawerTitle>
-                                            {positions[5].name}
-                                          </DrawerTitle>
-                                          <DrawerDescription>
-                                            IDR {positions[5].price}/hour and
-                                            can only accommodate{' '}
-                                            {positions[5].capacity} person
-                                            (position {number}).
-                                          </DrawerDescription>
-                                          <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
-                                            <span className="font-semibold">
-                                              Price on:
-                                            </span>
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                positions[5].name,
-                                              ) // Get the facility ID
-                                              const priceData =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData.prices
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData.prices
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData.prices
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData.prices
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData.prices
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData.prices
-                                                  : []
-
-                                              return priceData.length > 0
-                                                ? priceData.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.day} - IDR{' '}
-                                                        {price.price}/hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                            {(() => {
-                                              const facilityId = getFacilityId(
-                                                number <= 4
-                                                  ? positions[6].name
-                                                  : positions[0].name,
-                                              ) // Get the facility ID
-                                              const priceDataCustom =
-                                                facilityId === 'ps5-reguler'
-                                                  ? ps5RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'ikuzo-racing-simulator'
-                                                  ? ikuzoRacingSimulatorData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId === 'ps4-reguler'
-                                                  ? ps4RegulerData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-vip-room'
-                                                  ? familyVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'lovebirds-vip-room'
-                                                  ? lovebirdsVIPRoomData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'family-open-space'
-                                                  ? familyOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : facilityId ===
-                                                    'squad-open-space'
-                                                  ? squadOpenSpaceData[
-                                                      'custom-prices'
-                                                    ]
-                                                  : []
-
-                                              return priceDataCustom.length > 0
-                                                ? priceDataCustom.map(
-                                                    (price, index) => (
-                                                      <span key={index}>
-                                                        • {price.keterangan},{' '}
-                                                        {formatDateIndonesian(
-                                                          price.date,
-                                                        )}
-                                                        - IDR {price.price}
-                                                        /hour
-                                                      </span>
-                                                    ),
-                                                  )
-                                                : null
-                                            })()}
-                                          </DrawerDescription>
-                                        </DrawerHeader>
-
-                                        <div className="flex-relative w-full h-fit px-5">
-                                          <div
-                                            style={{
-                                              backgroundColor: '#ffffff',
-                                              borderRadius: '10px',
-                                              position: 'relative',
-                                              overflow: 'hidden',
-                                            }}
-                                          >
-                                            <img
-                                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[5].pict}`}
-                                              useMap="#image-map"
-                                              alt=""
-                                              style={{
-                                                width: '100%',
-                                                height: 'auto',
-                                              }}
-                                            />
-                                          </div>
-                                        </div>
-
-                                        {reserves.length > 0 ? (
-                                          <>
-                                            <Fade className="px-5 ">
-                                              <div className="flex gap-1 w-full my-2">
-                                                <div className="flex flex-col gap-2 w-full flex-1">
-                                                  <label
-                                                    htmlFor="nama"
-                                                    className="text-sm"
-                                                  >
-                                                    Reserved Times
-                                                  </label>
-                                                  <div className="flex flex-row flex-wrap gap-1">
-                                                    {reserves.map(
-                                                      (reserve, index) => {
-                                                        // Find saving_times that match the date AND is_active = 'Active'
-                                                        const matchingSavingTime = reserve.saving_times?.find(
-                                                          (saveTime) => {
-                                                            const savingDate =
-                                                              saveTime.date_saving?.split(
-                                                                'T',
-                                                              )[0] ||
-                                                              saveTime.date_saving
-                                                            const isActive =
-                                                              saveTime.is_active?.trim() ===
-                                                              'Active'
-                                                            return (
-                                                              savingDate ===
-                                                                selectedDate &&
-                                                              isActive
-                                                            )
-                                                          },
-                                                        )
-
-                                                        const startTime = matchingSavingTime
-                                                          ? matchingSavingTime.start_time_saving
-                                                          : reserve.reserve_start_time
-
-                                                        const endTime = matchingSavingTime
-                                                          ? matchingSavingTime.end_time_saving
-                                                          : reserve.reserve_end_time
-
-                                                        return (
-                                                          <div
-                                                            key={index}
-                                                            className={`text-xs px-2 py-1 border ${
-                                                              reserve.status_reserve ===
-                                                              'pending'
-                                                                ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
-                                                                : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
-                                                            } rounded-md w-fit`}
-                                                          >
-                                                            {startTime} -{' '}
-                                                            {endTime} WIB
-                                                          </div>
-                                                        )
-                                                      },
-                                                    )}
-                                                  </div>
-                                                </div>
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
-                                            </Fade>
-                                          </>
-                                        ) : null}
-
-                                        <Fade className="px-5 ">
-                                          <div className="flex gap-1 w-full mt-2 mb-3">
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                Start Time
-                                              </label>
-                                              <Select
-                                                value={startTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setStartTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Mulai
-                                                    </SelectLabel>
-                                                    {generatedTimes.map(
-                                                      (time, index) => (
-                                                        <SelectItem
-                                                          key={index}
-                                                          value={time}
-                                                        >
-                                                          {time}
-                                                        </SelectItem>
-                                                      ),
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
                                             </div>
-                                            <div className="flex flex-col gap-2 w-full flex-1">
-                                              <label
-                                                htmlFor="nama"
-                                                className="text-sm"
-                                              >
-                                                End Time
-                                              </label>
-                                              <Select
-                                                value={endTimeReservasi}
-                                                onValueChange={(value) =>
-                                                  setEndTimeReservasi(value)
-                                                }
-                                                required
-                                                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
-                                              >
-                                                <SelectTrigger className="py-5 px-3 text-sm">
-                                                  <SelectValue
-                                                    className="text-base"
-                                                    placeholder="00.00"
-                                                  />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  <SelectGroup>
-                                                    <SelectLabel className="text-sm">
-                                                      Pilih Waktu Berakhir
-                                                    </SelectLabel>
-                                                    {startTimeReservasi != '' &&
-                                                    timeArray.length != 0 ? (
-                                                      timeArray.map(
-                                                        (time, index) => {
-                                                          const isDisabled = disableTimes.includes(
-                                                            time,
-                                                          )
+                                          </Fade>
 
-                                                          return (
-                                                            <SelectItem
-                                                              key={index}
-                                                              value={time}
-                                                              className={
-                                                                'text-sm'
-                                                              }
-                                                              disabled={
-                                                                isDisabled
-                                                              }
-                                                            >
-                                                              {time}
-                                                            </SelectItem>
-                                                          )
-                                                        },
-                                                      )
-                                                    ) : (
-                                                      <SelectItem
-                                                        value={'00.00'}
-                                                      >
-                                                        <p className="text-gray-500">
-                                                          Waktu yang kamu pilih{' '}
-                                                          <br />
-                                                          sudah terisi. Silakan{' '}
-                                                          <br />
-                                                          pilih waktu bermain{' '}
-                                                          <br />
-                                                          di jam yang lain
-                                                        </p>
-                                                      </SelectItem>
-                                                    )}
-                                                  </SelectGroup>
-                                                </SelectContent>
-                                              </Select>
-                                            </div>
-                                          </div>
-                                        </Fade>
-
-                                        <DrawerFooter className="pt-2">
-                                          <div className="flex flex-col gap-2 px-2 mt-2">
+                                          <div className="flex flex-col gap-2 px-5 my-2">
                                             <DrawerClose asChild>
                                               <Button
                                                 variant="outline"
@@ -3753,41 +3010,790 @@ export default function Reservation() {
                                               </Button>
                                             </DrawerClose>
                                           </div>
-                                        </DrawerFooter>
-                                      </DrawerContent>
-                                    </Drawer>
-                                  )
-                                })}
+                                        </DrawerContent>
+                                      </Drawer>
+                                    )
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
+
+                          {selectedReservationPlace == 'private-space' &&
+                            selectedDate != '' && (
+                              <div className="flex flex-col mb-6">
+                                <div
+                                  className={`flex flex-row w-full justify-between items-center absolute md:top-36  z-50 px-56`}
+                                  ref={imageRef}
+                                  style={{
+                                    height: 'auto',
+                                    transform: `translate(${position.x}px, ${position.y}px)`,
+                                    cursor: 'move',
+                                  }}
+                                >
+                                  {[18, 19].map((number) => {
+                                    return (
+                                      <Drawer key={number}>
+                                        <DrawerTrigger asChild>
+                                          <div
+                                            key={number}
+                                            className={`cursor-pointer md:w-28 md:h-28 w-20 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex`}
+                                            onClick={() => {
+                                              setPosisiReservasi(number)
+                                              setNamaPosisiReservasi(
+                                                positions[4].name,
+                                              )
+                                              setPricePerReserve(
+                                                positions[4].price,
+                                              )
+                                              getPriceSetForToday(
+                                                positions[4].name,
+                                                selectedDate,
+                                              )
+                                              fetchingAvailableReservation(
+                                                selectedDate,
+                                                number,
+                                              )
+                                              getPriceDataCustom(
+                                                positions[4].name,
+                                              )
+                                            }}
+                                            style={{
+                                              transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                                            }}
+                                          >
+                                            <p className="opacity-100 text-[0.65rem] py-2 text-white text-center leading-none">
+                                              Family VIP Room
+                                            </p>{' '}
+                                          </div>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+                                          <DrawerHeader className="text-left">
+                                            <DrawerTitle>
+                                              {positions[4].name}
+                                            </DrawerTitle>
+                                            <DrawerDescription>
+                                              IDR {positions[4].price}/hour and
+                                              can only accomodate{' '}
+                                              {positions[4].capacity} person
+                                              (position {number}).
+                                            </DrawerDescription>
+                                            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                              <span className="font-semibold">
+                                                Price on:
+                                              </span>
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  positions[4].name,
+                                                ) // Get the facility ID
+                                                const priceData =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData.prices
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData.prices
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData.prices
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData.prices
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData.prices
+                                                    : []
+
+                                                return priceData.length > 0
+                                                  ? priceData.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.day} - IDR{' '}
+                                                          {price.price}/hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceDataCustom =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : []
+
+                                                return priceDataCustom.length >
+                                                  0
+                                                  ? priceDataCustom.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.keterangan},{' '}
+                                                          {formatDateIndonesian(
+                                                            price.date,
+                                                          )}
+                                                          - IDR {price.price}
+                                                          /hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                            </DrawerDescription>
+                                          </DrawerHeader>
+
+                                          <div className="flex-relative w-full h-fit px-5">
+                                            <div
+                                              style={{
+                                                backgroundColor: '#ffffff',
+                                                borderRadius: '10px',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                              }}
+                                            >
+                                              <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[4].pict}`}
+                                                useMap="#image-map"
+                                                alt=""
+                                                style={{
+                                                  width: '100%',
+                                                  height: 'auto',
+                                                }}
+                                              />
+                                            </div>
+                                          </div>
+
+                                          {reserves.length > 0 ? (
+                                            <>
+                                              <Fade className="px-5 ">
+                                                <div className="flex gap-1 w-full my-2">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Reserved Times
+                                                    </label>
+                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                      {reserves.map(
+                                                        (reserve, index) => {
+                                                          // Find saving_times that match the date AND is_active = 'Active'
+                                                          const matchingSavingTime = reserve.saving_times?.find(
+                                                            (saveTime) => {
+                                                              const savingDate =
+                                                                saveTime.date_saving?.split(
+                                                                  'T',
+                                                                )[0] ||
+                                                                saveTime.date_saving
+                                                              const isActive =
+                                                                saveTime.is_active?.trim() ===
+                                                                'Active'
+                                                              return (
+                                                                savingDate ===
+                                                                  selectedDate &&
+                                                                isActive
+                                                              )
+                                                            },
+                                                          )
+
+                                                          const startTime = matchingSavingTime
+                                                            ? matchingSavingTime.start_time_saving
+                                                            : reserve.reserve_start_time
+
+                                                          const endTime = matchingSavingTime
+                                                            ? matchingSavingTime.end_time_saving
+                                                            : reserve.reserve_end_time
+
+                                                          return (
+                                                            <div
+                                                              key={index}
+                                                              className={`text-xs px-2 py-1 border ${
+                                                                reserve.status_reserve ===
+                                                                'pending'
+                                                                  ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                                  : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                              } rounded-md w-fit`}
+                                                            >
+                                                              {startTime} -{' '}
+                                                              {endTime} WIB
+                                                            </div>
+                                                          )
+                                                        },
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </Fade>
+                                            </>
+                                          ) : null}
+
+                                          <Fade className="px-5 ">
+                                            <div className="flex gap-1 w-full mt-2 mb-3">
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  Start Time
+                                                </label>
+                                                <Select
+                                                  value={startTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setStartTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Mulai
+                                                      </SelectLabel>
+                                                      {generatedTimes.map(
+                                                        (time, index) => (
+                                                          <SelectItem
+                                                            key={index}
+                                                            value={time}
+                                                          >
+                                                            {time}
+                                                          </SelectItem>
+                                                        ),
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  End Time
+                                                </label>
+                                                <Select
+                                                  value={endTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setEndTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Berakhir
+                                                      </SelectLabel>
+                                                      {startTimeReservasi !=
+                                                        '' &&
+                                                      timeArray.length != 0 ? (
+                                                        timeArray.map(
+                                                          (time, index) => {
+                                                            const isDisabled = disableTimes.includes(
+                                                              time,
+                                                            )
+
+                                                            return (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                                className={
+                                                                  'text-sm'
+                                                                }
+                                                                disabled={
+                                                                  isDisabled
+                                                                }
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            )
+                                                          },
+                                                        )
+                                                      ) : (
+                                                        <SelectItem
+                                                          value={'00.00'}
+                                                        >
+                                                          <p className="text-gray-500">
+                                                            Waktu yang kamu
+                                                            pilih <br />
+                                                            sudah terisi.
+                                                            Silakan <br />
+                                                            pilih waktu bermain{' '}
+                                                            <br />
+                                                            di jam yang lain
+                                                          </p>
+                                                        </SelectItem>
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            </div>
+                                          </Fade>
+
+                                          <div className="flex flex-col gap-2 px-5 my-2">
+                                            <DrawerClose asChild>
+                                              <Button
+                                                variant="outline"
+                                                className={`bg-orange text-white border-orange py-5`}
+                                              >
+                                                Continue
+                                              </Button>
+                                            </DrawerClose>
+                                          </div>
+                                        </DrawerContent>
+                                      </Drawer>
+                                    )
+                                  })}
+                                </div>
+
+                                <div
+                                  className={`flex flex-row w-full bottom-52 gap-60  md:gap-80 absolute left-6  md:left-48 z-50 gap-[${
+                                    10 + scale * 10
+                                  }]`}
+                                  ref={imageRef}
+                                  style={{
+                                    height: 'auto',
+                                    transform: `translate(${position.x}px, ${position.y}px)`,
+                                    cursor: 'move',
+                                  }}
+                                >
+                                  {[20, 21, 22].map((number) => {
+                                    return (
+                                      <Drawer
+                                        onClose={(e) =>
+                                          setDrawerContent('default')
+                                        }
+                                        key={number}
+                                      >
+                                        <DrawerTrigger asChild>
+                                          <div
+                                            key={number}
+                                            className={`cursor-pointer md:w-28 md:h-28 w-20 h-10 border ${'border-gray-400 bg-gray-900 bg-opacity-20'} rounded-lg py-2 flex-col items-center justify-center flex ${
+                                              number == 10 && 'mr-16'
+                                            }`}
+                                            onClick={() => {
+                                              setPosisiReservasi(number)
+                                              setNamaPosisiReservasi(
+                                                positions[5].name,
+                                              )
+                                              setPricePerReserve(
+                                                positions[5].price,
+                                              )
+                                              getPriceSetForToday(
+                                                positions[5].name,
+                                                selectedDate,
+                                              )
+                                              fetchingAvailableReservation(
+                                                selectedDate,
+                                                number,
+                                              )
+                                              getPriceDataCustom(
+                                                positions[5].name,
+                                              )
+                                            }}
+                                            style={{
+                                              transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                                            }}
+                                          >
+                                            <p className="opacity-100 text-[0.65rem] text-center leading-none py-2 text-white">
+                                              LoveBirds VIP Room
+                                            </p>
+                                          </div>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="active:border-none border-none outline-none md:max-w-3xl md:mx-auto">
+                                          <DrawerHeader className="text-left">
+                                            <DrawerTitle>
+                                              {positions[5].name}
+                                            </DrawerTitle>
+                                            <DrawerDescription>
+                                              IDR {positions[5].price}/hour and
+                                              can only accommodate{' '}
+                                              {positions[5].capacity} person
+                                              (position {number}).
+                                            </DrawerDescription>
+                                            <DrawerDescription className="flex flex-col gap-0 mt-0 pt-0">
+                                              <span className="font-semibold">
+                                                Price on:
+                                              </span>
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  positions[5].name,
+                                                ) // Get the facility ID
+                                                const priceData =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData.prices
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData.prices
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData.prices
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData.prices
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData.prices
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData.prices
+                                                    : []
+
+                                                return priceData.length > 0
+                                                  ? priceData.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.day} - IDR{' '}
+                                                          {price.price}/hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                              {(() => {
+                                                const facilityId = getFacilityId(
+                                                  number <= 4
+                                                    ? positions[6].name
+                                                    : positions[0].name,
+                                                ) // Get the facility ID
+                                                const priceDataCustom =
+                                                  facilityId === 'ps5-reguler'
+                                                    ? ps5RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ikuzo-racing-simulator'
+                                                    ? ikuzoRacingSimulatorData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'ps4-reguler'
+                                                    ? ps4RegulerData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-vip-room'
+                                                    ? familyVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'lovebirds-vip-room'
+                                                    ? lovebirdsVIPRoomData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'family-open-space'
+                                                    ? familyOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : facilityId ===
+                                                      'squad-open-space'
+                                                    ? squadOpenSpaceData[
+                                                        'custom-prices'
+                                                      ]
+                                                    : []
+
+                                                return priceDataCustom.length >
+                                                  0
+                                                  ? priceDataCustom.map(
+                                                      (price, index) => (
+                                                        <span key={index}>
+                                                          • {price.keterangan},{' '}
+                                                          {formatDateIndonesian(
+                                                            price.date,
+                                                          )}
+                                                          - IDR {price.price}
+                                                          /hour
+                                                        </span>
+                                                      ),
+                                                    )
+                                                  : null
+                                              })()}
+                                            </DrawerDescription>
+                                          </DrawerHeader>
+
+                                          <div className="flex-relative w-full h-fit px-5">
+                                            <div
+                                              style={{
+                                                backgroundColor: '#ffffff',
+                                                borderRadius: '10px',
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                              }}
+                                            >
+                                              <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${positions[5].pict}`}
+                                                useMap="#image-map"
+                                                alt=""
+                                                style={{
+                                                  width: '100%',
+                                                  height: 'auto',
+                                                }}
+                                              />
+                                            </div>
+                                          </div>
+
+                                          {reserves.length > 0 ? (
+                                            <>
+                                              <Fade className="px-5 ">
+                                                <div className="flex gap-1 w-full my-2">
+                                                  <div className="flex flex-col gap-2 w-full flex-1">
+                                                    <label
+                                                      htmlFor="nama"
+                                                      className="text-sm"
+                                                    >
+                                                      Reserved Times
+                                                    </label>
+                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                      {reserves.map(
+                                                        (reserve, index) => {
+                                                          // Find saving_times that match the date AND is_active = 'Active'
+                                                          const matchingSavingTime = reserve.saving_times?.find(
+                                                            (saveTime) => {
+                                                              const savingDate =
+                                                                saveTime.date_saving?.split(
+                                                                  'T',
+                                                                )[0] ||
+                                                                saveTime.date_saving
+                                                              const isActive =
+                                                                saveTime.is_active?.trim() ===
+                                                                'Active'
+                                                              return (
+                                                                savingDate ===
+                                                                  selectedDate &&
+                                                                isActive
+                                                              )
+                                                            },
+                                                          )
+
+                                                          const startTime = matchingSavingTime
+                                                            ? matchingSavingTime.start_time_saving
+                                                            : reserve.reserve_start_time
+
+                                                          const endTime = matchingSavingTime
+                                                            ? matchingSavingTime.end_time_saving
+                                                            : reserve.reserve_end_time
+
+                                                          return (
+                                                            <div
+                                                              key={index}
+                                                              className={`text-xs px-2 py-1 border ${
+                                                                reserve.status_reserve ===
+                                                                'pending'
+                                                                  ? 'border-yellow-500 bg-yellow-500 bg-opacity-10 text-yellow-500'
+                                                                  : 'border-red-500 bg-red-500 bg-opacity-10 text-red-500'
+                                                              } rounded-md w-fit`}
+                                                            >
+                                                              {startTime} -{' '}
+                                                              {endTime} WIB
+                                                            </div>
+                                                          )
+                                                        },
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </Fade>
+                                            </>
+                                          ) : null}
+
+                                          <Fade className="px-5 ">
+                                            <div className="flex gap-1 w-full mt-2 mb-3">
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  Start Time
+                                                </label>
+                                                <Select
+                                                  value={startTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setStartTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Mulai
+                                                      </SelectLabel>
+                                                      {generatedTimes.map(
+                                                        (time, index) => (
+                                                          <SelectItem
+                                                            key={index}
+                                                            value={time}
+                                                          >
+                                                            {time}
+                                                          </SelectItem>
+                                                        ),
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <div className="flex flex-col gap-2 w-full flex-1">
+                                                <label
+                                                  htmlFor="nama"
+                                                  className="text-sm"
+                                                >
+                                                  End Time
+                                                </label>
+                                                <Select
+                                                  value={endTimeReservasi}
+                                                  onValueChange={(value) =>
+                                                    setEndTimeReservasi(value)
+                                                  }
+                                                  required
+                                                  className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg !px-3 !py-4 "
+                                                >
+                                                  <SelectTrigger className="py-5 px-3 text-sm">
+                                                    <SelectValue
+                                                      className="text-base"
+                                                      placeholder="00.00"
+                                                    />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    <SelectGroup>
+                                                      <SelectLabel className="text-sm">
+                                                        Pilih Waktu Berakhir
+                                                      </SelectLabel>
+                                                      {startTimeReservasi !=
+                                                        '' &&
+                                                      timeArray.length != 0 ? (
+                                                        timeArray.map(
+                                                          (time, index) => {
+                                                            const isDisabled = disableTimes.includes(
+                                                              time,
+                                                            )
+
+                                                            return (
+                                                              <SelectItem
+                                                                key={index}
+                                                                value={time}
+                                                                className={
+                                                                  'text-sm'
+                                                                }
+                                                                disabled={
+                                                                  isDisabled
+                                                                }
+                                                              >
+                                                                {time}
+                                                              </SelectItem>
+                                                            )
+                                                          },
+                                                        )
+                                                      ) : (
+                                                        <SelectItem
+                                                          value={'00.00'}
+                                                        >
+                                                          <p className="text-gray-500">
+                                                            Waktu yang kamu
+                                                            pilih <br />
+                                                            sudah terisi.
+                                                            Silakan <br />
+                                                            pilih waktu bermain{' '}
+                                                            <br />
+                                                            di jam yang lain
+                                                          </p>
+                                                        </SelectItem>
+                                                      )}
+                                                    </SelectGroup>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            </div>
+                                          </Fade>
+
+                                          <DrawerFooter className="pt-2">
+                                            <div className="flex flex-col gap-2 px-2 mt-2">
+                                              <DrawerClose asChild>
+                                                <Button
+                                                  variant="outline"
+                                                  className={`bg-orange text-white border-orange py-5`}
+                                                >
+                                                  Continue
+                                                </Button>
+                                              </DrawerClose>
+                                            </div>
+                                          </DrawerFooter>
+                                        </DrawerContent>
+                                      </Drawer>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Fade>
+                  </Fade>
 
-                <Fade delay={7} duration={1300}>
-                  <div className="flex flex-row gap-2 items-center justify-center mb-8">
-                    <div className="flex gap-1 items-center">
-                      <div className="w-4 h-4 border border-green-500 bg-green-500 bg-opacity-25 rounded-sm"></div>
-                      <p className="text-xs text-black">selected</p>
-                    </div>
-                    <div className="flex gap-1 items-center">
-                      <div className="w-4 h-4 border border-yellow-500 bg-yellow-500 bg-opacity-25 rounded-sm"></div>
-                      <p className="text-xs text-black">in hold</p>
-                    </div>
-                    <div className="flex gap-1 items-center">
-                      <div className="w-4 h-4 border border-red-500 bg-red-500 bg-opacity-25 rounded-sm"></div>
-                      <p className="text-xs text-black">reserved</p>
-                    </div>
-                    <div className="flex gap-1 items-center">
-                      <div className="w-4 h-4 border border-gray-500 bg-gray-500 bg-opacity-25 rounded-sm"></div>
-                      <p className="text-xs text-black">available</p>
-                    </div>
-                  </div>
-                </Fade>
-              </div>
-            </>
+                  <ReservationLegend delay={5} duration={1000} />
+                </>
+              )}
+            </div>
           ) : (
             <>
               <div
@@ -4010,60 +4016,292 @@ export default function Reservation() {
             </div>
           )}
 
-          <Dialog open={open}>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
-                  <BiMoney className="w-10 text-3xl" />
-                  <div className="flex flex-col gap-1">
-                    <DialogTitle>Cash Payment Reservation</DialogTitle>
-                  </div>
-                </div>
-              </DialogHeader>
-              <div className="py-2 text-gray-600">
-                Pastikan customer telah membayar kepada kasir dengan nominal
-                sebesar{' '}
-                <span className="font-bold text-orange text-lg">{`IDR ${
-                  selectedCustomPrices != null
-                    ? totalTime * selectedCustomPrices
-                    : totalTime * parseInt(selectedPriceToday)
-                }`}</span>{' '}
-                untuk waktu{' '}
-                <span className=" font-semibold">
-                  permainan {`${totalTime}`} jam di{' '}
-                  {`${namaPosisiReservasi} posisi ${posisiReservasi}`}
-                </span>
-              </div>
-              <input
-                type="text"
-                value={discountPrice}
-                onChange={(e) => setDiscountPrice(e.target.value)}
-                name="nama"
-                id="nama"
-                placeholder="Masukkan Harga Setelah Discount"
-                className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange   "
-              />
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  onClick={() => handleCashPaymentConfirmation()}
-                  className="bg-orange hover:bg-orange"
-                >
-                  Pay
-                </Button>
-              </DialogFooter>
-
-              <DialogClose
-                onClick={() => setOpen(!open)}
-                className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-              >
-                <Cross2Icon className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </DialogClose>
-            </DialogContent>
-          </Dialog>
+          <CashPaymentDialog
+            open={open}
+            setOpen={setOpen}
+            selectedCustomPrices={selectedCustomPrices}
+            totalTime={totalTime}
+            selectedPriceToday={selectedPriceToday}
+            namaPosisiReservasi={namaPosisiReservasi}
+            posisiReservasi={posisiReservasi}
+            discountPrice={discountPrice}
+            setDiscountPrice={setDiscountPrice}
+            handleCashPaymentConfirmation={handleCashPaymentConfirmation}
+          />
         </section>
       )}
     </>
+  )
+}
+
+const UserOptions = ({ selected, onChange }) => {
+  return (
+    <div className="w-fit py-5 text-black bg-white rounded-lg flex flex-row gap-3 items-center">
+      <button
+        onClick={() => onChange('guest')}
+        className={`px-6 py-2 rounded-lg font-medium transition-all ${
+          selected === 'guest'
+            ? 'bg-orange text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        Guest
+      </button>
+      <button
+        onClick={() => onChange('membership')}
+        className={`px-6 py-2 rounded-lg font-medium transition-all ${
+          selected === 'membership'
+            ? 'bg-orange text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        Membership
+      </button>
+    </div>
+  )
+}
+const MemberSelector = ({ members, onSelect, selectedId }) => {
+  const [search, setSearch] = React.useState('')
+  const [isOpen, setIsOpen] = React.useState(!selectedId)
+
+  const selectedMember = members.find((m) => m.id === selectedId)
+
+  const filteredMembers = members.filter(
+    (member) =>
+      member.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+      member.phone_number?.includes(search),
+  )
+
+  const handleSelect = (member) => {
+    onSelect(member)
+    setIsOpen(false)
+    setSearch('')
+  }
+
+  const handleGanti = () => {
+    onSelect({ id: '', full_name: '', phone_number: '' }) // Clear selection
+    setIsOpen(true)
+  }
+
+  if (selectedMember && !isOpen) {
+    return (
+      <div className="w-full bg-gradient-to-br from-orange-50 to-orange-50 rounded-xl p-6 border-2 border-orange-200 shadow-sm">
+        <div className="flex justify-between items-start">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-orange rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+              {selectedMember.full_name?.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 text-lg">
+                {selectedMember.full_name}
+              </h3>
+              <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                {selectedMember.phone_number}
+              </p>
+              {selectedMember.username && (
+                <p className="text-xs text-gray-500 mt-1">
+                  @{selectedMember.username}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={handleGanti}
+            className="px-4 py-2 bg-white text-orange rounded-lg font-medium hover:bg-orange/50 transition-all shadow-sm border border-orange-200"
+          >
+            Ganti
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full bg-white rounded-xl shadow-lg border border-gray-200">
+      <div className="p-4 border-b border-gray-200">
+        <div className="relative">
+          <svg
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            type="text"
+            placeholder="Cari nama atau nomor..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <div className="max-h-96 overflow-y-auto p-2">
+        {filteredMembers.length === 0 ? (
+          <div className="text-center py-12">
+            <svg
+              className="w-16 h-16 text-gray-300 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            <p className="text-gray-500 font-medium">Tidak ada data</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredMembers.map((member) => (
+              <div
+                key={member.id}
+                onClick={() => handleSelect(member)}
+                className="group p-4 border-2 border-transparent rounded-xl cursor-pointer transition-all hover:border-orange hover:bg-orange-50 hover:shadow-md"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange to-orange rounded-full flex items-center justify-center text-white font-semibold shadow-sm group-hover:scale-110 transition-transform">
+                    {member.full_name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 group-hover:text-orange transition-colors">
+                      {member.full_name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-0.5">
+                      {member.phone_number}
+                    </p>
+                    {member.username && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        @{member.username}
+                      </p>
+                    )}
+                  </div>
+                  <svg
+                    className="w-5 h-5 text-gray-400 group-hover:text-orange transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ReservationLegend({ delay = 7, duration = 1300 }) {
+  const legends = [
+    { color: 'green', label: 'selected' },
+    { color: 'yellow', label: 'in hold' },
+    { color: 'red', label: 'reserved' },
+    { color: 'gray', label: 'available' },
+  ]
+
+  return (
+    <Fade delay={delay} duration={duration}>
+      <div className="flex flex-row gap-2 items-center justify-center mb-8">
+        {legends.map((legend, index) => (
+          <div key={index} className="flex gap-1 items-center">
+            <div
+              className={`w-4 h-4 border border-${legend.color}-500 bg-${legend.color}-500 bg-opacity-25 rounded-sm`}
+            ></div>
+            <p className="text-xs text-black">{legend.label}</p>
+          </div>
+        ))}
+      </div>
+    </Fade>
+  )
+}
+
+function CashPaymentDialog({
+  open,
+  setOpen,
+  selectedCustomPrices,
+  totalTime,
+  selectedPriceToday,
+  namaPosisiReservasi,
+  posisiReservasi,
+  discountPrice,
+  setDiscountPrice,
+  handleCashPaymentConfirmation,
+}) {
+  const totalPrice =
+    selectedCustomPrices != null
+      ? totalTime * selectedCustomPrices
+      : totalTime * parseInt(selectedPriceToday)
+
+  return (
+    <Dialog open={open}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <div className="flex gap-2 items-center border-b border-b-slate-300 pb-3">
+            <BiMoney className="w-10 text-3xl" />
+            <div className="flex flex-col gap-1">
+              <DialogTitle>Cash Payment Reservation</DialogTitle>
+            </div>
+          </div>
+        </DialogHeader>
+        <div className="py-2 text-gray-600">
+          Pastikan customer telah membayar kepada kasir dengan nominal sebesar{' '}
+          <span className="font-bold text-orange text-lg">
+            IDR {totalPrice}
+          </span>{' '}
+          untuk waktu permainan{' '}
+          <span className="font-semibold">
+            {totalTime} jam di {namaPosisiReservasi} posisi {posisiReservasi}
+          </span>
+        </div>
+        <input
+          type="text"
+          value={discountPrice}
+          onChange={(e) => setDiscountPrice(e.target.value)}
+          placeholder="Masukkan Harga Setelah Discount"
+          className="border border-border duration-500 bg-transparent text-black placeholder:text-gray-300 rounded-lg px-3 py-2 active:border-orange focus:border-orange outline-none focus:outline-orange"
+        />
+        <DialogFooter>
+          <Button
+            type="submit"
+            onClick={handleCashPaymentConfirmation}
+            className="bg-orange hover:bg-orange"
+          >
+            Pay
+          </Button>
+        </DialogFooter>
+        <DialogClose
+          onClick={() => setOpen(!open)}
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+        >
+          <Cross2Icon className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogClose>
+      </DialogContent>
+    </Dialog>
   )
 }

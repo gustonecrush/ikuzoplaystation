@@ -93,22 +93,32 @@ function MembershipCustomers() {
     const phoneNumber = row.getValue('phone_number')?.toString() || ''
     const searchValue = filterValue.toLowerCase()
 
-    // Validasi format nomor Indonesia
-    const isValidIndonesianPhone = (phone) => {
-      // Harus dimulai dengan 62 atau 08, dan minimal 10 digit
-      return (
-        (phone.startsWith('62') && phone.length >= 11) ||
-        (phone.startsWith('08') && phone.length >= 10)
-      )
+    // Jika tidak ada search, tampilkan semua
+    if (!searchValue) return true
+
+    // Normalize nomor telepon ke format 62xxx
+    const normalizePhone = (phone) => {
+      if (!phone) return ''
+      phone = phone.replace(/\D/g, '')
+      if (phone.startsWith('0')) {
+        return '62' + phone.substring(1)
+      }
+      if (phone.startsWith('62')) {
+        return phone
+      }
+      return phone
     }
 
-    // Filter nomor tidak valid
-    if (phoneNumber && !isValidIndonesianPhone(phoneNumber)) {
-      return false
-    }
+    const normalizedPhone = normalizePhone(phoneNumber)
+    const normalizedSearch = normalizePhone(searchValue)
 
-    // Search di username atau phone_number
-    return username.includes(searchValue) || phoneNumber.includes(searchValue)
+    // Search di username ATAU phone_number
+    const matchUsername = username.includes(searchValue)
+    const matchPhone =
+      normalizedPhone.includes(normalizedSearch) ||
+      phoneNumber.includes(searchValue)
+
+    return matchUsername || matchPhone
   }
 
   // Columns Definition
@@ -311,6 +321,7 @@ function MembershipCustomers() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: customGlobalFilterFn,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
@@ -320,6 +331,7 @@ function MembershipCustomers() {
       rowSelection,
       globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
   })
 
   // API Functions
