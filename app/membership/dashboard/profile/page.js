@@ -66,7 +66,7 @@ export default function EditProfilePage() {
       })
 
       setEditing(false)
-      fetchProfile() // refresh data
+      fetchProfile()
     } catch (err) {
       Toast.fire({
         icon: 'error',
@@ -78,145 +78,146 @@ export default function EditProfilePage() {
   if (!user) return <LoaderHome />
 
   return (
-    <section className="max-w-xl mx-auto py-12 px-6 font-plusSansJakarta">
-      <h1 className="text-3xl font-bold mb-6 text-[#FF6200] text-center">
-        Profil Anggota
-      </h1>
+    <section className="min-h-screen py-12 px-6 font-plusSansJakarta bg-gradient-to-br from-orange-500 via-[#FF6200] to-orange-700">
+      <div className="max-w-xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8 text-white text-center drop-shadow-lg">
+          Profil Anggota
+        </h1>
 
-      {!editing ? (
-        <div className="space-y-4 text-sm">
-          <p>
-            <strong>Nama Lengkap:</strong> {user.full_name}
-          </p>
-          <p>
-            <strong>Username:</strong> {user.username}
-          </p>
-          <p>
-            <strong>Nomor Telepon:</strong> {user.phone_number}
-          </p>
-          <p>
-            <strong>Nomor WhatsApp:</strong> {user.whatsapp_number}
-          </p>
-          <p>
-            <strong>Tanggal Lahir:</strong> {user.birth_date}
-          </p>
-          <p>
-            <strong>Sumber Info:</strong> {user.awareness_source}
-          </p>
-          <button
-            onClick={() => setEditing(true)}
-            className="mt-6 bg-[#FF6200] hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-full"
-          >
-            Edit Profil
-          </button>{' '}
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
+          {!editing ? (
+            <div className="space-y-4 text-white">
+              <div className="p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                <strong className="text-orange-200">Nama Lengkap:</strong>
+                <p className="mt-1">{user.full_name}</p>
+              </div>
+              <div className="p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                <strong className="text-orange-200">Username:</strong>
+                <p className="mt-1">{user.username}</p>
+              </div>
+              <div className="p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                <strong className="text-orange-200">Nomor Telepon:</strong>
+                <p className="mt-1">{user.phone_number}</p>
+              </div>
+              <div className="p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                <strong className="text-orange-200">Nomor WhatsApp:</strong>
+                <p className="mt-1">{user.whatsapp_number}</p>
+              </div>
+              <div className="p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                <strong className="text-orange-200">Tanggal Lahir:</strong>
+                <p className="mt-1">{user.birth_date}</p>
+              </div>
+              <div className="p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                <strong className="text-orange-200">Sumber Info:</strong>
+                <p className="mt-1">{user.awareness_source}</p>
+              </div>
+              <button
+                onClick={() => setEditing(true)}
+                className="mt-6 w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-4 py-3 rounded-xl border border-white/30 transition-all duration-300 hover:scale-105"
+              >
+                Edit Profil
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white/90">
+                  Nama Lengkap
+                </label>
+                <input
+                  type="text"
+                  value={form.full_name}
+                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  className="w-full rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/25 transition-all"
+                  placeholder="Masukkan nama lengkap"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white/90">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  className="w-full rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/25 transition-all"
+                  placeholder="Masukkan username"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white/90">
+                  Nomor Telepon
+                </label>
+                <input
+                  type="text"
+                  value={form.phone_number}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/\D/g, '')
+                    if (val && !val.startsWith('0')) val = '0' + val
+                    setForm({ ...form, phone_number: val })
+                  }}
+                  className="w-full rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/25 transition-all"
+                  placeholder="08xxxxxxxxxx"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white/90">
+                  Nomor WhatsApp
+                </label>
+                <input
+                  type="text"
+                  value={form.whatsapp_number}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/\D/g, '')
+                    if (val && !val.startsWith('0')) val = '0' + val
+                    setForm({ ...form, whatsapp_number: val })
+                  }}
+                  className="w-full rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/25 transition-all"
+                  placeholder="08xxxxxxxxxx"
+                  required
+                />
+              </div>
+
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white/90">
+                  Dari Mana Tahu IKUZO
+                </label>
+                <input
+                  type="text"
+                  value={form.awareness_source}
+                  onChange={(e) => setForm({ ...form, awareness_source: e.target.value })}
+                  className="w-full rounded-xl px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/25 transition-all"
+                  placeholder="Instagram, Teman, dll"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditing(false)}
+                  className="flex-1 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-xl border border-white/30 transition-all duration-300"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-white/30 hover:bg-white/40 backdrop-blur-sm text-white font-semibold px-6 py-3 rounded-xl border border-white/40 transition-all duration-300 hover:scale-105"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          )}
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Full Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Nama Lengkap
-            </label>
-            <input
-              type="text"
-              value={form.full_name}
-              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="w-full border rounded-md px-4 py-2"
-              required
-            />
-          </div>
-
-          {/* Username */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Username</label>
-            <input
-              type="text"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full border rounded-md px-4 py-2"
-              required
-            />
-          </div>
-
-          {/* Phone Number */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Nomor Telepon
-            </label>
-            <input
-              type="text"
-              value={form.phone_number}
-              onChange={(e) =>
-                setForm({ ...form, phone_number: e.target.value })
-              }
-              className="w-full border rounded-md px-4 py-2"
-              required
-            />
-          </div>
-
-          {/* WhatsApp Number */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Nomor WhatsApp
-            </label>
-            <input
-              type="text"
-              value={form.whatsapp_number}
-              onChange={(e) =>
-                setForm({ ...form, whatsapp_number: e.target.value })
-              }
-              className="w-full border rounded-md px-4 py-2"
-              required
-            />
-          </div>
-
-          {/* Birth Date */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Tanggal Lahir
-            </label>
-            <input
-              type="date"
-              value={form.birth_date}
-              onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-              className="w-full border rounded-md px-4 py-2"
-              required
-            />
-          </div>
-
-          {/* Awareness Source */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Dari Mana Tahu IKUZO
-            </label>
-            <input
-              type="text"
-              value={form.awareness_source}
-              onChange={(e) =>
-                setForm({ ...form, awareness_source: e.target.value })
-              }
-              className="w-full border rounded-md px-4 py-2"
-              required
-            />
-          </div>
-
-          <div className="flex justify-between pt-4">
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="border px-4 py-2 rounded-md text-sm"
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              className="bg-[#FF6200] text-white px-6 py-2 rounded-md text-sm hover:bg-orange-600"
-            >
-              Simpan Perubahan
-            </button>
-          </div>
-        </form>
-      )}
+      </div>
     </section>
   )
 }

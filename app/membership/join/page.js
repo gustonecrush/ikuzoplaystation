@@ -13,8 +13,8 @@ import Navbar from '@/app/components/Navbar'
 export default function JoinMembershipPage() {
   const [form, setForm] = useState({
     full_name: '',
-    phone_number: '62',
-    whatsapp_number: '62',
+    phone_number: '08',
+    whatsapp_number: '08',
     username: '',
     birth_date: '',
     password: '',
@@ -126,14 +126,17 @@ export default function JoinMembershipPage() {
                 value={form.phone_number}
                 onChange={(e) => {
                   let val = e.target.value.replace(/\D/g, '')
-                  if (!val.startsWith('62')) val = '62' + val
+                  // Pastikan selalu diawali 0
+                  if (val && !val.startsWith('08')) {
+                    val = '08' + val
+                  }
                   setForm((prev) => ({
                     ...prev,
                     phone_number: val,
                     ...(sameAsPhone ? { whatsapp_number: val } : {}),
                   }))
                 }}
-                placeholder="628xxxxxxxxxx"
+                placeholder="08xxxxxxxxxx"
                 className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white focus:outline-none focus:ring-2 focus:ring-[#FF6200]"
               />
             </div>
@@ -152,7 +155,7 @@ export default function JoinMembershipPage() {
                     whatsapp_number: e.target.value.replace(/\D/g, ''),
                   })
                 }
-                placeholder="628xxxxxxxxxx"
+                placeholder="08xxxxxxxxxx"
                 disabled={sameAsPhone}
                 className="w-full rounded-md px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 placeholder-white/70 text-white disabled:opacity-70"
               />
