@@ -177,7 +177,7 @@ function page() {
   )
   const [rowSelection, setRowSelection] = React.useState({})
   // function to handle delete
-  const handleDeleteFacilityContent = async (id) => {
+  const handleDeleteReservation = async (id) => {
     try {
       const response = await axios.delete(`${baseUrl}/reservations/${id}`)
       if (response.status == 200) {
