@@ -74,6 +74,7 @@ import getDocument from '@/firebase/firestore/getData'
 import LoaderHome from '@/app/components/LoaderHome'
 import { capitalizeAndFormat, getFacilityId } from '@/utils/text'
 import { useFetchPositions } from '@/hooks/useFetchPositions'
+import { apiBaseUrl } from '@/utils/urls'
 
 export default function Reservation() {
   const [drawerContent, setDrawerContent] = useState('default')
