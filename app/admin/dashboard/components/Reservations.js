@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/dialog-custom'
 import {
   calculateTimeDifference,
-  convertToDate,
   convertToStandardTime,
   extractHour,
   formatDate,
@@ -67,11 +66,10 @@ import Checkout from '@/app/components/Checkout'
 import Loading from '@/app/reservation/loading'
 import { BiMoney } from 'react-icons/bi'
 import { Cross2Icon } from '@radix-ui/react-icons'
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Toast from '@/app/components/Toast'
 import { pricePackageDetermination } from '@/utils/price'
 import { RESERVATION_PLACE } from '@/constans/reservations'
-import { IoMdBook } from 'react-icons/io'
 import getDocument from '@/firebase/firestore/getData'
 import LoaderHome from '@/app/components/LoaderHome'
 import { capitalizeAndFormat, getFacilityId } from '@/utils/text'
@@ -107,22 +105,17 @@ export default function Reservation() {
       const response = await axios.get(
         `${baseUrl}/reservations?reserve_date=${date}`,
       )
-      console.log(`${baseUrl}/reservations?reserve_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
 
         setReservesPosition(jsonData)
-        console.log(response.data)
 
         setIsLoading(false)
       } else {
         setIsLoading(false)
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
-
       setIsLoading(false)
     }
   }
@@ -134,16 +127,11 @@ export default function Reservation() {
       const response = await axios.get(`${baseUrl}/dates`)
       if (response.status == 200) {
         const jsonData = await response.data
-
         setDateClose(jsonData.data)
-
-        console.log({ customTimeSelected })
       } else {
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
       setIsLoading(false)
     }
   }
@@ -153,7 +141,6 @@ export default function Reservation() {
       const response = await axios.get(
         `${apiBaseUrl}/reservations?reserve_date=${date}&position=${position}&status=settlement&pending=pending`,
       )
-      console.log('RESERVATION TEST', response)
 
       if (response.status === 200) {
         setReserves(response.data)
@@ -179,8 +166,6 @@ export default function Reservation() {
             }
           }
         })
-
-        console.log('BOOKED SLOTS:', slots)
         setBookedSlots(slots)
         setIsLoading(false)
       }
@@ -206,7 +191,6 @@ export default function Reservation() {
   const getTimeSelected = async (date) => {
     try {
       const response = await axios.get(`${baseUrl}/times?selected_date=${date}`)
-      console.log(`${baseUrl}/times?selected_date=${date}`)
       if (response.status == 200) {
         const jsonData = await response.data
 
@@ -215,14 +199,10 @@ export default function Reservation() {
         } else {
           setCustomTimeSelected([])
         }
-
-        console.log({ customTimeSelected })
       } else {
-        console.log({ response })
         throw new Error('Failed to fetch data')
       }
     } catch (error) {
-      console.log(error)
       setIsLoading(false)
     }
   }
@@ -307,11 +287,8 @@ export default function Reservation() {
           setSelectedPriceToday('')
           setContinueTapped(!continueTapped)
           setDiscountPrice('')
-          console.log(response)
         })
-        .catch((error) => {
-          console.log(error)
-        })
+        .catch((error) => {})
     } catch (error) {
       throw new Error(error)
     }
@@ -343,7 +320,6 @@ export default function Reservation() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/reservations`,
         reserveData,
       )
-      console.log(reserveResponse.data)
       setOpen(false)
       router.push(
         `/payment/success/invoice?order_id=${idReservasi}&status_code=200&transaction_status=settlement&cash=true`,
@@ -379,9 +355,7 @@ export default function Reservation() {
   }
 
   const fetchingAvailableReservation = async (date, position) => {
-    console.log('fetching')
     getAllReservation(date, position)
-    console.log('fetching', reserves)
   }
 
   const [familyVIPRoomData, setFamilyVIPRoomData] = React.useState(null)
@@ -447,7 +421,6 @@ export default function Reservation() {
       'squad-open-space': squadOpenSpaceData['custom-prices'],
     }
 
-    console.log('GET PRICE DATA CUSTOM', facilityPriceMap[facilityId] || [])
     getPriceByDate(facilityPriceMap[facilityId] || [], selectedDate)
     return facilityPriceMap[facilityId] || []
   }
@@ -470,18 +443,10 @@ export default function Reservation() {
         getDocument('space-setting-times', 'regular-space-doc'), // Index 2
       ])
 
-      console.log('FETCHED RESPONSES:', responses)
-
-      // Extract data from responses
       const privateData = responses[0]?.data
       const premiumData = responses[1]?.data
       const regularData = responses[2]?.data
 
-      console.log('Private Data:', privateData)
-      console.log('Premium Data:', premiumData)
-      console.log('Regular Data:', regularData)
-
-      // Set state with extracted values
       setPrivateSpaceData(privateData)
       setPremiumSpaceData(premiumData)
       setRegularSpaceData(regularData)
@@ -502,14 +467,9 @@ export default function Reservation() {
         ? premiumSpaceData.times
         : []
 
-    console.log({ value, today, times })
-
-    // Find time-set where today's day exists
     const foundItem = times.filter((item) =>
       item['time-day'].split(',').includes(today),
     )
-
-    console.log({ foundItem })
 
     return foundItem.length === 1 ? foundItem[0]['time-set'] : null
   }
@@ -536,14 +496,9 @@ export default function Reservation() {
         ? squadOpenSpaceData.prices
         : []
 
-    console.log({ value, today, prices })
-
-    // Find time-set where today's day exists
     const foundPrice = prices.filter((item) =>
       item['day'].split(',').includes(today),
     )
-
-    console.log({ foundPrice })
 
     foundPrice.length === 1
       ? setSelectedPriceToday(foundPrice[0]['price'])
@@ -566,14 +521,9 @@ export default function Reservation() {
         ? premiumSpaceData.times
         : []
 
-    console.log({ value, today, times })
-
-    // Find time-set where today's day exists
     const foundItem = times.filter((item) =>
       item['time-day'].split(',').includes(today),
     )
-
-    console.log({ foundItem })
 
     return foundItem.length === 1 ? foundItem[0]['time-set'] : null
   }
@@ -628,17 +578,12 @@ export default function Reservation() {
           const jsonData = await response.data
 
           setReservesPosition(jsonData)
-          console.log(response.data)
-
           setIsLoading(false)
         } else {
           setIsLoading(false)
-          console.log({ response })
           throw new Error('Failed to fetch data')
         }
       } catch (error) {
-        console.log(error)
-
         setIsLoading(false)
       }
     }
@@ -713,16 +658,13 @@ export default function Reservation() {
   )
 
   const fallbackPrice = parseInt(selectedPriceToday)
-  console.log({ fallbackPrice })
   const actualPrice = fallbackPrice
-  console.log({ actualPrice })
 
   const finalPrice = pricePackageDetermination(
     posisiReservasi,
     totalTime,
     actualPrice,
   )
-  console.log({ finalPrice })
 
   const safePrice = isNaN(finalPrice) ? 0 : finalPrice + 4000
 
