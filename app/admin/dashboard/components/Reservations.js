@@ -314,6 +314,9 @@ export default function Reservation() {
             ? totalTime * selectedCustomPrices
             : totalTime * parseInt(selectedPriceToday),
         position: posisiReservasi,
+        is_membership:
+          idMembership != '' || idMembership != null ? '' : 'Actvie',
+        id_membership: idMembership,
       }
 
       const reserveResponse = await axios.post(
@@ -3914,7 +3917,7 @@ export default function Reservation() {
               {selectedPay == 'non-cash' && (
                 <Checkout
                   id={idReservasi}
-                  idMembership={idMembership == '' ? idMembership : ''}
+                  idMembership={idMembership != '' ? idMembership : ''}
                   price={safePrice}
                   productName={`Reservation ${namaPosisiReservasi}`}
                   detailCustomer={{
