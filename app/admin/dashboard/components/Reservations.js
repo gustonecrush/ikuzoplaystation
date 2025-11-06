@@ -315,7 +315,7 @@ export default function Reservation() {
             : totalTime * parseInt(selectedPriceToday),
         position: posisiReservasi,
         is_membership:
-          idMembership != '' || idMembership != null ? '' : 'Actvie',
+          idMembership != '' || idMembership != null ? 'Active' : '',
         id_membership: idMembership,
       }
 
