@@ -3914,6 +3914,7 @@ export default function Reservation() {
               {selectedPay == 'non-cash' && (
                 <Checkout
                   id={idReservasi}
+                  idMembership={idMembership == '' ? idMembership : ''}
                   price={safePrice}
                   productName={`Reservation ${namaPosisiReservasi}`}
                   detailCustomer={{
