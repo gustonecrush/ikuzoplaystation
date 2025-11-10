@@ -57,6 +57,7 @@ import {
 
 import axios from 'axios'
 import { ChevronDown, Plus, Users } from 'lucide-react'
+import { apiBaseUrl } from '@/utils/urls'
 
 function MembershipCustomers() {
   const [data, setData] = React.useState([])
@@ -121,6 +122,25 @@ function MembershipCustomers() {
     return matchUsername || matchPhone
   }
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${apiBaseUrl}/customers/${selectedCustomer.id}`)
+      Toast.fire({
+        icon: 'success',
+        title: `Member berhasil dihapus!`,
+      })
+      setIsDeleteDialogOpen(false)
+      getAllDataMembershipCustomers()
+    } catch (error) {
+      Toast.fire({
+        icon: 'error',
+        title: `Member gagal dihapus!`,
+      })
+    }
+  }
+
   // Columns Definition
   const columns = [
     {
@@ -163,7 +183,6 @@ function MembershipCustomers() {
               <FaGift className="w-3 h-3 mr-1" />
               Benefits
             </Button>
-
             <Button
               variant="outline"
               size="sm"
@@ -176,7 +195,6 @@ function MembershipCustomers() {
               <FaClock className="w-3 h-3 mr-1" />
               Saved Times
             </Button>
-
             <Button
               variant="outline"
               size="sm"
@@ -188,6 +206,18 @@ function MembershipCustomers() {
             >
               <FaCalendarAlt className="w-3 h-3 mr-1" />
               Reservations
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-red-600 border-red-600 hover:bg-red-50"
+              onClick={() => {
+                setSelectedCustomer(customer)
+                setIsDeleteDialogOpen(true)
+              }}
+            >
+              <FaTrash className="w-3 h-3 mr-1" />
+              Delete
             </Button>
           </div>
         )
@@ -353,8 +383,6 @@ function MembershipCustomers() {
       setIsLoading(false)
     }
   }
-
-  console.log('ALL MEMBER', data)
 
   // Function untuk save benefits (single customer)
   const handleSaveBenefits = async () => {
@@ -790,12 +818,11 @@ function MembershipCustomers() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Saved Times Dialog */}
       <AlertDialog
         open={isSavedTimesDialogOpen}
         onOpenChange={setIsSavedTimesDialogOpen}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <FaClock className="w-5 h-5 text-green-600" />
@@ -805,15 +832,78 @@ function MembershipCustomers() {
               Saved times for {selectedCustomer?.full_name}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4">
-            <p>Saved times content goes here...</p>
+
+          <div className="py-4 max-h-96 overflow-y-auto space-y-3">
+            {selectedCustomer?.reservations?.map((reservation) => (
+              <div
+                key={reservation.id}
+                className="border rounded-lg p-4 bg-gray-50"
+              >
+                <p className="font-semibold text-sm mb-3 text-gray-700">
+                  Reservation #{reservation.id}
+                </p>
+
+                {reservation.saving_times?.length > 0 ? (
+                  <div className="space-y-2">
+                    {reservation.saving_times.map((time) => (
+                      <div
+                        key={time.id}
+                        className="flex items-center justify-between bg-white p-3 rounded-md border"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <p className="text-xs text-gray-500">Date</p>
+                            <p className="font-medium text-sm">
+                              {new Date(time.date_saving).toLocaleDateString(
+                                'id-ID',
+                                {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                },
+                              )}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">Time</p>
+                            <p className="font-medium text-sm">
+                              {time.start_time_saving} - {time.end_time_saving}
+                            </p>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            time.is_active === 'Active'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {time.is_active}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 text-center py-4">
+                    No saved times
+                  </p>
+                )}
+              </div>
+            ))}
+
+            {!selectedCustomer?.reservations?.length && (
+              <p className="text-sm text-gray-400 text-center py-8">
+                No reservations found
+              </p>
+            )}
           </div>
+
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Reservations Dialog */}
       <AlertDialog
         open={isReservationsDialogOpen}
@@ -934,7 +1024,7 @@ function MembershipCustomers() {
                     {reservation.saving_times?.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-gray-100">
                         <p className="text-xs font-semibold text-gray-700 mb-2">
-                          Modified Times:
+                          Saved Times:
                         </p>
                         <div className="space-y-1">
                           {reservation.saving_times.map((saveTime, idx) => (
@@ -995,18 +1085,44 @@ function MembershipCustomers() {
                 <span className="text-gray-600">
                   Total Spent:{' '}
                   <span className="font-semibold text-purple-600">
-                    IDR{' '}
                     {selectedCustomer.reservations
-                      .reduce((sum, r) => sum + (r.price || 0), 0)
-                      .toLocaleString('id-ID')}
+                      .reduce((sum, r) => sum + Number(r.price || 0), 0)
+                      .toLocaleString('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                      })}
                   </span>
                 </span>
               </div>
             </div>
           )}
-
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Customer</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete{' '}
+              <strong>{selectedCustomer?.full_name}</strong>? This action cannot
+              be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
