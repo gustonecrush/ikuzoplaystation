@@ -22,8 +22,8 @@ export default function MembershipFormRegistration({
 }) {
   const [form, setForm] = useState({
     full_name: '',
-    phone_number: '62',
-    whatsapp_number: '62',
+    phone_number: '',
+    whatsapp_number: '',
     username: '',
     birth_date: '',
     password: '',
@@ -125,8 +125,7 @@ export default function MembershipFormRegistration({
                   type="text"
                   value={form.phone_number}
                   onChange={(e) => {
-                    let val = e.target.value.replace(/\D/g, '')
-                    if (!val.startsWith('62')) val = '62' + val
+                    const val = e.target.value.replace(/\D/g, '')
                     setForm((prev) => ({
                       ...prev,
                       phone_number: val,
@@ -134,10 +133,9 @@ export default function MembershipFormRegistration({
                     }))
                   }}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange/20 focus:border-orange transition"
-                  placeholder="628xxxxxxxxxx"
+                  placeholder="08xxxxxxxxxx"
                 />
               </div>
-
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1.5 block">
                   Nomor WhatsApp
@@ -152,7 +150,7 @@ export default function MembershipFormRegistration({
                     })
                   }
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange/20 focus:border-orange transition disabled:bg-gray-50"
-                  placeholder="628xxxxxxxxxx"
+                  placeholder="08xxxxxxxxxx"
                   disabled={sameAsPhone}
                 />
               </div>
